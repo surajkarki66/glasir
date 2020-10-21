@@ -5,6 +5,7 @@ import compression from "compression";
 
 import client from "./index";
 import logger from "./utils/logger";
+import apiErrorHandler from "./error/api-error-handler";
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use(
     },
   })
 );
+app.use(apiErrorHandler);
 
 // Development
 if (process.env.NODE_ENV === "development") {
