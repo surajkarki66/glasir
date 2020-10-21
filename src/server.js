@@ -3,6 +3,8 @@ import express from "express";
 import morgan from "morgan";
 import compression from "compression";
 
+import client from "./index";
+
 const app = express();
 
 // Config .env
@@ -23,6 +25,16 @@ app.use(
     },
   })
 );
+
+// Database connection
+client
+  .then((client) => {
+    console.log("Database connected successfully.");
+  })
+  .catch((err) => {
+    console.log(err);
+    process.exit(1);
+  });
 
 // Development
 if (process.env.NODE_ENV === "development") {
