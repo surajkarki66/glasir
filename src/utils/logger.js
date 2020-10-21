@@ -3,7 +3,7 @@ import log4js from "log4js";
 // Logger configuration
 log4js.configure({
   appenders: {
-    fileAppender: { type: "file", filename: "./logs/data-validation.log" },
+    fileAppender: { type: "file", filename: "./logs/glasir.log" },
     console: { type: "console" },
   },
   categories: {
