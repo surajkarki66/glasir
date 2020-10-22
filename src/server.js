@@ -3,8 +3,6 @@ import express from "express";
 import morgan from "morgan";
 import compression from "compression";
 
-import client from "./index";
-import logger from "./utils/logger";
 import apiErrorHandler from "./error/api-error-handler";
 
 const app = express();
@@ -34,17 +32,4 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-const port = process.env.PORT || 8000;
-client
-  .then((client) => {
-    // inject db
-    logger.info("Database connected successfully.");
-  })
-  .catch((err) => {
-    logger.error(`Error connecting to the MongoDB URI: ${err.stack}`);
-    process.exit(1);
-  });
-
-app.listen(port, () => {
-  logger.info(`Listening on PORT ${port}.`);
-});
+export default app;
