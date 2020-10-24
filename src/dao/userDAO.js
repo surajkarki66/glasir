@@ -39,8 +39,9 @@ class UsersDAO {
 				password: password,
 				role: role,
 				isActive: isActive,
+				joined_date: new Date()
+
 			});
-			console.log(result)
 			const data = result.ops[0];
 
 			return {
@@ -54,6 +55,16 @@ class UsersDAO {
 			);
 			throw e;
 		}
+	}
+	static async getUserByEmail(email) {
+		return await UsersDAO.#users.findOne({
+			email: email
+		});
+	}
+	static async getUserByUsername(username) {
+		return await UsersDAO.#users.findOne({
+			username: username
+		});
 	}
 }
 

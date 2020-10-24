@@ -1,3 +1,5 @@
-import userDAO from "./userDAO";
+import usersDAO from "./userDAO";
 
-export { userDAO };
+export {
+	usersDAO
+};
