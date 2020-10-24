@@ -7,9 +7,9 @@ class UsersDAO {
 			return;
 		}
 		try {
-			UsersDAO.#users = await conn.db(process.env.NS).collection("users");
+			UsersDAO.#users = await conn.db(process.env.DB).collection("users");
 			logger.info(
-				`Connected to users collection of ${process.env.NS} database.`,
+				`Connected to users collection of ${process.env.DB} database.`,
 				"UsersDAO.injectDB()"
 			);
 		} catch (e) {
@@ -40,6 +40,7 @@ class UsersDAO {
 				role: role,
 				isActive: isActive,
 			});
+			console.log(result)
 			const data = result.ops[0];
 
 			return {

@@ -55,7 +55,9 @@ class User {
 }
 class UserController {
 	static async signup(req, res, next) {
-		//
+		return res.json({
+			success: true
+		})
 	}
 }
 

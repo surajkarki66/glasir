@@ -1,36 +1,36 @@
 {
-  "name": "Project-Glasir",
-  "version": "1.0.0",
-  "description": "Outsourcing Nepal",
-  "main": "index.js",
-  "repository": "https://github.com/surajkarki66/Project-Glasir.git",
-  "author": "Suraj Karki <suraj.karki500@gmail.com>",
-  "license": "MIT",
-  "private": false,
-  "scripts": {
-    "pre-run": "mkdir -p ./logs",
-    "dev": "yarn run pre-run && nodemon --exec babel-node src/index.js",
-  },
-  "devDependencies": {
-    "@babel/core": "^7.12.3",
-    "@babel/node": "^7.12.1",
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/preset-env": "^7.12.1",
-    "morgan": "^1.10.0",
-    "nodemon": "^2.0.6"
-  },
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "compression": "^1.7.4",
-    "cookie-parser": "^1.4.5",
-    "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "express-jwt": "^6.0.0",
-    "joi": "^17.2.1",
-    "jsonwebtoken": "^8.5.1",
-    "log4js": "^6.3.0",
-    "mongodb": "^3.6.2",
-    "multer": "^1.4.2"
-  }
+	"name": "Project-Glasir",
+	"version": "1.0.0",
+	"description": "Outsourcing Nepal",
+	"main": "index.js",
+	"repository": "https://github.com/surajkarki66/Project-Glasir.git",
+	"author": "Suraj Karki <suraj.karki500@gmail.com>",
+	"license": "MIT",
+	"private": false,
+	"scripts": {
+		"pre-run": "mkdir -p ./logs",
+		"dev": "yarn run pre-run && nodemon --exec babel-node src/index.js"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.12.3",
+		"@babel/node": "^7.12.1",
+		"@babel/plugin-proposal-class-properties": "^7.12.1",
+		"@babel/preset-env": "^7.12.1",
+		"morgan": "^1.10.0",
+		"nodemon": "^2.0.6"
+	},
+	"dependencies": {
+		"bcryptjs": "^2.4.3",
+		"compression": "^1.7.4",
+		"cookie-parser": "^1.4.5",
+		"cors": "^2.8.5",
+		"dotenv": "^8.2.0",
+		"express": "^4.17.1",
+		"express-jwt": "^6.0.0",
+		"joi": "^17.2.1",
+		"jsonwebtoken": "^8.5.1",
+		"log4js": "^6.3.0",
+		"mongodb": "^3.6.2",
+		"multer": "^1.4.2"
+	}
 }
