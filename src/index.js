@@ -4,6 +4,7 @@ import { MongoClient } from "mongodb";
 // Local Module
 import logger from "./utils/logger";
 import app from "./server";
+import { userDAO } from "./dao/index.js";
 
 // .env config
 dotenv.config();
@@ -16,6 +17,7 @@ MongoClient.connect(process.env.MONGO_URI, {
 })
   .then((client) => {
     // inject db
+    userDAO.injectDB(client);
     logger.info("Database connected successfully.");
 
     // Node Server

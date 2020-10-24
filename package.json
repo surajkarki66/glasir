@@ -9,11 +9,12 @@
   "private": false,
   "scripts": {
     "pre-run": "mkdir -p ./logs",
-    "dev": "yarn run pre-run && nodemon --exec babel-node src/index.js"
+    "dev": "yarn run pre-run && nodemon --exec babel-node src/index.js",
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
     "@babel/node": "^7.12.1",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
     "@babel/preset-env": "^7.12.1",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.6"
