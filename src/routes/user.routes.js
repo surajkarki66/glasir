@@ -5,10 +5,15 @@ import {
 import {
 	UserController
 } from "../controllers/index";
+import {
+	userSchema
+} from "../helpers/index";
+import dataValidation from "../middlewares/data-validation";
 
 const router = new Router();
 router
 	.route("/signup")
+	.post(dataValidation(userSchema.userSIGNUP, "body"))
 	.post(UserController.signup);
 
 export default router;
