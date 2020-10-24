@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
 import compression from "compression";
+import jwt from "express-jwt";
 
 import apiErrorHandler from "./error/api-error-handler";
 
@@ -26,6 +27,7 @@ app.use(
   })
 );
 app.use(apiErrorHandler);
+app.use(jwt({ secret: process.env.JWT_SECRET, algorithms: ["HS256"] }));
 
 // Development
 if (process.env.NODE_ENV === "development") {
