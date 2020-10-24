@@ -3,6 +3,7 @@ import express from "express";
 import morgan from "morgan";
 import compression from "compression";
 import jwt from "express-jwt";
+import cookieParser from "cookie-parser";
 
 import apiErrorHandler from "./error/api-error-handler";
 
@@ -14,6 +15,7 @@ dotenv.config();
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 app.use(
   compression({
     level: 6,
