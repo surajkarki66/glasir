@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-
 class User {
 	constructor({
 		_id,
@@ -28,12 +27,6 @@ class User {
 			isActive: this.isActive
 		};
 	}
-	static async hashPassword(password) {
-		return await bcrypt.hash(password, 10);
-	}
-	async comparePassword(plainText) {
-		return await bcrypt.compare(plainText, this.password);
-	}
 	encoded(exp_date) {
 		return jwt.sign({
 				exp: exp_date,
@@ -42,6 +35,13 @@ class User {
 			process.env.SECRET_KEY
 		);
 	}
+	async comparePassword(plainText) {
+		return await bcrypt.compare(plainText, this.password);
+	}
+	static async hashPassword(password) {
+		return await bcrypt.hash(password, 10);
+	}
+
 	static async decoded(userJwt) {
 		return jwt.verify(userJwt, process.env.SECRET_KEY, (error, res) => {
 			if (error) {
