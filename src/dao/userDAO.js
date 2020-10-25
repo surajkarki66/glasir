@@ -43,29 +43,26 @@ class UsersDAO {
         password: password,
         role: role,
         isActive: isActive,
-        joined_date: new Date(),
+        joinedDate: new Date(),
       });
-      if (data) {
+      if (result) {
         const data = result.ops[0];
-
         return {
           success: true,
           data: data,
           statusCode: 201,
         };
-      } else {
-        return {
-          success: false,
-          data: { message: "Signup failed." },
-          status: 404,
-        };
       }
     } catch (e) {
-      logger.error(
-        "Error occurred while adding new user: " + e.message,
-        "createUser()"
-      );
-      throw e;
+      if (String(e).startsWith("MongoError: E11000 duplicate key error")) {
+        return {
+          success: false,
+          error: "A user with the given email or username already exists.",
+          statusCode: 409,
+        };
+      }
+      logger.error(`Error occurred while adding new user, ${e}.`);
+      return { success: false, error: e, statusCode: 500 };
     }
   }
   static async getUsers({ page = 0, usersPerPage = 10 } = {}) {
@@ -77,7 +74,7 @@ class UsersDAO {
       logger.error(`Unable to issue find command, ${e.message}`);
       return {
         data: [],
-        success: true,
+        success: false,
         totalNumUsers: 0,
         statusCode: 404,
       };
@@ -113,23 +110,15 @@ class UsersDAO {
     });
   }
   static async getUserById(id) {
-    let cursor;
     try {
       const query = {
         _id: ObjectId(id),
       };
-      const sort = UsersDAO.#DEFAULT_SORT;
-      cursor = await UsersDAO.#users.find(query).sort(sort);
-    } catch (e) {
-      logger.error("Error occurred: " + e.message, "getUserById()");
-      throw e;
-    }
-    try {
-      const user = await cursor.toArray();
+      const user = await UsersDAO.#users.findOne(query);
       if (user) {
         return {
           success: true,
-          data: user[0],
+          data: user,
           statusCode: 200,
         };
       } else {
@@ -159,23 +148,31 @@ class UsersDAO {
           $set: updateObject,
         }
       );
-      if (result) {
+      if (result.modifiedCount === 1 && result.matchedCount === 1) {
         return {
+          success: true,
           data: {
-            success: true,
             message: "Updated successfully.",
           },
           statusCode: 201,
         };
-      } else {
+      }
+      if (result.matchedCount === 1) {
         return {
+          success: true,
           data: {
-            success: false,
-            message: "Updation unsuccessfull.",
+            message: "Updated already.",
           },
-          statusCode: 404,
+          statusCode: 201,
         };
       }
+      return {
+        success: false,
+        data: {
+          message: "No user exist with this userid.",
+        },
+        statusCode: 404,
+      };
     } catch (e) {
       logger.error(`Error occurred while updating user, ${e}`, "updateUser()");
       throw e;
@@ -186,12 +183,16 @@ class UsersDAO {
       await UsersDAO.#users.deleteOne({ _id: ObjectId(id) });
       if (!(await this.getUserById(id))) {
         return {
-          data: { success: true, message: "Deleted successfully." },
+          success: true,
+          data: { message: "Deleted successfully." },
           statusCode: 200,
         };
       } else {
         return {
-          data: { success: false, message: "Deletion unsuccessful" },
+          success: false,
+          data: {
+            message: "No user exist with this userid.",
+          },
           statusCode: 404,
         };
       }

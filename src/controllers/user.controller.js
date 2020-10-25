@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 import writeServerResponse from "../utils/utils";
 import ApiError from "../error/ApiError";
 import { usersDAO } from "../dao/index";
-import UsersDAO from "../dao/userDAO";
 
 class User {
   constructor({
@@ -70,7 +69,6 @@ class UserController {
       const email_result = usersDAO.getUserByEmail(email);
       const username_result = usersDAO.getUserByUsername(username);
       const result = await Promise.all([email_result, username_result]);
-
       if (result[0]) {
         next(ApiError.conflict("Email is already taken."));
         return;
@@ -84,39 +82,45 @@ class UserController {
           password: await User.hashPassword(userFromBody.password),
         };
         const insertResult = await usersDAO.createUser(userInfo);
-        const userFromDb = {
-          _id: insertResult.data._id,
-          isActive: insertResult.data.isActive,
-          joinedDate: insertResult.data.joined_date,
-        };
-        const user = new User(userFromDb);
-        const token = user.encoded(
-          Math.floor(Date.now() / 1000) + 60 * 60,
-          process.env.ACTIVATION_JWT_SECRET
-        ); // one hour exp.
-        const mailOptions = {
-          from: `"Glasir" ${process.env.USER}`,
-          to: email,
-          subject: "Account activation link",
-          body: "Thank you for choosing Glasir !",
-          html: `
-					<h1>Please use the following to activate your account</h1>
-					<p>${process.env.CLIENT_URL}/users/activate/${token}</p>
-					<hr />
-					<p>This email may contain sensetive information</p>
-					<p>${process.env.CLIENT_URL}</p>
-					 `,
-        };
-        // TODO: sending email.
-        writeServerResponse(
-          res,
-          mailOptions,
-          insertResult.statusCode,
-          "application/json"
-        );
+
+        if (insertResult.success) {
+          const userFromDb = {
+            _id: insertResult.data._id,
+            isActive: insertResult.data.isActive,
+            joinedDate: insertResult.data.joined_date,
+          };
+          const user = new User(userFromDb);
+          const token = user.encoded(
+            Math.floor(Date.now() / 1000) + 60 * 60,
+            process.env.ACTIVATION_JWT_SECRET
+          ); // one hour exp.
+          const mailOptions = {
+            from: `"Glasir" ${process.env.USER}`,
+            to: email,
+            subject: "Account activation link",
+            body: "Thank you for choosing Glasir !",
+            html: `
+           		<h1>Please use the following to activate your account</h1>
+           		<p>${process.env.CLIENT_URL}/users/activate/${token}</p>
+           		<hr />
+           		<p>This email may contain sensetive information</p>
+           		<p>${process.env.CLIENT_URL}</p>
+           		 `,
+          };
+          // TODO: sending email.
+          writeServerResponse(
+            res,
+            mailOptions,
+            insertResult.statusCode,
+            "application/json"
+          );
+        } else {
+          next(ApiError.conflict(insertResult.error));
+          return;
+        }
       }
     } catch (e) {
-      next(ApiError.internal(`Something went wrong: ${e.message}`));
+      next(ApiError.internal(`Something went wrong: ${e}`));
       return;
     }
   }
@@ -136,17 +140,22 @@ class UserController {
           usersDAO
             .updateUser(userId, updateObject)
             .then((result) => {
-              writeServerResponse(
-                res,
-                {
-                  message: "User activated successfully.",
-                },
-                result.statusCode,
-                "application/json"
-              );
+              if (result.success) {
+                writeServerResponse(
+                  res,
+                  {
+                    message: "User activated successfully.",
+                  },
+                  result.statusCode,
+                  "application/json"
+                );
+              } else {
+                next(ApiError.notfound(result.data.message));
+                return;
+              }
             })
             .catch((err) => {
-              next(ApiError.unauthorized(`User doesnot exist: ${err.message}`));
+              next(ApiError.internal(`Something went wrong. ${err.message}`));
               return;
             });
         }
@@ -159,9 +168,9 @@ class UserController {
   static async verifyEmail(req, res, next) {
     try {
       const { id } = req.params;
-      const user = await usersDAO.getUserById(id);
-      if (user) {
-        const { _id, isActive, joined_date, email } = user.data;
+      const result = await usersDAO.getUserById(id);
+      if (result.success) {
+        const { _id, isActive, joined_date, email } = result.data;
         const newUser = new User({ _id, isActive, joined_date });
         const token = newUser.encoded(
           Math.floor(Date.now() / 1000) + 60 * 60,
@@ -184,7 +193,7 @@ class UserController {
         writeServerResponse(
           res,
           mailOptions,
-          user.statusCode,
+          result.statusCode,
           "application/json"
         );
       } else {
@@ -192,7 +201,7 @@ class UserController {
         return;
       }
     } catch (err) {
-      next(ApiError.internal(`Something wen wrong. ${err}`));
+      next(ApiError.internal(`Something went wrong. ${err}`));
       return;
     }
   }
