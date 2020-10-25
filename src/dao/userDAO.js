@@ -109,6 +109,41 @@ class UsersDAO {
 			username: username
 		});
 	}
+	static async getUserById(id) {
+		let cursor;
+		try {
+			const query = {
+				_id: ObjectId(id)
+			};
+			const sort = UsersDAO.#DEFAULT_SORT
+			cursor = await UsersDAO.#users.find(query).sort(sort);
+		} catch (e) {
+			logger.error("Error occurred: " + e.message, "getUserById()");
+			throw e;
+		}
+		try {
+			const user = await cursor.toArray();
+			if (user) {
+				return {
+					data: user,
+					statusCode: 200
+				};
+			} else {
+				const message = "No document matching id: " + id + " could be found!";
+				logger.error(message, "getUserById()");
+				return {
+					data: [],
+					statusCode: 404
+				};
+			}
+		} catch (e) {
+			logger.error(
+				`Unable to convert cursor to array or problem counting documents, ${e.message}`,
+				"getUserById()"
+			);
+			throw e;
+		}
+	}
 }
 
 export default UsersDAO;
