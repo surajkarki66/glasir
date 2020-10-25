@@ -18,6 +18,9 @@ class ApiError {
   static forbidden(msg) {
     return new ApiError(403, msg);
   }
+  static unprocessable(msg) {
+    return new ApiError(422, msg);
+  }
 }
 
 export default ApiError;
