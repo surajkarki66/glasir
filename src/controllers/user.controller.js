@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import writeServerResponse from "../utils/utils";
 import ApiError from "../error/ApiError";
 import { usersDAO } from "../dao/index";
+import UsersDAO from "../dao/userDAO";
 
 class User {
   constructor({
@@ -192,6 +193,44 @@ class UserController {
       }
     } catch (err) {
       next(ApiError.internal(`Something wen wrong. ${err}`));
+      return;
+    }
+  }
+  static async login(req, res, next) {
+    try {
+      const { username, email, password } = req.body;
+      if (username) {
+        const userData = await usersDAO.getUserByUsername(username);
+        if (!userData) {
+          next(ApiError.unauthorized("Make sure your username is correct."));
+          return;
+        } else {
+          const user = new User(userData);
+          if (!(await user.comparePassword(password))) {
+            next(ApiError.unauthorized("Make sure your password is correct."));
+            return;
+          }
+          const data = { auth_token: user.encoded(), info: user.toJson() };
+          writeServerJsonResponse(res, data, 200, "application/json");
+        }
+      }
+      if (email) {
+        const userData = await usersDAO.getUserByEmail(email);
+        if (!userData) {
+          next(ApiError.unauthorized("Make sure your email is correct."));
+          return;
+        } else {
+          const user = new User(userData);
+          if (!(await user.comparePassword(password))) {
+            next(ApiError.unauthorized("Make sure your password is correct."));
+            return;
+          }
+          const data = { auth_token: user.encoded(), info: user.toJson() };
+          writeServerJsonResponse(res, data, 200, "application/json");
+        }
+      }
+    } catch (e) {
+      next(ApiError.internal(`Something went wrong: ${e.message}`));
       return;
     }
   }
