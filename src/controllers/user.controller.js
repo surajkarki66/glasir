@@ -6,7 +6,7 @@ import ApiError from "../error/ApiError";
 import {
 	usersDAO
 } from "../dao/index";
-
+import UsersDAO from "../dao/userDAO";
 
 class User {
 	constructor({
@@ -18,7 +18,7 @@ class User {
 		password,
 		role,
 		isActive,
-		joinedDate
+		joinedDate,
 	} = {}) {
 		this._id = _id;
 		this.username = username;
@@ -28,13 +28,13 @@ class User {
 		this.password = password;
 		this.role = role;
 		this.isActive = isActive;
-		this.joinedDate = joinedDate
+		this.joinedDate = joinedDate;
 	}
 	toJson() {
 		return {
 			userId: this._id,
 			isActive: this.isActive,
-			joinedDate: this.joinedDate
+			joinedDate: this.joinedDate,
 		};
 	}
 	encoded(exp_date, secretKey) {
@@ -56,7 +56,7 @@ class User {
 		return jwt.verify(userJwt, secretKey, (error, res) => {
 			if (error) {
 				return {
-					error
+					error,
 				};
 			}
 			return new User(res);
@@ -91,10 +91,13 @@ class UserController {
 				const userFromDb = {
 					_id: insertResult.data._id,
 					isActive: insertResult.data.isActive,
-					joinedDate: insertResult.data.joined_date
+					joinedDate: insertResult.data.joined_date,
 				};
 				const user = new User(userFromDb);
-				const token = user.encoded(Math.floor(Date.now() / 1000) + (60 * 60), process.env.ACTIVATION_JWT_SECRET) // one hour exp.
+				const token = user.encoded(
+					Math.floor(Date.now() / 1000) + 60 * 60,
+					process.env.ACTIVATION_JWT_SECRET
+				); // one hour exp.
 				const mailOptions = {
 					from: `"Glasir" ${process.env.USER}`,
 					to: email,
@@ -109,13 +112,58 @@ class UserController {
 					 `,
 				};
 				// TODO: sending email.
-				writeServerResponse(res, mailOptions, insertResult.statusCode, "application/json");
+				writeServerResponse(
+					res,
+					mailOptions,
+					insertResult.statusCode,
+					"application/json"
+				);
 			}
 		} catch (e) {
 			next(ApiError.internal(`Something went wrong: ${e.message}`));
 			return;
 		}
+	}
+	static async activationController(req, res, next) {
+		const {
+			token
+		} = req.params;
+		if (token) {
+			jwt.verify(token, process.env.ACTIVATION_JWT_SECRET, (err, decoded) => {
+				if (err) {
+					writeServerResponse(
+						res, {
+							errors: "Expired link. Signup again",
+						},
+						401,
+						"application/json"
+					);
+				} else {
+					const {
+						userId
+					} = jwt.decode(token);
 
+					const updateObject = {
+						isActive: true,
+					};
+					UsersDAO.updateUser(userId, updateObject)
+						.then((res) => {
+							writeServerResponse(res, {
+								success: true,
+								user: res,
+								message: "Signup success"
+							})
+						})
+						.catch((err) => {
+							next(ApiError.unauthorized(`User doesnot exist: ${err.message}`));
+							return;
+						});
+				}
+			});
+		} else {
+			next(ApiError.internal("Error happening please try again."));
+			return;
+		}
 	}
 }
 
