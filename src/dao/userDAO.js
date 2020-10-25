@@ -45,12 +45,21 @@ class UsersDAO {
         isActive: isActive,
         joined_date: new Date(),
       });
-      const data = result.ops[0];
+      if (data) {
+        const data = result.ops[0];
 
-      return {
-        data: data,
-        statusCode: 201,
-      };
+        return {
+          success: true,
+          data: data,
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: { message: "Signup failed." },
+          status: 404,
+        };
+      }
     } catch (e) {
       logger.error(
         "Error occurred while adding new user: " + e.message,
@@ -68,6 +77,7 @@ class UsersDAO {
       logger.error(`Unable to issue find command, ${e.message}`);
       return {
         data: [],
+        success: true,
         totalNumUsers: 0,
         statusCode: 404,
       };
@@ -81,6 +91,7 @@ class UsersDAO {
         parseInt(page) === 0 ? await UsersDAO.#users.countDocuments({}) : 0;
       return {
         data: documents,
+        success: true,
         totalNumUsers,
         statusCode: documents.length > 0 ? 200 : 404,
       };
@@ -117,6 +128,7 @@ class UsersDAO {
       const user = await cursor.toArray();
       if (user) {
         return {
+          success: true,
           data: user[0],
           statusCode: 200,
         };
@@ -124,6 +136,7 @@ class UsersDAO {
         const message = "No document matching id: " + id + " could be found!";
         logger.error(message, "getUserById()");
         return {
+          success: false,
           data: [],
           statusCode: 404,
         };
@@ -150,12 +163,40 @@ class UsersDAO {
         return {
           data: {
             success: true,
+            message: "Updated successfully.",
           },
           statusCode: 201,
+        };
+      } else {
+        return {
+          data: {
+            success: false,
+            message: "Updation unsuccessfull.",
+          },
+          statusCode: 404,
         };
       }
     } catch (e) {
       logger.error(`Error occurred while updating user, ${e}`, "updateUser()");
+      throw e;
+    }
+  }
+  static async deleteUser(id) {
+    try {
+      await UsersDAO.#users.deleteOne({ _id: ObjectId(id) });
+      if (!(await this.getUserById(id))) {
+        return {
+          data: { success: true, message: "Deleted successfully." },
+          statusCode: 200,
+        };
+      } else {
+        return {
+          data: { success: false, message: "Deletion unsuccessful" },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(`Error occurred while deleting user, ${e}`, "deleteUser()");
       throw e;
     }
   }
