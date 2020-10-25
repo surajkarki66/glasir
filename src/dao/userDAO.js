@@ -144,6 +144,26 @@ class UsersDAO {
 			throw e;
 		}
 	}
+	static async updateUser(id, updateObject) {
+		try {
+			const result = await UsersDAO.#users.updateOne({
+				_id: ObjectId(id)
+			}, {
+				$set: updateObject
+			});
+			if (result) {
+				return {
+					data: {
+						success: true
+					},
+					statusCode: 201
+				};
+			}
+		} catch (e) {
+			logger.error(`Error occurred while updating user, ${e}`, "updateUser()");
+			throw e;
+		}
+	}
 }
 
 export default UsersDAO;
