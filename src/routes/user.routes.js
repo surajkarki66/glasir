@@ -11,6 +11,11 @@ router
   .post(UserController.signup);
 
 router
+  .route("/login")
+  .post(dataValidation(userSchema.userLOGIN, "body"))
+  .post(UserController.login);
+
+router
   .route("/activate/:token")
   .get(dataValidation(userSchema.userACTIVATION, "params"))
   .get(UserController.activation);

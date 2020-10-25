@@ -210,8 +210,14 @@ class UserController {
             next(ApiError.unauthorized("Make sure your password is correct."));
             return;
           }
-          const data = { auth_token: user.encoded(), info: user.toJson() };
-          writeServerJsonResponse(res, data, 200, "application/json");
+          const data = {
+            auth_token: user.encoded(
+              Math.floor(Date.now() / 1000) + 60 * 60,
+              process.env.JWT_SECRET
+            ),
+            info: user.toJson(),
+          };
+          writeServerResponse(res, data, 200, "application/json");
         }
       }
       if (email) {
@@ -225,8 +231,14 @@ class UserController {
             next(ApiError.unauthorized("Make sure your password is correct."));
             return;
           }
-          const data = { auth_token: user.encoded(), info: user.toJson() };
-          writeServerJsonResponse(res, data, 200, "application/json");
+          const data = {
+            auth_token: user.encoded(
+              Math.floor(Date.now() / 1000) + 60 * 60,
+              process.env.JWT_SECRET
+            ),
+            info: user.toJson(),
+          };
+          writeServerResponse(res, data, 200, "application/json");
         }
       }
     } catch (e) {

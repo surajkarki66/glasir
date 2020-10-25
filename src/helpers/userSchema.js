@@ -25,18 +25,20 @@ const schemas = {
   userACTIVATIONEMAIL: Joi.object().keys({
     id: Joi.string().required(),
   }),
-  userLOGIN: Joi.object().keys({
-    username: Joi.string().min(4).max(20),
-    email: Joi.string().email({
-      minDomainSegments: 2,
-      tlds: {
-        allow: ["com", "net"],
-      },
-    }),
-    password: Joi.string()
-      .min(8)
-      .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
-      .required(),
-  }),
+  userLOGIN: Joi.object()
+    .keys({
+      username: Joi.string().min(4).max(20),
+      email: Joi.string().email({
+        minDomainSegments: 2,
+        tlds: {
+          allow: ["com", "net"],
+        },
+      }),
+      password: Joi.string()
+        .min(8)
+        .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+        .required(),
+    })
+    .xor("email", "username"),
 };
 export default schemas;
