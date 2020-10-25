@@ -19,5 +19,9 @@ const schemas = {
 			.pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
 			.required(),
 	}),
+	userACTIVATION: Joi.object().keys({
+		token: [Joi.string(), Joi.number()].required(),
+	})
+
 };
 export default schemas;
