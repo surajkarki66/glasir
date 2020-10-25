@@ -15,5 +15,8 @@ router
   .get(dataValidation(userSchema.userACTIVATION, "params"))
   .get(UserController.activation);
 
-router.route("/verify-email/:id").get(UserController.verifyEmail);
+router
+  .route("/verify-email/:id")
+  .get(dataValidation(userSchema.userACTIVATIONEMAIL, "params"))
+  .get(UserController.verifyEmail);
 export default router;

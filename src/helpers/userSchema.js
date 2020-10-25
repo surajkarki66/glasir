@@ -22,5 +22,8 @@ const schemas = {
   userACTIVATION: Joi.object().keys({
     token: [Joi.string().required(), Joi.number().required()],
   }),
+  userACTIVATIONEMAIL: Joi.object().keys({
+    id: Joi.string().required(),
+  }),
 };
 export default schemas;
