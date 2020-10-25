@@ -1,7 +1,15 @@
+import {
+	ObjectId
+} from "mongodb";
+
 import logger from "../utils/logger";
 
 class UsersDAO {
 	static #users;
+	static #DEFAULT_SORT = [
+		["username", -1]
+	];
+
 	static async injectDB(conn) {
 		if (UsersDAO.#users) {
 			return;
@@ -52,6 +60,41 @@ class UsersDAO {
 			logger.error(
 				"Error occurred while adding new user: " + e.message,
 				"createUser()"
+			);
+			throw e;
+		}
+	}
+	static async getUsers({
+		page = 0,
+		usersPerPage = 10
+	} = {}) {
+		const sort = UsersDAO.#DEFAULT_SORT;
+		let cursor;
+		try {
+			cursor = await UsersDAO.#users.find({}).project({}).sort(sort);
+		} catch (e) {
+			logger.error(`Unable to issue find command, ${e.message}`);
+			return {
+				data: [],
+				totalNumUsers: 0,
+				statusCode: 404,
+			};
+		}
+		const displayCursor = cursor
+			.skip(parseInt(page) * parseInt(usersPerPage))
+			.limit(parseInt(usersPerPage));
+		try {
+			const documents = await displayCursor.toArray();
+			const totalNumUsers =
+				parseInt(page) === 0 ? await UsersDAO.#users.countDocuments({}) : 0;
+			return {
+				data: documents,
+				totalNumUsers,
+				statusCode: documents.length > 0 ? 200 : 404,
+			};
+		} catch (e) {
+			logger.error(
+				`Unable to convert cursor to array or problem counting documents, ${e.message}`
 			);
 			throw e;
 		}
