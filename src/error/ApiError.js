@@ -21,6 +21,9 @@ class ApiError {
   static unprocessable(msg) {
     return new ApiError(422, msg);
   }
+  static notfound(msg) {
+    return new ApiError(404, msg);
+  }
 }
 
 export default ApiError;

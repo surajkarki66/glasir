@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 import writeServerResponse from "../utils/utils";
 import ApiError from "../error/ApiError";
 import { usersDAO } from "../dao/index";
-import UsersDAO from "../dao/userDAO";
 
 class User {
   constructor({
@@ -133,19 +132,19 @@ class UserController {
           const updateObject = {
             isActive: true,
           };
-          UsersDAO.updateUser(userId, updateObject)
+          usersDAO
+            .updateUser(userId, updateObject)
             .then((result) => {
               writeServerResponse(
                 res,
                 {
-                  message: "Signup success",
+                  message: "User activated successfully.",
                 },
                 result.statusCode,
                 "application/json"
               );
             })
             .catch((err) => {
-              console.log(err);
               next(ApiError.unauthorized(`User doesnot exist: ${err.message}`));
               return;
             });
@@ -153,6 +152,46 @@ class UserController {
       });
     } else {
       next(ApiError.internal("Error happening please try again."));
+      return;
+    }
+  }
+  static async verifyEmail(req, res, next) {
+    try {
+      const { id } = req.params;
+      const user = await usersDAO.getUserById(id);
+      if (user) {
+        const { _id, isActive, joined_date, email } = user.data;
+        const newUser = new User({ _id, isActive, joined_date });
+        const token = newUser.encoded(
+          Math.floor(Date.now() / 1000) + 60 * 60,
+          process.env.ACTIVATION_JWT_SECRET
+        ); // one hour duration.
+        const mailOptions = {
+          from: `"Glasir" ${process.env.USER}`,
+          to: email,
+          subject: "Account activation link",
+          body: "Thank you for choosing Glasir !",
+          html: `
+					<h1>Please use the following to activate your account</h1>
+					<p>${process.env.CLIENT_URL}/users/activate/${token}</p>
+					<hr />
+					<p>This email may contain sensetive information</p>
+					<p>${process.env.CLIENT_URL}</p>
+					 `,
+        };
+        // TODO: sending email.
+        writeServerResponse(
+          res,
+          mailOptions,
+          user.statusCode,
+          "application/json"
+        );
+      } else {
+        next(ApiError.notfound("User doesnot exist."));
+        return;
+      }
+    } catch (err) {
+      next(ApiError.internal(`Something wen wrong. ${err}`));
       return;
     }
   }

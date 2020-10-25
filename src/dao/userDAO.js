@@ -117,7 +117,7 @@ class UsersDAO {
       const user = await cursor.toArray();
       if (user) {
         return {
-          data: user,
+          data: user[0],
           statusCode: 200,
         };
       } else {
