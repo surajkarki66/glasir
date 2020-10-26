@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 import writeServerResponse from "../utils/utils";
 import ApiError from "../error/ApiError";
@@ -217,6 +218,7 @@ class UserController {
           const data = {
             message: "Login successfull.",
             accessToken: user.encoded(process.env.ACCESS_TOKEN_SECRET, "5m"),
+            refreshToken: user.encoded(process.env.REFRESH_TOKEN_SECRET, "7d"),
             info: user.toJson(),
           };
           writeServerResponse(res, data, 200, "application/json");
@@ -234,7 +236,9 @@ class UserController {
             return;
           }
           const data = {
+            message: "Login successfull.",
             accessToken: user.encoded(process.env.ACCESS_TOKEN_SECRET, "5m"),
+            refreshToken: user.encoded(process.env.REFRESH_TOKEN_SECRET, "7d"),
             info: user.toJson(),
           };
           writeServerResponse(res, data, 200, "application/json");
