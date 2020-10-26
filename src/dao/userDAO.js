@@ -148,7 +148,10 @@ class UsersDAO {
           $set: updateObject,
         }
       );
-      if (result.modifiedCount === 1 && result.matchedCount === 1) {
+      if (
+        (result.modifiedCount === 1 && result.matchedCount === 1) ||
+        result.matchedCount === 1
+      ) {
         return {
           success: true,
           data: {
@@ -157,15 +160,7 @@ class UsersDAO {
           statusCode: 201,
         };
       }
-      if (result.matchedCount === 1) {
-        return {
-          success: true,
-          data: {
-            message: "Updated already.",
-          },
-          statusCode: 201,
-        };
-      }
+
       return {
         success: false,
         data: {
@@ -180,22 +175,22 @@ class UsersDAO {
   }
   static async deleteUser(id) {
     try {
-      await UsersDAO.#users.deleteOne({ _id: ObjectId(id) });
-      if (!(await this.getUserById(id))) {
+      const result = await UsersDAO.#users.deleteOne({ _id: ObjectId(id) });
+      if (result.deletedCount === 1) {
         return {
           success: true,
           data: { message: "Deleted successfully." },
           statusCode: 200,
         };
-      } else {
-        return {
-          success: false,
-          data: {
-            message: "No user exist with this userid.",
-          },
-          statusCode: 404,
-        };
       }
+
+      return {
+        success: false,
+        data: {
+          message: "No user exist with this userid.",
+        },
+        statusCode: 404,
+      };
     } catch (e) {
       logger.error(`Error occurred while deleting user, ${e}`, "deleteUser()");
       throw e;

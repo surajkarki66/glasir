@@ -34,14 +34,11 @@ class User {
       joinedDate: this.joinedDate,
     };
   }
-  encoded(exp_date, secretKey) {
-    return jwt.sign(
-      {
-        exp: exp_date,
-        ...this.toJson(),
-      },
-      secretKey
-    );
+  encoded(secretKey, exp_time) {
+    const token = jwt.sign(this.toJson(), secretKey, {
+      expiresIn: exp_time,
+    });
+    return token;
   }
   async comparePassword(plainText) {
     return await bcrypt.compare(plainText, this.password);
@@ -84,19 +81,12 @@ class UserController {
         const insertResult = await usersDAO.createUser(userInfo);
 
         if (insertResult.success) {
-          const userFromDb = {
-            _id: insertResult.data._id,
-            isActive: insertResult.data.isActive,
-            joinedDate: insertResult.data.joined_date,
-          };
-          const user = new User(userFromDb);
-          const token = user.encoded(
-            Math.floor(Date.now() / 1000) + 60 * 60,
-            process.env.ACTIVATION_JWT_SECRET
-          ); // one hour exp.
+          const { data } = insertResult;
+          const user = new User(data);
+          const token = user.encoded(process.env.ACTIVATION_TOKEN_SECRET, "5m");
           const mailOptions = {
             from: `"Glasir" ${process.env.USER}`,
-            to: email,
+            to: data.email,
             subject: "Account activation link",
             body: "Thank you for choosing Glasir !",
             html: `
@@ -127,13 +117,12 @@ class UserController {
   static async activation(req, res, next) {
     const { token } = req.params;
     if (token) {
-      jwt.verify(token, process.env.ACTIVATION_JWT_SECRET, (err, decoded) => {
+      jwt.verify(token, process.env.ACTIVATION_TOKEN_SECRET, (err, decoded) => {
         if (err) {
           next(ApiError.unauthorized("Expired link. Signup again."));
           return;
         } else {
           const { userId } = jwt.decode(token);
-
           const updateObject = {
             isActive: true,
           };
@@ -170,32 +159,38 @@ class UserController {
       const { id } = req.params;
       const result = await usersDAO.getUserById(id);
       if (result.success) {
-        const { _id, isActive, joined_date, email } = result.data;
-        const newUser = new User({ _id, isActive, joined_date });
-        const token = newUser.encoded(
-          Math.floor(Date.now() / 1000) + 60 * 60,
-          process.env.ACTIVATION_JWT_SECRET
-        ); // one hour duration.
-        const mailOptions = {
-          from: `"Glasir" ${process.env.USER}`,
-          to: email,
-          subject: "Account activation link",
-          body: "Thank you for choosing Glasir !",
-          html: `
-					<h1>Please use the following to activate your account</h1>
-					<p>${process.env.CLIENT_URL}/users/activate/${token}</p>
-					<hr />
-					<p>This email may contain sensetive information</p>
-					<p>${process.env.CLIENT_URL}</p>
-					 `,
-        };
-        // TODO: sending email.
-        writeServerResponse(
-          res,
-          mailOptions,
-          result.statusCode,
-          "application/json"
-        );
+        if (!result.data.isActive) {
+          const { data } = result;
+          const user = new User(data);
+          const token = user.encoded(process.env.ACTIVATION_TOKEN_SECRET, "5m");
+          const mailOptions = {
+            from: `"Glasir" ${process.env.USER}`,
+            to: data.email,
+            subject: "Account activation link",
+            body: "Thank you for choosing Glasir !",
+            html: `
+						<h1>Please use the following to activate your account</h1>
+						<p>${process.env.CLIENT_URL}/users/activate/${token}</p>
+						<hr />
+						<p>This email may contain sensetive information</p>
+						<p>${process.env.CLIENT_URL}</p>
+						 `,
+          };
+          // TODO: sending email.
+          writeServerResponse(
+            res,
+            mailOptions,
+            result.statusCode,
+            "application/json"
+          );
+        } else {
+          writeServerResponse(
+            res,
+            { message: "Email is already verified." },
+            result.statusCode,
+            "application/json"
+          );
+        }
       } else {
         next(ApiError.notfound("User doesnot exist."));
         return;
@@ -220,10 +215,8 @@ class UserController {
             return;
           }
           const data = {
-            auth_token: user.encoded(
-              Math.floor(Date.now() / 1000) + 60 * 60,
-              process.env.JWT_SECRET
-            ),
+            message: "Login successfull.",
+            accessToken: user.encoded(process.env.ACCESS_TOKEN_SECRET, "5m"),
             info: user.toJson(),
           };
           writeServerResponse(res, data, 200, "application/json");
@@ -241,10 +234,7 @@ class UserController {
             return;
           }
           const data = {
-            auth_token: user.encoded(
-              Math.floor(Date.now() / 1000) + 60 * 60,
-              process.env.JWT_SECRET
-            ),
+            accessToken: user.encoded(process.env.ACCESS_TOKEN_SECRET, "5m"),
             info: user.toJson(),
           };
           writeServerResponse(res, data, 200, "application/json");
