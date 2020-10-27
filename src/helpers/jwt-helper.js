@@ -60,4 +60,14 @@ const verifyToken = async (token, secretKey) => {
   });
 };
 
-export { signToken, verifyToken };
+const verifyRefreshToken = (refreshToken, secretKey) => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(refreshToken, secretKey, (err, payload) => {
+      if (err) return reject(createError.Unauthorized());
+      const userId = payload.aud;
+      resolve(userId);
+    });
+  });
+};
+
+export { signToken, verifyToken, verifyRefreshToken };
