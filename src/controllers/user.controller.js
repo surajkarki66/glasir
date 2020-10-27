@@ -1,10 +1,10 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import crypto from "crypto";
 
 import writeServerResponse from "../utils/utils";
 import ApiError from "../error/ApiError";
 import { usersDAO } from "../dao/index";
+import { signToken } from "../helpers/jwt-helper";
 
 class User {
   constructor({
@@ -28,35 +28,12 @@ class User {
     this.isActive = isActive;
     this.joinedDate = joinedDate;
   }
-  toJson() {
-    return {
-      userId: this._id,
-      isActive: this.isActive,
-      joinedDate: this.joinedDate,
-    };
-  }
-  encoded(secretKey, exp_time) {
-    const token = jwt.sign(this.toJson(), secretKey, {
-      expiresIn: exp_time,
-    });
-    return token;
-  }
+
   async comparePassword(plainText) {
     return await bcrypt.compare(plainText, this.password);
   }
   static async hashPassword(password) {
     return await bcrypt.hash(password, 10);
-  }
-
-  static async decoded(userJwt, secretKey) {
-    return jwt.verify(userJwt, secretKey, (error, res) => {
-      if (error) {
-        return {
-          error,
-        };
-      }
-      return new User(res);
-    });
   }
 }
 class UserController {
@@ -215,11 +192,10 @@ class UserController {
             next(ApiError.unauthorized("Make sure your password is correct."));
             return;
           }
+          const accessToken = await signToken(user._id, "ACCESS");
           const data = {
             message: "Login successfull.",
-            accessToken: user.encoded(process.env.ACCESS_TOKEN_SECRET, "5m"),
-            refreshToken: user.encoded(process.env.REFRESH_TOKEN_SECRET, "7d"),
-            info: user.toJson(),
+            accessToken: accessToken,
           };
           writeServerResponse(res, data, 200, "application/json");
         }
