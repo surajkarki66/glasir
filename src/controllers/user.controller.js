@@ -1,10 +1,9 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 
 import writeServerResponse from "../utils/utils";
 import ApiError from "../error/ApiError";
 import { usersDAO } from "../dao/index";
-import { signToken } from "../helpers/jwt-helper";
+import { signToken, verifyToken } from "../helpers/jwt-helper";
 
 class User {
   constructor({
@@ -61,7 +60,7 @@ class UserController {
         if (insertResult.success) {
           const { data } = insertResult;
           const user = new User(data);
-          const token = user.encoded(process.env.ACTIVATION_TOKEN_SECRET, "5m");
+          const token = await signToken(user._id, "ACTIVATION", "5m");
           const mailOptions = {
             from: `"Glasir" ${process.env.USER}`,
             to: data.email,
@@ -93,42 +92,43 @@ class UserController {
     }
   }
   static async activation(req, res, next) {
-    const { token } = req.params;
-    if (token) {
-      jwt.verify(token, process.env.ACTIVATION_TOKEN_SECRET, (err, decoded) => {
-        if (err) {
-          next(ApiError.unauthorized("Expired link. Signup again."));
+    try {
+      const { token } = req.params;
+      const result = await verifyToken(
+        token,
+        process.env.ACTIVATION_TOKEN_SECRET
+      );
+      if (result.error) {
+        next(ApiError.badRequest(result.error));
+        return;
+      }
+      const userId = result.aud;
+      const updateObject = {
+        isActive: true,
+      };
+      usersDAO
+        .updateUser(userId, updateObject)
+        .then((result) => {
+          if (result.success) {
+            writeServerResponse(
+              res,
+              {
+                message: "User activated successfully.",
+              },
+              result.statusCode,
+              "application/json"
+            );
+          } else {
+            next(ApiError.notfound(result.data.message));
+            return;
+          }
+        })
+        .catch((err) => {
+          next(ApiError.internal(`Something went wrong. ${err.message}`));
           return;
-        } else {
-          const { userId } = jwt.decode(token);
-          const updateObject = {
-            isActive: true,
-          };
-          usersDAO
-            .updateUser(userId, updateObject)
-            .then((result) => {
-              if (result.success) {
-                writeServerResponse(
-                  res,
-                  {
-                    message: "User activated successfully.",
-                  },
-                  result.statusCode,
-                  "application/json"
-                );
-              } else {
-                next(ApiError.notfound(result.data.message));
-                return;
-              }
-            })
-            .catch((err) => {
-              next(ApiError.internal(`Something went wrong. ${err.message}`));
-              return;
-            });
-        }
-      });
-    } else {
-      next(ApiError.internal("Error happening please try again."));
+        });
+    } catch (err) {
+      next(ApiError.internal(`Something went wrong. ${err.message}`));
       return;
     }
   }
@@ -140,7 +140,7 @@ class UserController {
         if (!result.data.isActive) {
           const { data } = result;
           const user = new User(data);
-          const token = await signToken(user._id, "ACTIVATION");
+          const token = await signToken(user._id, "ACTIVATION", "5m");
           const mailOptions = {
             from: `"Glasir" ${process.env.USER}`,
             to: data.email,
@@ -192,8 +192,8 @@ class UserController {
             next(ApiError.unauthorized("Make sure your password is correct."));
             return;
           }
-          const accessToken = await signToken(user._id, "ACCESS");
-          const refreshToken = await signToken(user._id, "REFRESH");
+          const accessToken = await signToken(user._id, "ACCESS", "1h");
+          const refreshToken = await signToken(user._id, "REFRESH", "7d");
           const data = {
             message: "Login successfull.",
             accessToken: accessToken,
@@ -213,8 +213,8 @@ class UserController {
             next(ApiError.unauthorized("Make sure your password is correct."));
             return;
           }
-          const accessToken = await signToken(user._id, "ACCESS");
-          const refreshToken = await signToken(user._id, "REFRESH");
+          const accessToken = await signToken(user._id, "ACCESS", "1h");
+          const refreshToken = await signToken(user._id, "REFRESH", "7d");
           const data = {
             message: "Login successfull.",
             accessToken: accessToken,

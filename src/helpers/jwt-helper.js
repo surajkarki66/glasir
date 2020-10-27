@@ -12,7 +12,7 @@ const sign = (payload, secret, options) => {
     });
   });
 };
-const signToken = (userId, type) => {
+const signToken = (userId, type, expiresIn) => {
   let secret;
   let options;
   let payload = {};
@@ -20,7 +20,7 @@ const signToken = (userId, type) => {
     case "ACCESS":
       secret = process.env.ACCESS_TOKEN_SECRET;
       options = {
-        expiresIn: "1h",
+        expiresIn: expiresIn,
         issuer: "pickurpage.com",
         audience: userId.toString(),
       };
@@ -28,7 +28,7 @@ const signToken = (userId, type) => {
     case "REFRESH":
       secret = process.env.REFRESH_TOKEN_SECRET;
       options = {
-        expiresIn: "7d",
+        expiresIn: expiresIn,
         issuer: "pickurpage.com",
         audience: userId.toString(),
       };
@@ -36,7 +36,7 @@ const signToken = (userId, type) => {
     case "ACTIVATION":
       secret = process.env.ACTIVATION_TOKEN_SECRET;
       options = {
-        expiresIn: "5m",
+        expiresIn: expiresIn,
         issuer: "pickurpage.com",
         audience: userId.toString(),
       };
@@ -46,5 +46,18 @@ const signToken = (userId, type) => {
     //
   }
 };
+const verifyToken = async (token, secretKey) => {
+  return jwt.verify(token, secretKey, (error, response) => {
+    if (error) {
+      if (String(error).startsWith("TokenExpiredError")) {
+        return { error: "Expired link. Signup again." };
+      }
+      if (String(error).startsWith("JsonWebTokenError")) {
+        return { error: "Invalid token." };
+      }
+    }
+    return response;
+  });
+};
 
-export { signToken };
+export { signToken, verifyToken };
