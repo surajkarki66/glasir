@@ -193,9 +193,11 @@ class UserController {
             return;
           }
           const accessToken = await signToken(user._id, "ACCESS");
+          const refreshToken = await signToken(user._id, "REFRESH");
           const data = {
             message: "Login successfull.",
             accessToken: accessToken,
+            refreshToken: refreshToken,
           };
           writeServerResponse(res, data, 200, "application/json");
         }

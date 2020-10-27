@@ -25,6 +25,14 @@ const signToken = (userId, type) => {
         audience: userId.toString(),
       };
       return sign(payload, secret, options);
+    case "REFRESH":
+      secret = process.env.REFRESH_TOKEN_SECRET;
+      options = {
+        expiresIn: "7d",
+        issuer: "pickurpage.com",
+        audience: userId.toString(),
+      };
+      return sign(payload, secret, options);
 
     default:
     //
