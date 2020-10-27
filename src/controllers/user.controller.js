@@ -3,7 +3,11 @@ import bcrypt from "bcryptjs";
 import writeServerResponse from "../utils/utils";
 import ApiError from "../error/ApiError";
 import { usersDAO } from "../dao/index";
-import { signToken, verifyToken } from "../helpers/jwt-helper";
+import {
+  signToken,
+  verifyToken,
+  verifyRefreshToken,
+} from "../helpers/jwt-helper";
 
 class User {
   constructor({
@@ -231,13 +235,18 @@ class UserController {
   static async refreshToken(req, res, next) {
     try {
       const { refreshToken } = req.body;
-      const userId = await verifyRefreshToken(refreshToken);
+      const userId = await verifyRefreshToken(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET
+      );
 
-      const accessToken = await signAccessToken(userId);
-      const refToken = await signRefreshToken(userId);
-      res.send({ accessToken: accessToken, refreshToken: refToken });
+      const accessToken = await signToken(userId, "ACCESS", "1h");
+      const refToken = await signToken(userId, "REFRESH", "7d");
+      const data = { accessToken: accessToken, refreshToken: refToken };
+      writeServerResponse(res, data, 200, "application/json");
     } catch (error) {
-      next(error);
+      next(ApiError.internal("Something went wrong."));
+      return;
     }
   }
 }
