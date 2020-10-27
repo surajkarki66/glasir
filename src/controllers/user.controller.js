@@ -245,6 +245,18 @@ class UserController {
       const data = { accessToken: accessToken, refreshToken: refToken };
       writeServerResponse(res, data, 200, "application/json");
     } catch (error) {
+      if (String(error).startsWith("UnauthorizedError")) {
+        next(ApiError.unauthorized("Expired link. Signup again."));
+        return;
+      }
+      if (String(error).startsWith("BadRequestError")) {
+        next(ApiError.badRequest("Invalid token."));
+        return;
+      }
+      if (String(error).startsWith("ForbiddenError")) {
+        next(ApiError.forbidden("Invalid token."));
+        return;
+      }
       next(ApiError.internal("Something went wrong."));
       return;
     }

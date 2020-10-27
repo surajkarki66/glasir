@@ -5,7 +5,6 @@ import { MongoClient } from "mongodb";
 import logger from "./utils/logger";
 import app from "./server";
 import { usersDAO } from "./dao/index.js";
-import redisServer from "./helpers/init_redis";
 
 // .env config
 dotenv.config();
@@ -22,7 +21,7 @@ MongoClient.connect(process.env.MONGO_URI, {
     logger.info("Database connected successfully.");
 
     // Create redis server
-    redisServer();
+    require("./helpers/init_redis");
 
     // Node Server
     const port = process.env.PORT || 8000;

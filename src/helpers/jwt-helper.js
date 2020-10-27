@@ -1,11 +1,9 @@
 import jwt from "jsonwebtoken";
 import createError from "http-errors";
 
-import redisServer from "../helpers/init_redis";
+import client from "../helpers/init_redis";
 
-const client = redisServer();
-
-const sign = (payload, secret, options, isRefresh = false) => {
+const sign = (payload, secret, options, isRefresh) => {
   return new Promise((resolve, reject) => {
     jwt.sign(payload, secret, options, (err, token) => {
       if (err) {
@@ -13,9 +11,10 @@ const sign = (payload, secret, options, isRefresh = false) => {
         return;
       }
       if (isRefresh) {
-        client.SET(
+        const userId = options.audience;
+        client.set(
           userId,
-          options.audience,
+          token,
           "EX",
           7 * 24 * 60 * 60, // 7 days
           (err, reply) => {
@@ -43,7 +42,7 @@ const signToken = (userId, type, expiresIn) => {
         issuer: "pickurpage.com",
         audience: userId.toString(),
       };
-      return sign(payload, secret, options);
+      return sign(payload, secret, options, false);
     case "REFRESH":
       secret = process.env.REFRESH_TOKEN_SECRET;
       options = {
@@ -51,7 +50,7 @@ const signToken = (userId, type, expiresIn) => {
         issuer: "pickurpage.com",
         audience: userId.toString(),
       };
-      return sign(payload, secret, options, (isRefresh = true));
+      return sign(payload, secret, options, true);
     case "ACTIVATION":
       secret = process.env.ACTIVATION_TOKEN_SECRET;
       options = {
@@ -59,7 +58,7 @@ const signToken = (userId, type, expiresIn) => {
         issuer: "pickurpage.com",
         audience: userId.toString(),
       };
-      return sign(payload, secret, options);
+      return sign(payload, secret, options, false);
 
     default:
     //
@@ -82,15 +81,26 @@ const verifyToken = async (token, secretKey) => {
 const verifyRefreshToken = (refreshToken, secretKey) => {
   return new Promise((resolve, reject) => {
     jwt.verify(refreshToken, secretKey, (err, payload) => {
-      if (err) return reject(createError.Unauthorized());
+      if (err) {
+        if (String(error).startsWith("TokenExpiredError")) {
+          return reject(
+            createError.Unauthorized("Expired link. Signup again.")
+          );
+        }
+        if (String(error).startsWith("JsonWebTokenError")) {
+          return reject(createError.BadRequest("Invalid token."));
+        }
+      }
       const userId = payload.aud;
-      client.GET(userId, (err, result) => {
+      client.get(userId.toString(), (err, result) => {
         if (err) {
-          reject(createError.InternalServerError());
+          reject(createError.InternalServerError("Invalid refresh token."));
           return;
         }
         if (refreshToken === result) return resolve(userId);
-        reject(createError.Unauthorized());
+        reject(
+          createError.Forbidden("Refresh token is doesnot belongs to you.")
+        );
       });
     });
   });
