@@ -43,5 +43,8 @@ const schemas = {
   refreshTOKEN: Joi.object().keys({
     refreshToken: [Joi.string().required(), Joi.number().required()],
   }),
+  userLOGOUT: Joi.object().keys({
+    refreshToken: [Joi.string().required(), Joi.number().required()],
+  }),
 };
 export default schemas;
