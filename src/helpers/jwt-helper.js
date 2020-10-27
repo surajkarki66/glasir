@@ -33,6 +33,14 @@ const signToken = (userId, type) => {
         audience: userId.toString(),
       };
       return sign(payload, secret, options);
+    case "ACTIVATION":
+      secret = process.env.ACTIVATION_TOKEN_SECRET;
+      options = {
+        expiresIn: "5m",
+        issuer: "pickurpage.com",
+        audience: userId.toString(),
+      };
+      return sign(payload, secret, options);
 
     default:
     //

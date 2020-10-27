@@ -140,7 +140,7 @@ class UserController {
         if (!result.data.isActive) {
           const { data } = result;
           const user = new User(data);
-          const token = user.encoded(process.env.ACTIVATION_TOKEN_SECRET, "5m");
+          const token = await signToken(user._id, "ACTIVATION");
           const mailOptions = {
             from: `"Glasir" ${process.env.USER}`,
             to: data.email,
@@ -213,11 +213,12 @@ class UserController {
             next(ApiError.unauthorized("Make sure your password is correct."));
             return;
           }
+          const accessToken = await signToken(user._id, "ACCESS");
+          const refreshToken = await signToken(user._id, "REFRESH");
           const data = {
             message: "Login successfull.",
-            accessToken: user.encoded(process.env.ACCESS_TOKEN_SECRET, "5m"),
-            refreshToken: user.encoded(process.env.REFRESH_TOKEN_SECRET, "7d"),
-            info: user.toJson(),
+            accessToken: accessToken,
+            refreshToken: refreshToken,
           };
           writeServerResponse(res, data, 200, "application/json");
         }
