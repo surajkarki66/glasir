@@ -40,5 +40,8 @@ const schemas = {
         .required(),
     })
     .xor("email", "username"),
+  refreshTOKEN: Joi.object().keys({
+    refreshToken: [Joi.string().required(), Joi.number().required()],
+  }),
 };
 export default schemas;

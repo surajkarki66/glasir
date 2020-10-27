@@ -16,6 +16,11 @@ router
   .post(UserController.login);
 
 router
+  .route("/refresh-token")
+  .post(dataValidation(userSchema.refreshTOKEN, "body"))
+  .post(UserController.refreshToken);
+
+router
   .route("/activate/:token")
   .get(dataValidation(userSchema.userACTIVATION, "params"))
   .get(UserController.activation);
