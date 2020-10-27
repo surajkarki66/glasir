@@ -1,12 +1,31 @@
 import jwt from "jsonwebtoken";
 import createError from "http-errors";
 
-const sign = (payload, secret, options) => {
+import redisServer from "../helpers/init_redis";
+
+const client = redisServer();
+
+const sign = (payload, secret, options, isRefresh = false) => {
   return new Promise((resolve, reject) => {
     jwt.sign(payload, secret, options, (err, token) => {
       if (err) {
         reject(createError.InternalServerError());
         return;
+      }
+      if (isRefresh) {
+        client.SET(
+          userId,
+          options.audience,
+          "EX",
+          7 * 24 * 60 * 60, // 7 days
+          (err, reply) => {
+            if (err) {
+              reject(createError.InternalServerError());
+              return;
+            }
+            resolve(token);
+          }
+        );
       }
       resolve(token);
     });
@@ -32,7 +51,7 @@ const signToken = (userId, type, expiresIn) => {
         issuer: "pickurpage.com",
         audience: userId.toString(),
       };
-      return sign(payload, secret, options);
+      return sign(payload, secret, options, (isRefresh = true));
     case "ACTIVATION":
       secret = process.env.ACTIVATION_TOKEN_SECRET;
       options = {
@@ -65,7 +84,14 @@ const verifyRefreshToken = (refreshToken, secretKey) => {
     jwt.verify(refreshToken, secretKey, (err, payload) => {
       if (err) return reject(createError.Unauthorized());
       const userId = payload.aud;
-      resolve(userId);
+      client.GET(userId, (err, result) => {
+        if (err) {
+          reject(createError.InternalServerError());
+          return;
+        }
+        if (refreshToken === result) return resolve(userId);
+        reject(createError.Unauthorized());
+      });
     });
   });
 };
