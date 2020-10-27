@@ -265,16 +265,33 @@ class UserController {
     try {
       const { refreshToken } = req.body;
       const userId = await verifyRefreshToken(refreshToken);
-      client.DEL(userId, (err, val) => {
+      client.del(userId, (err, val) => {
         if (err) {
-          console.log(err.message);
-          throw createError.InternalServerError();
+          next(ApiError.internal("Something went wrong."));
+          return;
         }
-        console.log(val);
-        res.sendStatus(204);
+        writeServerResponse(
+          res,
+          { message: "Logout successfully." },
+          204,
+          "application/json"
+        );
       });
     } catch (error) {
-      next(error);
+      if (String(error).startsWith("UnauthorizedError")) {
+        next(ApiError.unauthorized("Expired link. Signup again."));
+        return;
+      }
+      if (String(error).startsWith("BadRequestError")) {
+        next(ApiError.badRequest("Invalid token."));
+        return;
+      }
+      if (String(error).startsWith("ForbiddenError")) {
+        next(ApiError.forbidden("Invalid token."));
+        return;
+      }
+      next(ApiError.internal("Something went wrong."));
+      return;
     }
   }
 }
