@@ -301,26 +301,29 @@ class UserController {
   static async delete(req, res, next) {
     try {
       const { password } = req.body;
-      const decoded_user = req.jwt;
-      console.log(decoded_user);
-      //const result = await usersDAO.getUserById(id);
-      // if (result.success) {
-      //   const user = new User();
-      //   if (!(await user.comparePassword(password))) {
-      //     next(ApiError.unauthorized("Make sure your password is correct."));
-      //     return;
-      //   }
-      //   const deleteResult = await AccountsDAO.deleteUser(decoded_user.email);
-      //   const { error } = deleteResult;
-      //   if (error) {
-      //     next(ApiError.internal(error));
-      //     return;
-      //   }
-      //   writeServerJsonResponse(res, deleteResult, 200);
-      // } else {
-      //   next(ApiError.notfound("User doesnot exist."));
-      //   return;
-      // }
+      const { aud } = req.jwt;
+      const result = await usersDAO.getUserById(aud);
+      if (result.success) {
+        const user = new User(result.data);
+
+        if (!(await user.comparePassword(password))) {
+          next(ApiError.unauthorized("Make sure your password is correct."));
+          return;
+        }
+        const deleteResult = await usersDAO.deleteUser(aud);
+        if (deleteResult.success) {
+          writeServerResponse(
+            res,
+            { message: "Deleted successfully." },
+            deleteResult.statusCode,
+            "application/json"
+          );
+        }
+        next(ApiError.notfound("User doesnot exist."));
+        return;
+      }
+      next(ApiError.notfound("User doesnot exist."));
+      return;
     } catch (e) {
       next(ApiError.internal(`Something went wrong: ${e.message}`));
       return;

@@ -46,5 +46,11 @@ const schemas = {
   userLOGOUT: Joi.object().keys({
     refreshToken: [Joi.string().required(), Joi.number().required()],
   }),
+  userDELETE: Joi.object().keys({
+    password: Joi.string()
+      .min(8)
+      .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+      .required(),
+  }),
 };
 export default schemas;

@@ -3,6 +3,7 @@ import { Router } from "express";
 import { UserController } from "../controllers/index";
 import { userSchema } from "../helpers/index";
 import dataValidation from "../middlewares/data-validation";
+import { checkAuth } from "../middlewares/auth-validation";
 
 const router = new Router();
 router
@@ -24,6 +25,12 @@ router
   .route("/logout")
   .post(dataValidation(userSchema.userLOGOUT, "body"))
   .post(UserController.logout);
+
+router
+  .route("/delete")
+  .post(checkAuth)
+  .post(dataValidation(userSchema.userDELETE, "body"))
+  .post(UserController.delete);
 
 router
   .route("/activate/:token")
