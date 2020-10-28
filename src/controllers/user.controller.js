@@ -298,6 +298,34 @@ class UserController {
       return;
     }
   }
+  static async delete(req, res, next) {
+    try {
+      const { password } = req.body;
+      const decoded_user = req.jwt;
+      console.log(decoded_user);
+      //const result = await usersDAO.getUserById(id);
+      // if (result.success) {
+      //   const user = new User();
+      //   if (!(await user.comparePassword(password))) {
+      //     next(ApiError.unauthorized("Make sure your password is correct."));
+      //     return;
+      //   }
+      //   const deleteResult = await AccountsDAO.deleteUser(decoded_user.email);
+      //   const { error } = deleteResult;
+      //   if (error) {
+      //     next(ApiError.internal(error));
+      //     return;
+      //   }
+      //   writeServerJsonResponse(res, deleteResult, 200);
+      // } else {
+      //   next(ApiError.notfound("User doesnot exist."));
+      //   return;
+      // }
+    } catch (e) {
+      next(ApiError.internal(`Something went wrong: ${e.message}`));
+      return;
+    }
+  }
 }
 
 export default UserController;
