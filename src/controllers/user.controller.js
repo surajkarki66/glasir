@@ -80,7 +80,7 @@ class UserController {
            		 `,
           };
           // TODO: sending email.
-          writeServerResponse(
+          return writeServerResponse(
             res,
             mailOptions,
             insertResult.statusCode,
@@ -115,7 +115,7 @@ class UserController {
         .updateUser(userId, updateObject)
         .then((result) => {
           if (result.success) {
-            writeServerResponse(
+            return writeServerResponse(
               res,
               {
                 message: "User activated successfully.",
@@ -160,14 +160,14 @@ class UserController {
 						 `,
           };
           // TODO: sending email.
-          writeServerResponse(
+          return writeServerResponse(
             res,
             mailOptions,
             result.statusCode,
             "application/json"
           );
         } else {
-          writeServerResponse(
+          return writeServerResponse(
             res,
             { message: "Email is already verified." },
             result.statusCode,
@@ -204,7 +204,7 @@ class UserController {
             accessToken: accessToken,
             refreshToken: refreshToken,
           };
-          writeServerResponse(res, data, 200, "application/json");
+          return writeServerResponse(res, data, 200, "application/json");
         }
       }
       if (email) {
@@ -225,7 +225,7 @@ class UserController {
             accessToken: accessToken,
             refreshToken: refreshToken,
           };
-          writeServerResponse(res, data, 200, "application/json");
+          return writeServerResponse(res, data, 200, "application/json");
         }
       }
     } catch (e) {
@@ -244,7 +244,7 @@ class UserController {
       const accessToken = await signToken(userId, "ACCESS", "1h");
       const refToken = await signToken(userId, "REFRESH", "7d");
       const data = { accessToken: accessToken, refreshToken: refToken };
-      writeServerResponse(res, data, 200, "application/json");
+      return writeServerResponse(res, data, 200, "application/json");
     } catch (error) {
       if (String(error).startsWith("UnauthorizedError")) {
         next(ApiError.unauthorized("Expired link. Signup again."));
@@ -274,7 +274,7 @@ class UserController {
           next(ApiError.internal("Something went wrong."));
           return;
         }
-        writeServerResponse(
+        return writeServerResponse(
           res,
           { message: "Logout successfully." },
           204,
@@ -312,7 +312,7 @@ class UserController {
         }
         const deleteResult = await usersDAO.deleteUser(aud);
         if (deleteResult.success) {
-          writeServerResponse(
+          return writeServerResponse(
             res,
             { message: "Deleted successfully." },
             deleteResult.statusCode,
