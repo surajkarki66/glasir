@@ -8,6 +8,7 @@ import {
   verifyToken,
   verifyRefreshToken,
 } from "../helpers/jwt-helper";
+import client from "../helpers/init_redis";
 
 class User {
   constructor({
@@ -264,7 +265,10 @@ class UserController {
   static async logout(req, res, next) {
     try {
       const { refreshToken } = req.body;
-      const userId = await verifyRefreshToken(refreshToken);
+      const userId = await verifyRefreshToken(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET
+      );
       client.del(userId, (err, val) => {
         if (err) {
           next(ApiError.internal("Something went wrong."));

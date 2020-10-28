@@ -82,12 +82,12 @@ const verifyRefreshToken = (refreshToken, secretKey) => {
   return new Promise((resolve, reject) => {
     jwt.verify(refreshToken, secretKey, (err, payload) => {
       if (err) {
-        if (String(error).startsWith("TokenExpiredError")) {
+        if (String(err).startsWith("TokenExpiredError")) {
           return reject(
             createError.Unauthorized("Expired link. Signup again.")
           );
         }
-        if (String(error).startsWith("JsonWebTokenError")) {
+        if (String(err).startsWith("JsonWebTokenError")) {
           return reject(createError.BadRequest("Invalid token."));
         }
       }

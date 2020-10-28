@@ -21,6 +21,11 @@ router
   .post(UserController.refreshToken);
 
 router
+  .route("/logout")
+  .post(dataValidation(userSchema.userLOGOUT, "body"))
+  .post(UserController.logout);
+
+router
   .route("/activate/:token")
   .get(dataValidation(userSchema.userACTIVATION, "params"))
   .get(UserController.activation);
