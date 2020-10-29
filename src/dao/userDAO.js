@@ -73,8 +73,8 @@ class UsersDAO {
     } catch (e) {
       logger.error(`Unable to issue find command, ${e.message}`);
       return {
-        data: [],
         success: false,
+        data: [],
         totalNumUsers: 0,
         statusCode: 404,
       };
@@ -87,8 +87,8 @@ class UsersDAO {
       const totalNumUsers =
         parseInt(page) === 0 ? await UsersDAO.#users.countDocuments({}) : 0;
       return {
-        data: documents,
         success: true,
+        data: documents,
         totalNumUsers,
         statusCode: documents.length > 0 ? 200 : 404,
       };

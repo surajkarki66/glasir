@@ -298,6 +298,35 @@ class UserController {
       return;
     }
   }
+  static async getUsers(req, res, next) {
+    try {
+      const { page, usersPerPage } = req.query;
+      const result = await usersDAO.getUsers({
+        page,
+        usersPerPage,
+      });
+      if (result.success) {
+        const users = {
+          users: result.data,
+          page: page,
+          filters: {},
+          entries_per_page: usersPerPage,
+          totalResults: result.totalNumUsers,
+        };
+        return writeServerResponse(
+          res,
+          users,
+          result.statusCode,
+          "application/json"
+        );
+      }
+      next(ApiError.notFound("Users not found."));
+      return;
+    } catch (e) {
+      next(ApiError.internal(`Something went wrong: ${e.message}`));
+      return;
+    }
+  }
   static async getUserDetails(req, res, next) {
     try {
       const id = req.params.id;
