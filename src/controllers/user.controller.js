@@ -92,7 +92,7 @@ class UserController {
         }
       }
     } catch (e) {
-      next(ApiError.internal(`Something went wrong: ${e}`));
+      next(ApiError.internal(`Something went wrong: ${e.message}`));
       return;
     }
   }
@@ -179,7 +179,7 @@ class UserController {
         return;
       }
     } catch (err) {
-      next(ApiError.internal(`Something went wrong. ${err}`));
+      next(ApiError.internal(`Something went wrong. ${err.message}`));
       return;
     }
   }
@@ -295,6 +295,21 @@ class UserController {
         return;
       }
       next(ApiError.internal("Something went wrong."));
+      return;
+    }
+  }
+  static async getUserDetails(req, res, next) {
+    try {
+      const id = req.params.id;
+      const result = await usersDAO.getUserById(id);
+      if (result.success) {
+        console.log(result);
+      } else {
+        next(ApiError.notfound("User doesnot exist."));
+        return;
+      }
+    } catch (error) {
+      next(ApiError.internal("Something went wrong: ", error.messages));
       return;
     }
   }
