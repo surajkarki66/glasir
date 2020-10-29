@@ -52,6 +52,10 @@ const schemas = {
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
       .required(),
   }),
+  userLIST: Joi.object().keys({
+    page: Joi.number().required(),
+    usersPerPage: Joi.number().required(),
+  }),
   userDETAILS: Joi.object().keys({
     id: Joi.string().required(),
   }),

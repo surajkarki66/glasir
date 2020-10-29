@@ -33,6 +33,11 @@ router
   .post(UserController.delete);
 
 router
+  .route("/get-users")
+  .get(dataValidation(userSchema.userLIST, "query"))
+  .get(UserController.getUsers);
+
+router
   .route("/activate/:token")
   .get(dataValidation(userSchema.userACTIVATION, "params"))
   .get(UserController.activation);
@@ -46,4 +51,5 @@ router
   .route("/:id")
   .get(dataValidation(userSchema.userDETAILS, "params"))
   .get(UserController.getUserDetails);
+
 export default router;
