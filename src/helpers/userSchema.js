@@ -52,5 +52,8 @@ const schemas = {
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
       .required(),
   }),
+  userDETAILS: Joi.object().keys({
+    id: Joi.string().required(),
+  }),
 };
 export default schemas;

@@ -303,7 +303,13 @@ class UserController {
       const id = req.params.id;
       const result = await usersDAO.getUserById(id);
       if (result.success) {
-        console.log(result);
+        const { data } = result;
+        return writeServerResponse(
+          res,
+          data,
+          result.statusCode,
+          "application/json"
+        );
       } else {
         next(ApiError.notfound("User doesnot exist."));
         return;

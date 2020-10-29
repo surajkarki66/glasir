@@ -41,4 +41,9 @@ router
   .route("/verify-email/:id")
   .get(dataValidation(userSchema.userACTIVATIONEMAIL, "params"))
   .get(UserController.verifyEmail);
+
+router
+  .route("/:id")
+  .get(dataValidation(userSchema.userDETAILS, "params"))
+  .get(UserController.getUserDetails);
 export default router;
