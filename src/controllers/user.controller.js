@@ -298,6 +298,53 @@ class UserController {
       return;
     }
   }
+
+  static async changePassword(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { oldPassword, newPassword } = req.body;
+      const result = await usersDAO.getUserById(id);
+      if (result.success) {
+        const user = new User(result.data);
+
+        if (!(await user.comparePassword(oldPassword))) {
+          next(ApiError.unauthorized("Make sure your password is correct."));
+          return;
+        }
+        const updatedPassword = {
+          password: await User.hashPassword(newPassword),
+        };
+
+        usersDAO
+          .updateUser(id, updatedPassword)
+          .then((result) => {
+            if (result.success) {
+              return writeServerResponse(
+                res,
+                {
+                  message: "Password changed successfully.",
+                },
+                result.statusCode,
+                "application/json"
+              );
+            } else {
+              next(ApiError.notfound(result.data.message));
+              return;
+            }
+          })
+          .catch((err) => {
+            next(ApiError.internal(`Something went wrong. ${err.message}`));
+            return;
+          });
+      } else {
+        next(ApiError.notfound("User doesnot exist."));
+        return;
+      }
+    } catch (error) {
+      next(ApiError.internal(`Something went wrong. ${error.message}`));
+      return;
+    }
+  }
   static async getUsers(req, res, next) {
     try {
       const { page, usersPerPage } = req.query;
