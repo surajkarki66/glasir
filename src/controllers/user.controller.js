@@ -351,8 +351,8 @@ class UserController {
   static async delete(req, res, next) {
     try {
       const { password } = req.body;
-      const { aud } = req.jwt;
-      const result = await usersDAO.getUserById(aud);
+      const { id } = req.params;
+      const result = await usersDAO.getUserById(id);
       if (result.success) {
         const user = new User(result.data);
 
@@ -360,7 +360,7 @@ class UserController {
           next(ApiError.unauthorized("Make sure your password is correct."));
           return;
         }
-        const deleteResult = await usersDAO.deleteUser(aud);
+        const deleteResult = await usersDAO.deleteUser(id);
         if (deleteResult.success) {
           return writeServerResponse(
             res,

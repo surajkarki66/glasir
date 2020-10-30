@@ -27,10 +27,10 @@ router
   .post(UserController.logout);
 
 router
-  .route("/delete")
-  .post(checkAuth)
-  .post(dataValidation(userSchema.userDELETE, "body"))
-  .post(UserController.delete);
+  .route("/delete/:id")
+  .delete(checkAuth)
+  .delete(dataValidation(userSchema.userDELETE, "body"))
+  .delete(UserController.delete);
 
 router
   .route("/get-users")
@@ -39,8 +39,8 @@ router
 
 router
   .route("/activate/:token")
-  .get(dataValidation(userSchema.userACTIVATION, "params"))
-  .get(UserController.activation);
+  .patch(dataValidation(userSchema.userACTIVATION, "params"))
+  .patch(UserController.activation);
 
 router
   .route("/verify-email/:id")
