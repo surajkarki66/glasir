@@ -59,5 +59,15 @@ const schemas = {
   userDETAILS: Joi.object().keys({
     id: Joi.string().required(),
   }),
+  passwordCHANGE: Joi.object().keys({
+    oldPassword: Joi.string()
+      .min(8)
+      .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+      .required(),
+    newPassword: Joi.string()
+      .min(8)
+      .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+      .required(),
+  }),
 };
 export default schemas;

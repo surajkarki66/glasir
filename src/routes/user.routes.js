@@ -4,6 +4,7 @@ import { UserController } from "../controllers/index";
 import { userSchema } from "../helpers/index";
 import dataValidation from "../middlewares/data-validation";
 import { checkAuth } from "../middlewares/auth-validation";
+import { onlySameUserCanDoThisAction } from "../middlewares/auth-permission";
 
 const router = new Router();
 router
@@ -31,6 +32,13 @@ router
   .delete(checkAuth)
   .delete(dataValidation(userSchema.userDELETE, "body"))
   .delete(UserController.delete);
+
+router
+  .route("/change-password/:id")
+  .patch(checkAuth)
+  .patch(onlySameUserCanDoThisAction)
+  .patch(dataValidation(userSchema.passwordCHANGE, "body"))
+  .patch(UserController.changePassword);
 
 router
   .route("/get-users")
