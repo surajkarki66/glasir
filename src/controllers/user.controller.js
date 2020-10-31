@@ -9,6 +9,7 @@ import {
   verifyRefreshToken,
 } from "../helpers/jwt-helper";
 import client from "../helpers/init_redis";
+import mg from "../helpers/mail-gun";
 
 class User {
   constructor({
@@ -67,7 +68,7 @@ class UserController {
           const user = new User(data);
           const token = await signToken(user._id, "ACTIVATION", "5m");
           const mailOptions = {
-            from: `"Glasir" ${process.env.USER}`,
+            from: `Glasir <${process.env.COMPANY}>`,
             to: data.email,
             subject: "Account activation link",
             body: "Thank you for choosing Glasir !",
@@ -79,13 +80,22 @@ class UserController {
            		<p>${process.env.CLIENT_URL}</p>
            		 `,
           };
-          // TODO: sending email.
-          return writeServerResponse(
-            res,
-            mailOptions,
-            insertResult.statusCode,
-            "application/json"
-          );
+          mg.messages().send(mailOptions, (error, body) => {
+            if (error) {
+              next(ApiError.internal(`Something went wrong: ${error.message}`));
+              return;
+            }
+            const data = {
+              message:
+                "Account created successfully.Please check your email for verification.",
+            };
+            return writeServerResponse(
+              res,
+              data,
+              insertResult.statusCode,
+              "application/json"
+            );
+          });
         } else {
           next(ApiError.conflict(insertResult.error));
           return;
