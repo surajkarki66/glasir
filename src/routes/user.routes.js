@@ -52,6 +52,8 @@ router
 
 router
   .route("/verify-email/:id")
+  .patch(checkAuth)
+  .patch(onlySameUserCanDoThisAction)
   .get(dataValidation(userSchema.userACTIVATIONEMAIL, "params"))
   .get(UserController.verifyEmail);
 

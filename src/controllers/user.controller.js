@@ -157,25 +157,33 @@ class UserController {
           const user = new User(data);
           const token = await signToken(user._id, "ACTIVATION", "5m");
           const mailOptions = {
-            from: `"Glasir" ${process.env.USER}`,
+            from: `Glasir <${process.env.COMPANY}>`,
             to: data.email,
             subject: "Account activation link",
             body: "Thank you for choosing Glasir !",
             html: `
-						<h1>Please use the following to activate your account</h1>
-						<p>${process.env.CLIENT_URL}/users/activate/${token}</p>
-						<hr />
-						<p>This email may contain sensetive information</p>
-						<p>${process.env.CLIENT_URL}</p>
-						 `,
+           		<h1>Please use the following to activate your account</h1>
+           		<p>${process.env.CLIENT_URL}/users/activate/${token}</p>
+           		<hr />
+           		<p>This email may contain sensetive information</p>
+           		<p>${process.env.CLIENT_URL}</p>
+           		 `,
           };
-          // TODO: sending email.
-          return writeServerResponse(
-            res,
-            mailOptions,
-            result.statusCode,
-            "application/json"
-          );
+          mg.messages().send(mailOptions, (error, body) => {
+            if (error) {
+              next(ApiError.internal(`Something went wrong: ${error.message}`));
+              return;
+            }
+            const data = {
+              message: "Confirmation email is sent! Please check your email.",
+            };
+            return writeServerResponse(
+              res,
+              data,
+              result.statusCode,
+              "application/json"
+            );
+          });
         } else {
           return writeServerResponse(
             res,
