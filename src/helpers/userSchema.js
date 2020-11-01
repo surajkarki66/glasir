@@ -79,5 +79,11 @@ const schemas = {
       })
       .required(),
   }),
+  passwordRESET: Joi.object().keys({
+    newPassword: Joi.string()
+      .min(8)
+      .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+      .required(),
+  }),
 };
 export default schemas;

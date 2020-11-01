@@ -414,29 +414,22 @@ class UserController {
       const updatedPassword = {
         password: await User.hashPassword(newPassword),
       };
-      usersDAO
-        .updateUser(userId, updatedPassword)
-        .then((result) => {
-          if (result.success) {
-            return writeServerResponse(
-              res,
-              {
-                message: "Great! Now you can login with your new password",
-              },
-              result.statusCode,
-              "application/json"
-            );
-          } else {
-            next(ApiError.notfound(result.data.message));
-            return;
-          }
-        })
-        .catch((err) => {
-          next(ApiError.internal(`Something went wrong. ${err.message}`));
-          return;
-        });
+      const user = await usersDAO.updateUser(userId, updatedPassword);
+      if (user.success) {
+        return writeServerResponse(
+          res,
+          {
+            message: "Great! Now you can login with your new password",
+          },
+          user.statusCode,
+          "application/json"
+        );
+      } else {
+        next(ApiError.notfound(result.data.message));
+        return;
+      }
     } catch (error) {
-      next(ApiError.internal(`Something went wrong. ${err.message}`));
+      next(ApiError.internal(`Something went wrong. ${error.message}`));
       return;
     }
   }
