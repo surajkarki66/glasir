@@ -60,8 +60,17 @@ const signToken = (userId, type, expiresIn) => {
       };
       return sign(payload, secret, options, false);
 
+    case "FORGOT":
+      secret = process.env.FORGOT_TOKEN_SECRET;
+      options = {
+        expiresIn: expiresIn,
+        issuer: "pickurpage.com",
+        audience: userId.toString(),
+      };
+      return sign(payload, secret, options, false);
+
     default:
-    //
+    // pass
   }
 };
 const verifyToken = async (token, secretKey) => {

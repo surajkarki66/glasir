@@ -74,7 +74,7 @@ class UserController {
             body: "Thank you for choosing Glasir !",
             html: `
            		<h1>Please use the following to activate your account</h1>
-           		<p>${process.env.CLIENT_URL}/users/activate/${token}</p>
+           		<p>${process.env.CLIENT_URL}/user/activate/${token}</p>
            		<hr />
            		<p>This email may contain sensetive information</p>
            		<p>${process.env.CLIENT_URL}</p>
@@ -163,7 +163,7 @@ class UserController {
             body: "Thank you for choosing Glasir !",
             html: `
            		<h1>Please use the following to activate your account</h1>
-           		<p>${process.env.CLIENT_URL}/users/activate/${token}</p>
+           		<p>${process.env.CLIENT_URL}/user/activate/${token}</p>
            		<hr />
            		<p>This email may contain sensetive information</p>
            		<p>${process.env.CLIENT_URL}</p>
@@ -360,6 +360,47 @@ class UserController {
       }
     } catch (error) {
       next(ApiError.internal(`Something went wrong. ${error.message}`));
+      return;
+    }
+  }
+  static async forgotPassword(req, res, next) {
+    try {
+      const { email } = req.body;
+      const result = await usersDAO.getUserByEmail(email);
+      if (result) {
+        const { _id } = result;
+        const token = await signToken(_id, "FORGOT", "5m");
+        const mailOptions = {
+          from: `Glasir <${process.env.COMPANY}>`,
+          to: email,
+          subject: `Password Reset link`,
+          html: `
+                    <h1>Please use the following link to reset your password</h1>
+                    <p>${process.env.CLIENT_URL}/user/password-reset/${token}</p>
+                    <hr />
+                    <p>This email may contain sensetive information</p>
+                    <p>${process.env.CLIENT_URL}</p>
+                `,
+        };
+        mg.messages().send(mailOptions, (error, body) => {
+          if (error) {
+            next(ApiError.internal(`Something went wrong: ${error.message}`));
+            return;
+          }
+          const data = {
+            message: `Email has been sent to ${email}. Follow the instruction to reset your password.`,
+          };
+          return writeServerResponse(res, data, 200, "application/json");
+        });
+      }
+      return writeServerResponse(
+        res,
+        { error: "User with that email does not exist" },
+        404,
+        "application/json"
+      );
+    } catch (error) {
+      next(ApiError.internal(`Something went wrong: ${e.message}`));
       return;
     }
   }

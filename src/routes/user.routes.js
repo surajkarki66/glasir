@@ -40,6 +40,8 @@ router
   .patch(dataValidation(userSchema.passwordCHANGE, "body"))
   .patch(UserController.changePassword);
 
+router.route("/forgot-password").post(UserController.forgotPassword);
+
 router
   .route("/get-users")
   .get(dataValidation(userSchema.userLIST, "query"))
