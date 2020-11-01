@@ -401,6 +401,45 @@ class UserController {
       return;
     }
   }
+  static async resetPassword(req, res, next) {
+    try {
+      const { token } = req.params;
+      const { newPassword } = req.body;
+      const result = await verifyToken(token, process.env.FORGOT_TOKEN_SECRET);
+      if (result.error) {
+        next(ApiError.badRequest(result.error));
+        return;
+      }
+      const userId = result.aud;
+      const updatedPassword = {
+        password: await User.hashPassword(newPassword),
+      };
+      usersDAO
+        .updateUser(userId, updatedPassword)
+        .then((result) => {
+          if (result.success) {
+            return writeServerResponse(
+              res,
+              {
+                message: "Great! Now you can login with your new password",
+              },
+              result.statusCode,
+              "application/json"
+            );
+          } else {
+            next(ApiError.notfound(result.data.message));
+            return;
+          }
+        })
+        .catch((err) => {
+          next(ApiError.internal(`Something went wrong. ${err.message}`));
+          return;
+        });
+    } catch (error) {
+      next(ApiError.internal(`Something went wrong. ${err.message}`));
+      return;
+    }
+  }
   static async getUsers(req, res, next) {
     try {
       const { page, usersPerPage } = req.query;
