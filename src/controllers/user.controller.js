@@ -392,13 +392,10 @@ class UserController {
           };
           return writeServerResponse(res, data, 200, "application/json");
         });
+      } else {
+        next(ApiError.notfound("User with that email does not exist"));
+        return;
       }
-      return writeServerResponse(
-        res,
-        { error: "User with that email does not exist" },
-        404,
-        "application/json"
-      );
     } catch (error) {
       next(ApiError.internal(`Something went wrong: ${e.message}`));
       return;

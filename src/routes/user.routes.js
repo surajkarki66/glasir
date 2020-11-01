@@ -34,13 +34,16 @@ router
   .delete(UserController.delete);
 
 router
+  .route("/forgot-password")
+  .post(dataValidation(userSchema.passwordFORGOT, "body"))
+  .post(UserController.forgotPassword);
+
+router
   .route("/change-password/:id")
   .patch(checkAuth)
   .patch(onlySameUserCanDoThisAction)
   .patch(dataValidation(userSchema.passwordCHANGE, "body"))
   .patch(UserController.changePassword);
-
-router.route("/forgot-password").post(UserController.forgotPassword);
 
 router
   .route("/get-users")

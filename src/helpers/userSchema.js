@@ -69,5 +69,15 @@ const schemas = {
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
       .required(),
   }),
+  passwordFORGOT: Joi.object().keys({
+    email: Joi.string()
+      .email({
+        minDomainSegments: 2,
+        tlds: {
+          allow: ["com", "net"],
+        },
+      })
+      .required(),
+  }),
 };
 export default schemas;
