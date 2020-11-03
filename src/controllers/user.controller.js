@@ -121,27 +121,20 @@ class UserController {
       const updateObject = {
         isActive: true,
       };
-      usersDAO
-        .updateUser(userId, updateObject)
-        .then((result) => {
-          if (result.success) {
-            return writeServerResponse(
-              res,
-              {
-                message: "User activated successfully.",
-              },
-              result.statusCode,
-              "application/json"
-            );
-          } else {
-            next(ApiError.notfound(result.data.message));
-            return;
-          }
-        })
-        .catch((err) => {
-          next(ApiError.internal(`Something went wrong. ${err.message}`));
-          return;
-        });
+      const user = await usersDAO.updateUser(userId, updateObject);
+      if (user.success) {
+        return writeServerResponse(
+          res,
+          {
+            message: "User activated successfully.",
+          },
+          user.statusCode,
+          "application/json"
+        );
+      } else {
+        next(ApiError.notfound(user.data.message));
+        return;
+      }
     } catch (err) {
       next(ApiError.internal(`Something went wrong. ${err.message}`));
       return;
