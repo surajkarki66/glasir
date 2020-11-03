@@ -323,37 +323,29 @@ class UserController {
       const { oldPassword, newPassword } = req.body;
       const result = await usersDAO.getUserById(id);
       if (result.success) {
-        const user = new User(result.data);
+        const newUser = new User(result.data);
 
-        if (!(await user.comparePassword(oldPassword))) {
+        if (!(await newUser.comparePassword(oldPassword))) {
           next(ApiError.unauthorized("Make sure your password is correct."));
           return;
         }
         const updatedPassword = {
           password: await User.hashPassword(newPassword),
         };
-
-        usersDAO
-          .updateUser(id, updatedPassword)
-          .then((result) => {
-            if (result.success) {
-              return writeServerResponse(
-                res,
-                {
-                  message: "Password changed successfully.",
-                },
-                result.statusCode,
-                "application/json"
-              );
-            } else {
-              next(ApiError.notfound(result.data.message));
-              return;
-            }
-          })
-          .catch((err) => {
-            next(ApiError.internal(`Something went wrong. ${err.message}`));
-            return;
-          });
+        const user = await usersDAO.updateUser(id, updatedPassword);
+        if (user.success) {
+          return writeServerResponse(
+            res,
+            {
+              message: "Password changed successfully.",
+            },
+            user.statusCode,
+            "application/json"
+          );
+        } else {
+          next(ApiError.notfound(user.data.message));
+          return;
+        }
       } else {
         next(ApiError.notfound("User doesnot exist."));
         return;
@@ -433,6 +425,7 @@ class UserController {
       return;
     }
   }
+
   static async getUsers(req, res, next) {
     try {
       const { page, usersPerPage } = req.query;
