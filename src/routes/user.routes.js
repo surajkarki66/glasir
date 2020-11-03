@@ -51,6 +51,10 @@ router
   .post(UserController.resetPassword);
 
 router
+  .route("/change-user-details/:id")
+  .patch(UserController.changeUserDetails);
+
+router
   .route("/get-users")
   .get(dataValidation(userSchema.userLIST, "query"))
   .get(UserController.getUsers);

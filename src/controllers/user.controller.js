@@ -418,6 +418,11 @@ class UserController {
       return;
     }
   }
+  static async changeUserDetails(req, res, next) {
+    try {
+      const updateObject = req.body;
+    } catch (error) {}
+  }
 
   static async getUsers(req, res, next) {
     try {
