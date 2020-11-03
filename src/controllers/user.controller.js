@@ -420,8 +420,30 @@ class UserController {
   }
   static async changeUserDetails(req, res, next) {
     try {
-      const updateObject = req.body;
-    } catch (error) {}
+      const { firstName, lastName } = req.body;
+      const { id } = req.params;
+      const updateObject = {
+        firstName: firstName,
+        lastName: lastName,
+      };
+      const result = await usersDAO.updateUser(id, updateObject);
+      if (result.success) {
+        return writeServerResponse(
+          res,
+          {
+            message: "Update successfully.",
+          },
+          result.statusCode,
+          "application/json"
+        );
+      } else {
+        next(ApiError.notfound(result.data.message));
+        return;
+      }
+    } catch (error) {
+      next(ApiError.internal(`Something went wrong. ${error.message}`));
+      return;
+    }
   }
 
   static async getUsers(req, res, next) {

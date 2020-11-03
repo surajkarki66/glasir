@@ -34,6 +34,11 @@ router
   .delete(UserController.delete);
 
 router
+  .route("/change-user-details/:id")
+  .patch(dataValidation(userSchema.userDetailsCHANGE, "body"))
+  .patch(UserController.changeUserDetails);
+
+router
   .route("/change-password/:id")
   .patch(checkAuth)
   .patch(onlySameUserCanDoThisAction)
@@ -49,10 +54,6 @@ router
   .route("/reset-password/:token")
   .post(dataValidation(userSchema.passwordRESET, "body"))
   .post(UserController.resetPassword);
-
-router
-  .route("/change-user-details/:id")
-  .patch(UserController.changeUserDetails);
 
 router
   .route("/get-users")

@@ -86,9 +86,8 @@ const schemas = {
       .required(),
   }),
   userDetailsCHANGE: Joi.object().keys({
-    username: Joi.string().min(4).max(20),
-    firstName: Joi.string().min(2).max(20),
-    lastName: Joi.string().min(2).max(20),
+    firstName: Joi.string().min(2).max(20).required(),
+    lastName: Joi.string().min(2).max(20).required(),
   }),
 };
 export default schemas;
