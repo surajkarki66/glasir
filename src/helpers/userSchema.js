@@ -85,5 +85,10 @@ const schemas = {
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
       .required(),
   }),
+  userDetailsCHANGE: Joi.object().keys({
+    username: Joi.string().min(4).max(20),
+    firstName: Joi.string().min(2).max(20),
+    lastName: Joi.string().min(2).max(20),
+  }),
 };
 export default schemas;
