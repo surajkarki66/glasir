@@ -452,6 +452,24 @@ class UserController {
       return;
     }
   }
+  static async changeEmail(req, res, next) {
+    try {
+      const { email } = req.body;
+      const { id } = req.params;
+      const user = usersDAO.getUserByEmail(email);
+      if (user && user._id.toString() !== id) {
+        next(ApiError.conflict("Email is already taken."));
+        return;
+      }
+      const updateObject = { email: email, isActive: false };
+      const result = await usersDAO.updateUser(id, updateObject);
+      if (result.success) {
+      } else {
+        next(ApiError.notfound(result.data.message));
+        return;
+      }
+    } catch (error) {}
+  }
 
   static async getUsers(req, res, next) {
     try {
