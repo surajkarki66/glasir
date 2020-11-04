@@ -418,43 +418,21 @@ class UserController {
       return;
     }
   }
-  static async changeUsername(req, res, next) {
-    try {
-      const { username } = req.body;
-      const { id } = req.params;
-      const result = await usersDAO.getUserByUsername(username);
-      if (result) {
-        next(ApiError.conflict("Username is already taken."));
-        return;
-      }
-      const updateObject = { username: username };
-      const user = await usersDAO.updateUser(id, updateObject);
-      if (user.success) {
-        return writeServerResponse(
-          res,
-          {
-            message: "Username change successfully.",
-          },
-          user.statusCode,
-          "application/json"
-        );
-      } else {
-        next(ApiError.notfound(result.data.message));
-        return;
-      }
-    } catch (error) {
-      next(ApiError.internal(`Something went wrong. ${error.message}`));
-      return;
-    }
-  }
   static async changeUserDetails(req, res, next) {
     try {
-      const { firstName, lastName } = req.body;
+      const userDetails = req.body;
       const { id } = req.params;
-      const updateObject = {
-        firstName: firstName,
-        lastName: lastName,
-      };
+      let updateObject = userDetails;
+
+      if (updateObject.username) {
+        const { username } = updateObject;
+        const user = await usersDAO.getUserByUsername(username);
+        if (user && user._id.toString() !== id) {
+          next(ApiError.conflict("Username is already taken."));
+          return;
+        }
+        updateObject = { ...updateObject, username: username };
+      }
       const result = await usersDAO.updateUser(id, updateObject);
       if (result.success) {
         return writeServerResponse(
