@@ -456,7 +456,8 @@ class UserController {
     try {
       const { email } = req.body;
       const { id } = req.params;
-      const user = usersDAO.getUserByEmail(email);
+      const user = await usersDAO.getUserByEmail(email);
+
       if (user && user._id.toString() !== id) {
         next(ApiError.conflict("Email is already taken."));
         return;
@@ -464,11 +465,43 @@ class UserController {
       const updateObject = { email: email, isActive: false };
       const result = await usersDAO.updateUser(id, updateObject);
       if (result.success) {
+        const token = await signToken(id, "ACTIVATION", "5m");
+        const mailOptions = {
+          from: `Glasir <${process.env.COMPANY}>`,
+          to: email,
+          subject: "Account activation link",
+          body: "Thank you for choosing Glasir !",
+          html: `
+						 <h1>Please use the following to activate your account</h1>
+						 <p>${process.env.CLIENT_URL}/user/activate/${token}</p>
+						 <hr />
+						 <p>This email may contain sensetive information</p>
+						 <p>${process.env.CLIENT_URL}</p>
+							`,
+        };
+        mg.messages().send(mailOptions, (error, body) => {
+          if (error) {
+            next(ApiError.internal(`Something went wrong: ${error.message}`));
+            return;
+          }
+          const data = {
+            message: "Confirmation email is sent! Please check your email.",
+          };
+          return writeServerResponse(
+            res,
+            data,
+            result.statusCode,
+            "application/json"
+          );
+        });
       } else {
         next(ApiError.notfound(result.data.message));
         return;
       }
-    } catch (error) {}
+    } catch (error) {
+      next(ApiError.internal(`Something went wrong. ${error.message}`));
+      return;
+    }
   }
 
   static async getUsers(req, res, next) {
@@ -481,9 +514,9 @@ class UserController {
       if (result.success) {
         const users = {
           users: result.data,
-          page: page,
+          page: Number(page),
           filters: {},
-          entries_per_page: usersPerPage,
+          entries_per_page: Number(usersPerPage),
           totalResults: result.totalNumUsers,
         };
         return writeServerResponse(

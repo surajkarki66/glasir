@@ -7,6 +7,13 @@ import { checkAuth } from "../middlewares/auth-validation";
 import { onlySameUserCanDoThisAction } from "../middlewares/auth-permission";
 
 const router = new Router();
+
+router
+  .route("/get-users")
+  .get(checkAuth)
+  .get(dataValidation(userSchema.userLIST, "query"))
+  .get(UserController.getUsers);
+
 router
   .route("/signup")
   .post(dataValidation(userSchema.userSIGNUP, "body"))
@@ -24,14 +31,9 @@ router
 
 router
   .route("/logout")
+  .post(checkAuth)
   .post(dataValidation(userSchema.userLOGOUT, "body"))
   .post(UserController.logout);
-
-router
-  .route("/delete/:id")
-  .delete(checkAuth)
-  .delete(dataValidation(userSchema.userDELETE, "body"))
-  .delete(UserController.delete);
 
 router
   .route("/change-user-details/:id")
@@ -41,11 +43,11 @@ router
   .patch(UserController.changeUserDetails);
 
 router
-  .route("/change-password/:id")
+  .route("/change-email/:id")
   .patch(checkAuth)
   .patch(onlySameUserCanDoThisAction)
-  .patch(dataValidation(userSchema.passwordCHANGE, "body"))
-  .patch(UserController.changePassword);
+  .patch(dataValidation(userSchema.emailCHANGE, "body"))
+  .patch(UserController.changeEmail);
 
 router
   .route("/forgot-password")
@@ -58,25 +60,30 @@ router
   .post(UserController.resetPassword);
 
 router
-  .route("/get-users")
-  .get(dataValidation(userSchema.userLIST, "query"))
-  .get(UserController.getUsers);
+  .route("/delete/:id")
+  .delete(checkAuth)
+  .delete(onlySameUserCanDoThisAction)
+  .delete(dataValidation(userSchema.userDELETE, "body"))
+  .delete(UserController.delete);
+
+router
+  .route("/:id")
+  .get(checkAuth)
+  .get(dataValidation(userSchema.userDETAILS, "params"))
+  .get(UserController.getUserDetails);
 
 router
   .route("/activate/:token")
+  .patch(checkAuth)
+  .patch(onlySameUserCanDoThisAction)
   .patch(dataValidation(userSchema.userACTIVATION, "params"))
   .patch(UserController.activation);
 
 router
   .route("/verify-email/:id")
-  .patch(checkAuth)
-  .patch(onlySameUserCanDoThisAction)
+  .get(checkAuth)
+  .get(onlySameUserCanDoThisAction)
   .get(dataValidation(userSchema.userACTIVATIONEMAIL, "params"))
   .get(UserController.verifyEmail);
-
-router
-  .route("/:id")
-  .get(dataValidation(userSchema.userDETAILS, "params"))
-  .get(UserController.getUserDetails);
 
 export default router;
