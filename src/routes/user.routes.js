@@ -35,8 +35,8 @@ router
 
 router
   .route("/change-user-details/:id")
-  //.patch(checkAuth)
-  //.patch(onlySameUserCanDoThisAction)
+  .patch(checkAuth)
+  .patch(onlySameUserCanDoThisAction)
   .patch(dataValidation(userSchema.userDetailsCHANGE, "body"))
   .patch(UserController.changeUserDetails);
 
