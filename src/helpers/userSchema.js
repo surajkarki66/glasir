@@ -90,5 +90,15 @@ const schemas = {
     lastName: Joi.string().min(2).max(20),
     username: Joi.string().min(4).max(20),
   }),
+  emailCHANGE: Joi.object().keys({
+    email: Joi.string()
+      .email({
+        minDomainSegments: 2,
+        tlds: {
+          allow: ["com", "net"],
+        },
+      })
+      .required(),
+  }),
 };
 export default schemas;
