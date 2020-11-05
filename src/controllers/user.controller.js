@@ -215,6 +215,14 @@ class UserController {
             accessToken: accessToken,
             refreshToken: refreshToken,
           };
+          res.cookie("AccessToken", accessToken, {
+            httpOnly: true,
+            maxAge: 3600000,
+          });
+          res.cookie("RefreshToken", refreshToken, {
+            httpOnly: true,
+            maxAge: 604800000,
+          });
           return writeServerResponse(res, data, 200, "application/json");
         }
       }
@@ -236,6 +244,14 @@ class UserController {
             accessToken: accessToken,
             refreshToken: refreshToken,
           };
+          res.cookie("AccessToken", accessToken, {
+            httpOnly: true,
+            maxAge: 3600000,
+          });
+          res.cookie("RefreshToken", refreshToken, {
+            httpOnly: true,
+            maxAge: 604800000,
+          });
           return writeServerResponse(res, data, 200, "application/json");
         }
       }
@@ -255,6 +271,14 @@ class UserController {
       const accessToken = await signToken(userId, "ACCESS", "1h");
       const refToken = await signToken(userId, "REFRESH", "7d");
       const data = { accessToken: accessToken, refreshToken: refToken };
+      res.cookie("AccessToken", accessToken, {
+        httpOnly: true,
+        maxAge: 3600000,
+      });
+      res.cookie("RefreshToken", refreshToken, {
+        httpOnly: true,
+        maxAge: 604800000,
+      });
       return writeServerResponse(res, data, 200, "application/json");
     } catch (error) {
       if (String(error).startsWith("UnauthorizedError")) {

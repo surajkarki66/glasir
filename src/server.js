@@ -34,7 +34,7 @@ app.use(
 );
 
 // Routes
-app.use("/api/user", userRoute);
+app.use("/api/v1/user", userRoute);
 
 app.use(apiErrorHandler);
 
