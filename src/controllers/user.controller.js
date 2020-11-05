@@ -66,7 +66,12 @@ class UserController {
         if (insertResult.success) {
           const { data } = insertResult;
           const user = new User(data);
-          const token = await signToken(user._id, "ACTIVATION", "5m");
+          const token = await signToken(
+            user._id,
+            user.role,
+            "ACTIVATION",
+            "5m"
+          );
           const mailOptions = {
             from: `Glasir <${process.env.COMPANY}>`,
             to: data.email,
@@ -148,7 +153,12 @@ class UserController {
         if (!result.data.isActive) {
           const { data } = result;
           const user = new User(data);
-          const token = await signToken(user._id, "ACTIVATION", "5m");
+          const token = await signToken(
+            user._id,
+            user.role,
+            "ACTIVATION",
+            "5m"
+          );
           const mailOptions = {
             from: `Glasir <${process.env.COMPANY}>`,
             to: data.email,
@@ -208,8 +218,18 @@ class UserController {
             next(ApiError.unauthorized("Make sure your password is correct."));
             return;
           }
-          const accessToken = await signToken(user._id, "ACCESS", "1h");
-          const refreshToken = await signToken(user._id, "REFRESH", "7d");
+          const accessToken = await signToken(
+            user._id,
+            user.role,
+            "ACCESS",
+            "1h"
+          );
+          const refreshToken = await signToken(
+            user._id,
+            user.role,
+            "REFRESH",
+            "7d"
+          );
           const data = {
             message: "Login successfull.",
             accessToken: accessToken,
@@ -237,8 +257,18 @@ class UserController {
             next(ApiError.unauthorized("Make sure your password is correct."));
             return;
           }
-          const accessToken = await signToken(user._id, "ACCESS", "1h");
-          const refreshToken = await signToken(user._id, "REFRESH", "7d");
+          const accessToken = await signToken(
+            user._id,
+            user.role,
+            "ACCESS",
+            "1h"
+          );
+          const refreshToken = await signToken(
+            user._id,
+            user.role,
+            "REFRESH",
+            "7d"
+          );
           const data = {
             message: "Login successfull.",
             accessToken: accessToken,
@@ -263,13 +293,14 @@ class UserController {
   static async refreshToken(req, res, next) {
     try {
       const { refreshToken } = req.body;
-      const userId = await verifyRefreshToken(
+      const result = await verifyRefreshToken(
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET
       );
+      const { aud, role } = result;
 
-      const accessToken = await signToken(userId, "ACCESS", "1h");
-      const refToken = await signToken(userId, "REFRESH", "7d");
+      const accessToken = await signToken(aud, role, "ACCESS", "1h");
+      const refToken = await signToken(aud, role, "REFRESH", "7d");
       const data = { accessToken: accessToken, refreshToken: refToken };
       res.cookie("AccessToken", accessToken, {
         httpOnly: true,
@@ -377,8 +408,8 @@ class UserController {
       const { email } = req.body;
       const result = await usersDAO.getUserByEmail(email);
       if (result) {
-        const { _id } = result;
-        const token = await signToken(_id, "FORGOT", "5m");
+        const { _id, role } = result;
+        const token = await signToken(_id, role, "FORGOT", "5m");
         const mailOptions = {
           from: `Glasir <${process.env.COMPANY}>`,
           to: email,
@@ -481,7 +512,7 @@ class UserController {
       const { email } = req.body;
       const { id } = req.params;
       const user = await usersDAO.getUserByEmail(email);
-
+      const { role } = req.jwt;
       if (user && user._id.toString() !== id) {
         next(ApiError.conflict("Email is already taken."));
         return;
@@ -489,7 +520,7 @@ class UserController {
       const updateObject = { email: email, isActive: false };
       const result = await usersDAO.updateUser(id, updateObject);
       if (result.success) {
-        const token = await signToken(id, "ACTIVATION", "5m");
+        const token = await signToken(id, role, "ACTIVATION", "5m");
         const mailOptions = {
           from: `Glasir <${process.env.COMPANY}>`,
           to: email,

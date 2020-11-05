@@ -73,17 +73,16 @@ router
   .get(UserController.getUserDetails);
 
 router
-  .route("/activate/:token")
-  .patch(checkAuth)
-  .patch(onlySameUserCanDoThisAction)
-  .patch(dataValidation(userSchema.userACTIVATION, "params"))
-  .patch(UserController.activation);
-
-router
   .route("/verify-email/:id")
   .get(checkAuth)
   .get(onlySameUserCanDoThisAction)
   .get(dataValidation(userSchema.userACTIVATIONEMAIL, "params"))
   .get(UserController.verifyEmail);
+
+router
+  .route("/activate/:token")
+  .patch(checkAuth)
+  .patch(dataValidation(userSchema.userACTIVATION, "params"))
+  .patch(UserController.activation);
 
 export default router;

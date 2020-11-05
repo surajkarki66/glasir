@@ -30,12 +30,13 @@ const sign = (payload, secret, options, isRefresh) => {
     });
   });
 };
-const signToken = (userId, type, expiresIn) => {
+const signToken = (userId, role, type, expiresIn) => {
   let secret;
   let options;
   let payload = {};
   switch (type) {
     case "ACCESS":
+      payload = { role: role };
       secret = process.env.ACCESS_TOKEN_SECRET;
       options = {
         expiresIn: expiresIn,
@@ -44,6 +45,7 @@ const signToken = (userId, type, expiresIn) => {
       };
       return sign(payload, secret, options, false);
     case "REFRESH":
+      payload = { role: role };
       secret = process.env.REFRESH_TOKEN_SECRET;
       options = {
         expiresIn: expiresIn,
@@ -52,6 +54,7 @@ const signToken = (userId, type, expiresIn) => {
       };
       return sign(payload, secret, options, true);
     case "ACTIVATION":
+      payload = { role: role };
       secret = process.env.ACTIVATION_TOKEN_SECRET;
       options = {
         expiresIn: expiresIn,
@@ -61,6 +64,7 @@ const signToken = (userId, type, expiresIn) => {
       return sign(payload, secret, options, false);
 
     case "FORGOT":
+      payload = { role: role };
       secret = process.env.FORGOT_TOKEN_SECRET;
       options = {
         expiresIn: expiresIn,
@@ -83,6 +87,7 @@ const verifyToken = async (token, secretKey) => {
         return { error: "Invalid token." };
       }
     }
+    console.log(response);
     return response;
   });
 };
@@ -90,6 +95,7 @@ const verifyToken = async (token, secretKey) => {
 const verifyRefreshToken = (refreshToken, secretKey) => {
   return new Promise((resolve, reject) => {
     jwt.verify(refreshToken, secretKey, (err, payload) => {
+      console.log(payload);
       if (err) {
         if (String(err).startsWith("TokenExpiredError")) {
           return reject(
@@ -106,7 +112,7 @@ const verifyRefreshToken = (refreshToken, secretKey) => {
           reject(createError.InternalServerError("Invalid refresh token."));
           return;
         }
-        if (refreshToken === result) return resolve(userId);
+        if (refreshToken === result) return resolve(payload);
         reject(
           createError.Forbidden("Refresh token is doesnot belongs to you.")
         );
