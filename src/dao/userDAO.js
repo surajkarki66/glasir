@@ -67,9 +67,10 @@ class UsersDAO {
   }
   static async getUsers({ page = 0, usersPerPage = 10 } = {}) {
     const sort = UsersDAO.#DEFAULT_SORT;
+    const projection = { password: 0 };
     let cursor;
     try {
-      cursor = await UsersDAO.#users.find({}).project({}).sort(sort);
+      cursor = await UsersDAO.#users.find({}).project(projection).sort(sort);
     } catch (e) {
       logger.error(`Unable to issue find command, ${e.message}`);
       return {

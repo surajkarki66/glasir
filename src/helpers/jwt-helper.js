@@ -87,7 +87,6 @@ const verifyToken = async (token, secretKey) => {
         return { error: "Invalid token." };
       }
     }
-    console.log(response);
     return response;
   });
 };
@@ -95,7 +94,6 @@ const verifyToken = async (token, secretKey) => {
 const verifyRefreshToken = (refreshToken, secretKey) => {
   return new Promise((resolve, reject) => {
     jwt.verify(refreshToken, secretKey, (err, payload) => {
-      console.log(payload);
       if (err) {
         if (String(err).startsWith("TokenExpiredError")) {
           return reject(

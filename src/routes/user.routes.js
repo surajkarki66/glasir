@@ -1,4 +1,6 @@
 import { Router } from "express";
+import YAML from "yamljs";
+import swaggerUi from "swagger-ui-express";
 
 import { UserController } from "../controllers/index";
 import { userSchema } from "../helpers/index";
@@ -7,6 +9,7 @@ import { checkAuth } from "../middlewares/auth-validation";
 import { onlySameUserCanDoThisAction } from "../middlewares/auth-permission";
 
 const router = new Router();
+const swaggerDocument = YAML.load("./swagger.yaml");
 
 router
   .route("/get-users")
@@ -30,10 +33,25 @@ router
   .post(UserController.refreshToken);
 
 router
+  .route("/activate")
+  .patch(dataValidation(userSchema.userACTIVATION, "body"))
+  .patch(UserController.activation);
+
+router
   .route("/logout")
   .post(checkAuth)
   .post(dataValidation(userSchema.userLOGOUT, "body"))
   .post(UserController.logout);
+
+router
+  .route("/forgot-password")
+  .post(dataValidation(userSchema.passwordFORGOT, "body"))
+  .post(UserController.forgotPassword);
+
+router
+  .route("/reset-password")
+  .post(dataValidation(userSchema.passwordRESET, "body"))
+  .post(UserController.resetPassword);
 
 router
   .route("/change-user-details/:id")
@@ -48,16 +66,6 @@ router
   .patch(onlySameUserCanDoThisAction)
   .patch(dataValidation(userSchema.emailCHANGE, "body"))
   .patch(UserController.changeEmail);
-
-router
-  .route("/forgot-password")
-  .post(dataValidation(userSchema.passwordFORGOT, "body"))
-  .post(UserController.forgotPassword);
-
-router
-  .route("/reset-password/:token")
-  .post(dataValidation(userSchema.passwordRESET, "body"))
-  .post(UserController.resetPassword);
 
 router
   .route("/delete/:id")
@@ -79,10 +87,6 @@ router
   .get(dataValidation(userSchema.userACTIVATIONEMAIL, "params"))
   .get(UserController.verifyEmail);
 
-router
-  .route("/activate/:token")
-  .patch(checkAuth)
-  .patch(dataValidation(userSchema.userACTIVATION, "params"))
-  .patch(UserController.activation);
+router.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 export default router;

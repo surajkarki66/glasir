@@ -42,6 +42,35 @@ class User {
   }
 }
 class UserController {
+  static async getUsers(req, res, next) {
+    try {
+      const { page, usersPerPage } = req.query;
+      const result = await usersDAO.getUsers({
+        page,
+        usersPerPage,
+      });
+      if (result.success) {
+        const users = {
+          users: result.data,
+          page: Number(page),
+          filters: {},
+          entries_per_page: Number(usersPerPage),
+          totalResults: result.totalNumUsers,
+        };
+        return writeServerResponse(
+          res,
+          users,
+          result.statusCode,
+          "application/json"
+        );
+      }
+      next(ApiError.notFound("Users not found."));
+      return;
+    } catch (e) {
+      next(ApiError.internal(`Something went wrong: ${e.message}`));
+      return;
+    }
+  }
   static async signup(req, res, next) {
     try {
       const userFromBody = req.body;
@@ -113,7 +142,7 @@ class UserController {
   }
   static async activation(req, res, next) {
     try {
-      const { token } = req.params;
+      const { token } = req.body;
       const result = await verifyToken(
         token,
         process.env.ACTIVATION_TOKEN_SECRET
@@ -210,12 +239,12 @@ class UserController {
       if (username) {
         const userData = await usersDAO.getUserByUsername(username);
         if (!userData) {
-          next(ApiError.unauthorized("Make sure your username is correct."));
+          next(ApiError.badRequest("Make sure your username is correct."));
           return;
         } else {
           const user = new User(userData);
           if (!(await user.comparePassword(password))) {
-            next(ApiError.unauthorized("Make sure your password is correct."));
+            next(ApiError.badRequest("Make sure your password is correct."));
             return;
           }
           const accessToken = await signToken(
@@ -249,12 +278,12 @@ class UserController {
       if (email) {
         const userData = await usersDAO.getUserByEmail(email);
         if (!userData) {
-          next(ApiError.unauthorized("Make sure your email is correct."));
+          next(ApiError.badRequest("Make sure your email is correct."));
           return;
         } else {
           const user = new User(userData);
           if (!(await user.comparePassword(password))) {
-            next(ApiError.unauthorized("Make sure your password is correct."));
+            next(ApiError.badRequest("Make sure your password is correct."));
             return;
           }
           const accessToken = await signToken(
@@ -343,7 +372,7 @@ class UserController {
         return writeServerResponse(
           res,
           { message: "Logout successfully." },
-          204,
+          200,
           "application/json"
         );
       });
@@ -443,8 +472,7 @@ class UserController {
   }
   static async resetPassword(req, res, next) {
     try {
-      const { token } = req.params;
-      const { newPassword } = req.body;
+      const { newPassword, token } = req.body;
       const result = await verifyToken(token, process.env.FORGOT_TOKEN_SECRET);
       if (result.error) {
         next(ApiError.badRequest(result.error));
@@ -513,6 +541,7 @@ class UserController {
       const { id } = req.params;
       const user = await usersDAO.getUserByEmail(email);
       const { role } = req.jwt;
+
       if (user && user._id.toString() !== id) {
         next(ApiError.conflict("Email is already taken."));
         return;
@@ -555,36 +584,6 @@ class UserController {
       }
     } catch (error) {
       next(ApiError.internal(`Something went wrong. ${error.message}`));
-      return;
-    }
-  }
-
-  static async getUsers(req, res, next) {
-    try {
-      const { page, usersPerPage } = req.query;
-      const result = await usersDAO.getUsers({
-        page,
-        usersPerPage,
-      });
-      if (result.success) {
-        const users = {
-          users: result.data,
-          page: Number(page),
-          filters: {},
-          entries_per_page: Number(usersPerPage),
-          totalResults: result.totalNumUsers,
-        };
-        return writeServerResponse(
-          res,
-          users,
-          result.statusCode,
-          "application/json"
-        );
-      }
-      next(ApiError.notFound("Users not found."));
-      return;
-    } catch (e) {
-      next(ApiError.internal(`Something went wrong: ${e.message}`));
       return;
     }
   }

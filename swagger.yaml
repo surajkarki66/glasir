@@ -1,0 +1,634 @@
+openapi: 3.0.0
+info:
+  title: Glasir REST APIs
+  description: This is the API documentation of Glasir
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+
+paths:
+  /api/v1/user/get-users:
+    get:
+      summary: Get a list of all users
+      tags: [Users]
+      description: Restricted to admin users.
+      operationId: get-users
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: An object containing page details and an array of all users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "5eb12e197e06a76ccdefc121"
+                        username:
+                          type: string
+                          example: "MrJason"
+                        firstName:
+                          type: string
+                          example: "Jason"
+                        lastName:
+                          type: string
+                          example: "Watmore"
+                        email:
+                          type: string
+                          example: "jason@example.com"
+                        role:
+                          type: string
+                          enum: [Admin, Freelancer, Client]
+                          example: "Admin"
+                        joinedDate:
+                          type: string
+                          example: "2020-05-05T09:12:57.848Z"
+                        updatedDate:
+                          type: string
+                          example: "2020-05-08T03:11:21.553Z"
+                        isActive:
+                          type: boolean
+                          example: true
+                  page:
+                    type: number
+                    example: 10
+                  filters:
+                    type: object
+                    example: "{}"
+                  entries_per_page:
+                    type: number
+                    example: 12
+                  totalResults:
+                     type: number
+                     example: 19
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /api/v1/user/login:
+    post:
+      summary: Authenticate user credentials and return a JWT token and a cookie with a refresh token
+      tags: [Users]
+      description: User must be verified before authenticating.
+      operationId: authenticate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "jason@example.com"
+                username:
+                  type: string
+                  example: "jasonbourne"
+                password:
+                  type: string
+                  example: "pass123"
+              required:
+                - email
+                - username
+                - password
+      responses:
+        "200":
+          description: AccessToken and RefreshToken with their respective cookies.
+          headers:
+            Set-Cookie:
+              description: "`refreshToken`"
+              schema:
+                type: string
+                example: refreshToken=51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550; Path=/; Expires=Tue, 16 Jun 2020 09:14:17 GMT; HttpOnly
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWIxMmUxOTdlMDZhNzZjY2RlZmMxMjEiLCJpZCI6IjVlYjEyZTE5N2UwNmE3NmNjZGVmYzEyMSIsImlhdCI6MTU4ODc1ODE1N30.xR9H0STbFOpSkuGA9jHNZOJ6eS7umHHqKRhI807YT1Y"
+
+                  refreshToken:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWIxMmUxOTdlMDZhNzZjY2RlZmMxMjEiLCJpZCI6IjVlYjEyZTE5N2UwNmE3NmNjZGVmYzEyMSIsImlhdCI6MTU4ODc1ODE1N30.xR9H0STbFOpSkuGA9jHNZOJ6eS7umHHqKRhI807YT1Y"
+        "400":
+          description: The email or password is incorrect
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Email or password is incorrect"
+  /api/v1/user/refresh-token:
+    post:
+      summary: Use a refresh token to generate a new JWT token and a new refresh token
+      tags: [Users]
+      description: The refresh token is sent and returned via cookies.
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+                  example: "51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550"
+      required:
+       - refreshToken
+      parameters:
+        - in: cookie
+          name: refreshToken
+          description: The `refreshToken` cookie
+          schema:
+            type: string
+            example: 51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550
+      responses:
+        "200":
+          description: a JWT access token and a new refresh token cookie
+          headers:
+            Set-Cookie:
+              description: "`refreshToken`"
+              schema:
+                type: string
+                example: refreshToken=51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550; Path=/; Expires=Tue, 16 Jun 2020 09:14:17 GMT; HttpOnly
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                   accessToken:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWIxMmUxOTdlMDZhNzZjY2RlZmMxMjEiLCJpZCI6IjVlYjEyZTE5N2UwNmE3NmNjZGVmYzEyMSIsImlhdCI6MTU4ODc1ODE1N30.xR9H0STbFOpSkuGA9jHNZOJ6eS7umHHqKRhI807YT1Y"
+
+                   refreshToken:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWIxMmUxOTdlMDZhNzZjY2RlZmMxMjEiLCJpZCI6IjVlYjEyZTE5N2UwNmE3NmNjZGVmYzEyMSIsImlhdCI6MTU4ODc1ODE1N30.xR9H0STbFOpSkuGA9jHNZOJ6eS7umHHqKRhI807YT1Y"
+        "400":
+          description: The refresh token is invalid, revoked or expired
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid token"
+        "401":
+          description: The refresh token is expired
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Token is expired."
+
+  /api/v1/user/signup:
+    post:
+      summary: Register a new user account and send a verification email
+      tags: [Users]
+      description: First the user is created , then user got the verification email to activate their account.
+      operationId: signup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "jasonwatmore"
+                firstName:
+                  type: string
+                  example: "Jason"
+                lastName:
+                  type: string
+                  example: "Watmore"
+                email:
+                  type: string
+                  example: "jason@example.com"
+                password:
+                  type: string
+                  example: "pass123"
+
+                role:
+                  type: string
+                  enum: [Admin, Freelancer, Client]
+              required:
+                - username
+                - firstName
+                - lastName
+                - email
+                - password
+                - role
+      responses:
+        "200":
+          description: The registration request was successful and a verification email has been sent to the specified email address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Account created successfully.Please check your email for verification."
+
+        "409":
+         description: The email and username is already taken
+         content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "The email and username is already taken"
+  /api/v1/user/activate:
+    patch:
+      summary: Verify a new user with a verification token received by email after registration
+      tags: [Users]
+      operationId: verifyEmail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: "3c7f8d9c4cb348ff95a0b74a1452aa24fc9611bb76768bb9eafeeb826ddae2935f1880bc7713318f"
+              required:
+                - token
+      responses:
+        "200":
+          description: Verification was successful and your account is activated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User activated successfully."
+        "400":
+          description: Verification failed due to an invalid token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Verification failed"
+
+        "404":
+          description: User with that id doesnot exist.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User updation failed."
+
+  /api/v1/user/logout:
+    post:
+     summary: User are logout by removing their refresh token from redis database.
+     tags: [Users]
+     security:
+        - bearerAuth: []
+     operationId: logout
+     requestBody:
+       require: true
+       content:
+        application/json:
+         schema:
+            type: object
+            properties:
+              refreshToken:
+                type: string
+                example: "3c7f8d9c4cb348ff95a0b74a1452aa24fc9611bb76768bb9eafeeb826ddae2935f1880bc7713318f"
+            required:
+              - refreshToken
+     responses:
+        "200":
+          description: User logout from backend.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User logout successfully."
+        "400":
+          description: The refresh token is invalid, revoked or expired
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid token"
+        "401":
+          description: The refresh token is expired
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Token is expired."
+  /api/v1/user/forgot-password:
+    post:
+      summary: Submit email address to reset the password on an account
+      tags: [Users]
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "jason@example.com"
+              required:
+                - email
+      responses:
+        "200":
+          description: The request was received and an email has been sent to the specified address with password reset instructions (if the email address is associated with an account)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Email has been sent to user. Follow the instruction to reset your password."
+        "404":
+          description: Email entered by user is not exist in his account.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User with that email does not exist"
+  /api/v1/user/reset-password:
+    post:
+      summary: Validate the reset password token received by email after submitting to the /api/v1/user/forgot-password route
+      tags: [Users]
+      operationId: reset-password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: "3c7f8d9c4cb348ff95a0b74a1452aa24fc9611bb76768bb9eafeeb826ddae2935f1880bc7713318f"
+                newPassword:
+                  type: string
+                  example: "pas123"
+              required:
+                - token
+                - newPassword
+      responses:
+        "200":
+          description: Token is verified and now you can make your new password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Great! Now you can login with your new password"
+        "400":
+          description: Token is invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid token"
+
+        "404":
+          description: User that you are try to find is not exist.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User doesnot exist."
+
+
+  /api/v1/user/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: User id
+        required: true
+        example: "5eb12e197e06a76ccdefc121"
+        schema:
+          type: string
+    get:
+      summary: Get a single user by id
+      tags: [Users]
+      description: Admin users can access any user, regular users are allowed to their own account.
+      operationId: getUserById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Details of the specified user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "5eb12e197e06a76ccdefc121"
+                  username:
+                    type: string
+                    example: "MrJason"
+                  firstName:
+                    type: string
+                    example: "Jason"
+                  lastName:
+                    type: string
+                    example: "Watmore"
+                  email:
+                    type: string
+                    example: "jason@example.com"
+                  role:
+                    type: string
+                    example: "Admin"
+                  joinedDate:
+                    type: string
+                    example: "2020-05-05T09:12:57.848Z"
+                  updatedDate:
+                    type: string
+                    example: "2020-05-08T03:11:21.553Z"
+                  isActive:
+                    type: boolean
+                    example: true
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /api/v1/user/change-user-details/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: User id
+        required: true
+        example: "5eb12e197e06a76ccdefc121"
+        schema:
+          type: string
+    patch:
+      summary: Update any username, firstName and lastName of user.
+      tags: [Users]
+      description: Admin users can update any account including role, regular users are restricted to their own account and cannot update role.
+      operationId: updateAccount
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "MrJason"
+                firstName:
+                  type: string
+                  example: "Jason"
+                lastName:
+                  type: string
+                  example: "Watmore"
+
+                updatedDate:
+                  type: string
+                  example: "2020-05-08T03:11:21.553Z"
+                role:
+                  type: string
+                  enum: [Admin, Freelancer, Client]
+      responses:
+        "200":
+          description: User updated successfully. The details of the updated account are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User updated successfully"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+         $ref: "#/components/responses/UnauthorizedError"
+
+  /api/v1/user/delete/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: User id
+        required: true
+        example: "5eb12e197e06a76ccdefc121"
+        schema:
+          type: string
+    delete:
+      summary: Delete an user
+      tags: [Users]
+      description: Admin users can delete any user, regular users are restricted to their own account.
+      operationId: deleteUser
+      security:
+       - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: "pass123"
+              required:
+               - password
+      responses:
+        "200":
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Deleted successfully."
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid, or the user does not have access to perform the action
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Unauthorized"
+    NotFoundError:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Not Found"

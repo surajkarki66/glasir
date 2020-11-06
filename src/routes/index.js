@@ -1,5 +1,4 @@
-import userRoute from "./user.routes";
+import swaggerRoutes from "./swagger.routes";
+import userRoutes from "./user.routes";
 
-export {
-	userRoute
-}
+export { swaggerRoutes, userRoutes };

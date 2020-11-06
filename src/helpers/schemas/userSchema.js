@@ -80,6 +80,7 @@ const schemas = {
       .required(),
   }),
   passwordRESET: Joi.object().keys({
+    token: [Joi.string().required(), Joi.number().required()],
     newPassword: Joi.string()
       .min(8)
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
