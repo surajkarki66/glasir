@@ -71,168 +71,7 @@ class UserController {
       return;
     }
   }
-  static async signup(req, res, next) {
-    try {
-      const userFromBody = req.body;
-      const { email, username } = userFromBody;
-      const email_result = usersDAO.getUserByEmail(email);
-      const username_result = usersDAO.getUserByUsername(username);
-      const result = await Promise.all([email_result, username_result]);
-      if (result[0]) {
-        next(ApiError.conflict("Email is already taken."));
-        return;
-      } else if (result[1]) {
-        next(ApiError.conflict("Username is already taken."));
-        return;
-      } else {
-        const userInfo = {
-          ...userFromBody,
-          isActive: false,
-          password: await User.hashPassword(userFromBody.password),
-        };
-        const insertResult = await usersDAO.createUser(userInfo);
 
-        if (insertResult.success) {
-          const { data } = insertResult;
-          const user = new User(data);
-          const token = await signToken(
-            user._id,
-            user.role,
-            "ACTIVATION",
-            "5m"
-          );
-          const mailOptions = {
-            from: `Glasir <${process.env.COMPANY}>`,
-            to: data.email,
-            subject: "Account activation link",
-            body: "Thank you for choosing Glasir !",
-            html: `
-           		<h1>Please use the following to activate your account</h1>
-           		<p>${process.env.CLIENT_URL}/user/activate/${token}</p>
-           		<hr />
-           		<p>This email may contain sensetive information</p>
-           		<p>${process.env.CLIENT_URL}</p>
-           		 `,
-          };
-          mg.messages().send(mailOptions, (error, body) => {
-            if (error) {
-              next(ApiError.internal(`Something went wrong: ${error.message}`));
-              return;
-            }
-            const data = {
-              message:
-                "Account created successfully.Please check your email for verification.",
-            };
-            return writeServerResponse(
-              res,
-              data,
-              insertResult.statusCode,
-              "application/json"
-            );
-          });
-        } else {
-          next(ApiError.conflict(insertResult.error));
-          return;
-        }
-      }
-    } catch (e) {
-      next(ApiError.internal(`Something went wrong: ${e.message}`));
-      return;
-    }
-  }
-  static async activation(req, res, next) {
-    try {
-      const { token } = req.body;
-      const result = await verifyToken(
-        token,
-        process.env.ACTIVATION_TOKEN_SECRET
-      );
-      if (result.error) {
-        next(ApiError.badRequest(result.error));
-        return;
-      }
-      const userId = result.aud;
-      const updateObject = {
-        isActive: true,
-      };
-      const user = await usersDAO.updateUser(userId, updateObject);
-      if (user.success) {
-        return writeServerResponse(
-          res,
-          {
-            message: "User activated successfully.",
-          },
-          user.statusCode,
-          "application/json"
-        );
-      } else {
-        next(ApiError.notfound(user.data.message));
-        return;
-      }
-    } catch (err) {
-      next(ApiError.internal(`Something went wrong. ${err.message}`));
-      return;
-    }
-  }
-  static async verifyEmail(req, res, next) {
-    try {
-      const { id } = req.params;
-      const result = await usersDAO.getUserById(id);
-      if (result.success) {
-        if (!result.data.isActive) {
-          const { data } = result;
-          const user = new User(data);
-          const token = await signToken(
-            user._id,
-            user.role,
-            "ACTIVATION",
-            "5m"
-          );
-          const mailOptions = {
-            from: `Glasir <${process.env.COMPANY}>`,
-            to: data.email,
-            subject: "Account activation link",
-            body: "Thank you for choosing Glasir !",
-            html: `
-           		<h1>Please use the following to activate your account</h1>
-           		<p>${process.env.CLIENT_URL}/user/activate/${token}</p>
-           		<hr />
-           		<p>This email may contain sensetive information</p>
-           		<p>${process.env.CLIENT_URL}</p>
-           		 `,
-          };
-          mg.messages().send(mailOptions, (error, body) => {
-            if (error) {
-              next(ApiError.internal(`Something went wrong: ${error.message}`));
-              return;
-            }
-            const data = {
-              message: "Confirmation email is sent! Please check your email.",
-            };
-            return writeServerResponse(
-              res,
-              data,
-              result.statusCode,
-              "application/json"
-            );
-          });
-        } else {
-          return writeServerResponse(
-            res,
-            { message: "Email is already verified." },
-            result.statusCode,
-            "application/json"
-          );
-        }
-      } else {
-        next(ApiError.notfound("User doesnot exist."));
-        return;
-      }
-    } catch (err) {
-      next(ApiError.internal(`Something went wrong. ${err.message}`));
-      return;
-    }
-  }
   static async login(req, res, next) {
     try {
       const { username, email, password } = req.body;
@@ -319,6 +158,7 @@ class UserController {
       return;
     }
   }
+
   static async refreshToken(req, res, next) {
     try {
       const { refreshToken } = req.body;
@@ -357,6 +197,113 @@ class UserController {
       return;
     }
   }
+
+  static async signup(req, res, next) {
+    try {
+      const userFromBody = req.body;
+      const { email, username } = userFromBody;
+      const email_result = usersDAO.getUserByEmail(email);
+      const username_result = usersDAO.getUserByUsername(username);
+      const result = await Promise.all([email_result, username_result]);
+      if (result[0]) {
+        next(ApiError.conflict("Email is already taken."));
+        return;
+      } else if (result[1]) {
+        next(ApiError.conflict("Username is already taken."));
+        return;
+      } else {
+        const userInfo = {
+          ...userFromBody,
+          password: await User.hashPassword(userFromBody.password),
+          isActive: false,
+          joinedDate: new Date(),
+          updatedDate: null,
+        };
+        const insertResult = await usersDAO.createUser(userInfo);
+
+        if (insertResult.success) {
+          const { data } = insertResult;
+          const user = new User(data);
+          const token = await signToken(
+            user._id,
+            user.role,
+            "ACTIVATION",
+            "5m"
+          );
+          const mailOptions = {
+            from: `Glasir <${process.env.COMPANY}>`,
+            to: data.email,
+            subject: "Account activation link",
+            body: "Thank you for choosing Glasir !",
+            html: `
+           		<h1>Please use the following to activate your account</h1>
+           		<p>${process.env.CLIENT_URL}/user/activate/${token}</p>
+           		<hr />
+           		<p>This email may contain sensetive information</p>
+           		<p>${process.env.CLIENT_URL}</p>
+           		 `,
+          };
+          mg.messages().send(mailOptions, (error, body) => {
+            if (error) {
+              next(ApiError.internal(`Something went wrong: ${error.message}`));
+              return;
+            }
+            const data = {
+              message:
+                "Account created successfully.Please check your email for verification.",
+            };
+            return writeServerResponse(
+              res,
+              data,
+              insertResult.statusCode,
+              "application/json"
+            );
+          });
+        } else {
+          next(ApiError.conflict(insertResult.error));
+          return;
+        }
+      }
+    } catch (e) {
+      next(ApiError.internal(`Something went wrong: ${e.message}`));
+      return;
+    }
+  }
+  static async activation(req, res, next) {
+    try {
+      const { token } = req.body;
+      const result = await verifyToken(
+        token,
+        process.env.ACTIVATION_TOKEN_SECRET
+      );
+      if (result.error) {
+        next(ApiError.badRequest(result.error));
+        return;
+      }
+      const userId = result.aud;
+      const updateObject = {
+        isActive: true,
+      };
+      const user = await usersDAO.updateUser(userId, updateObject);
+      if (user.success) {
+        return writeServerResponse(
+          res,
+          {
+            message: "User activated successfully.",
+          },
+          user.statusCode,
+          "application/json"
+        );
+      } else {
+        next(ApiError.notfound(user.data.message));
+        return;
+      }
+    } catch (err) {
+      next(ApiError.internal(`Something went wrong. ${err.message}`));
+      return;
+    }
+  }
+
   static async logout(req, res, next) {
     try {
       const { refreshToken } = req.body;
@@ -394,44 +341,6 @@ class UserController {
     }
   }
 
-  static async changePassword(req, res, next) {
-    try {
-      const { id } = req.params;
-      const { oldPassword, newPassword } = req.body;
-      const result = await usersDAO.getUserById(id);
-      if (result.success) {
-        const newUser = new User(result.data);
-
-        if (!(await newUser.comparePassword(oldPassword))) {
-          next(ApiError.unauthorized("Make sure your password is correct."));
-          return;
-        }
-        const updatedPassword = {
-          password: await User.hashPassword(newPassword),
-        };
-        const user = await usersDAO.updateUser(id, updatedPassword);
-        if (user.success) {
-          return writeServerResponse(
-            res,
-            {
-              message: "Password changed successfully.",
-            },
-            user.statusCode,
-            "application/json"
-          );
-        } else {
-          next(ApiError.notfound(user.data.message));
-          return;
-        }
-      } else {
-        next(ApiError.notfound("User doesnot exist."));
-        return;
-      }
-    } catch (error) {
-      next(ApiError.internal(`Something went wrong. ${error.message}`));
-      return;
-    }
-  }
   static async forgotPassword(req, res, next) {
     try {
       const { email } = req.body;
@@ -470,6 +379,7 @@ class UserController {
       return;
     }
   }
+
   static async resetPassword(req, res, next) {
     try {
       const { newPassword, token } = req.body;
@@ -501,6 +411,47 @@ class UserController {
       return;
     }
   }
+
+  static async changePassword(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { oldPassword, newPassword } = req.body;
+      const result = await usersDAO.getUserById(id);
+      if (result.success) {
+        const newUser = new User(result.data);
+
+        if (!(await newUser.comparePassword(oldPassword))) {
+          next(ApiError.unauthorized("Make sure your password is correct."));
+          return;
+        }
+        const updatedPassword = {
+          updatedDate: new Date(),
+          password: await User.hashPassword(newPassword),
+        };
+        const user = await usersDAO.updateUser(id, updatedPassword);
+        if (user.success) {
+          return writeServerResponse(
+            res,
+            {
+              message: "Password changed successfully.",
+            },
+            user.statusCode,
+            "application/json"
+          );
+        } else {
+          next(ApiError.notfound(user.data.message));
+          return;
+        }
+      } else {
+        next(ApiError.notfound("User doesnot exist."));
+        return;
+      }
+    } catch (error) {
+      next(ApiError.internal(`Something went wrong. ${error.message}`));
+      return;
+    }
+  }
+
   static async changeUserDetails(req, res, next) {
     try {
       const userDetails = req.body;
@@ -546,7 +497,11 @@ class UserController {
         next(ApiError.conflict("Email is already taken."));
         return;
       }
-      const updateObject = { email: email, isActive: false };
+      const updateObject = {
+        email: email,
+        isActive: false,
+        updatedDate: new Date(),
+      };
       const result = await usersDAO.updateUser(id, updateObject);
       if (result.success) {
         const token = await signToken(id, role, "ACTIVATION", "5m");
@@ -584,6 +539,66 @@ class UserController {
       }
     } catch (error) {
       next(ApiError.internal(`Something went wrong. ${error.message}`));
+      return;
+    }
+  }
+
+  static async verifyEmail(req, res, next) {
+    try {
+      const { id } = req.params;
+      const result = await usersDAO.getUserById(id);
+      if (result.success) {
+        if (!result.data.isActive) {
+          const { data } = result;
+          const user = new User(data);
+          const token = await signToken(
+            user._id,
+            user.role,
+            "ACTIVATION",
+            "5m"
+          );
+          const mailOptions = {
+            from: `Glasir <${process.env.COMPANY}>`,
+            to: data.email,
+            subject: "Account activation link",
+            body: "Thank you for choosing Glasir !",
+            html: `
+           		<h1>Please use the following to activate your account</h1>
+           		<p>${process.env.CLIENT_URL}/user/activate/${token}</p>
+           		<hr />
+           		<p>This email may contain sensetive information</p>
+           		<p>${process.env.CLIENT_URL}</p>
+           		 `,
+          };
+          mg.messages().send(mailOptions, (error, body) => {
+            if (error) {
+              next(ApiError.internal(`Something went wrong: ${error.message}`));
+              return;
+            }
+            const data = {
+              message: "Confirmation email is sent! Please check your email.",
+            };
+            return writeServerResponse(
+              res,
+              data,
+              result.statusCode,
+              "application/json"
+            );
+          });
+        } else {
+          return writeServerResponse(
+            res,
+            { message: "Email is already verified." },
+            result.statusCode,
+            "application/json"
+          );
+        }
+      } else {
+        next(ApiError.notfound("User doesnot exist."));
+        return;
+      }
+    } catch (err) {
+      next(ApiError.internal(`Something went wrong. ${err.message}`));
       return;
     }
   }

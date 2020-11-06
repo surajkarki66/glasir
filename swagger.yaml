@@ -17,6 +17,22 @@ paths:
       operationId: get-users
       security:
         - bearerAuth: []
+
+      parameters:
+        - in: query
+          name: page
+          description: Page number of list of users.
+          schema:
+            type: number
+            example: 2
+
+        - in: query
+          name: usersPerPage
+          description: How many users in single page.
+          schema:
+            type: number
+            example: 10
+
       responses:
         "200":
           description: An object containing page details and an array of all users
@@ -72,6 +88,12 @@ paths:
                      example: 19
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+
   /api/v1/user/login:
     post:
       summary: Authenticate user credentials and return a JWT token and a cookie with a refresh token
@@ -86,7 +108,7 @@ paths:
               type: object
               properties:
                 email:
-                  type: string
+                  type: email
                   example: "jason@example.com"
                 username:
                   type: string
@@ -103,10 +125,11 @@ paths:
           description: AccessToken and RefreshToken with their respective cookies.
           headers:
             Set-Cookie:
-              description: "`refreshToken`"
+              description: "`accessToken and refreshToken`"
               schema:
-                type: string
-                example: refreshToken=51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550; Path=/; Expires=Tue, 16 Jun 2020 09:14:17 GMT; HttpOnly
+                    type: string
+                    example: accessToken=51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550; Path=/; Expires=Tue, 16 Jun 2020 09:14:17 GMT; HttpOnly refreshToken=51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550; Path=/; Expires=Tue, 16 Jun 2020 09:14:17 GMT; HttpOnly
+
           content:
             application/json:
               schema:
@@ -129,6 +152,8 @@ paths:
                   error:
                     type: string
                     example: "Email or password is incorrect"
+
+
   /api/v1/user/refresh-token:
     post:
       summary: Use a refresh token to generate a new JWT token and a new refresh token
@@ -147,13 +172,7 @@ paths:
                   example: "51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550"
       required:
        - refreshToken
-      parameters:
-        - in: cookie
-          name: refreshToken
-          description: The `refreshToken` cookie
-          schema:
-            type: string
-            example: 51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550
+
       responses:
         "200":
           description: a JWT access token and a new refresh token cookie
@@ -195,6 +214,10 @@ paths:
                   error:
                     type: string
                     example: "Token is expired."
+
+        "403":
+           $ref: "#/components/responses/ForbiddenError"
+
 
   /api/v1/user/signup:
     post:
@@ -257,6 +280,8 @@ paths:
                   error:
                     type: string
                     example: "The email and username is already taken"
+
+
   /api/v1/user/activate:
     patch:
       summary: Verify a new user with a verification token received by email after registration
@@ -357,6 +382,8 @@ paths:
                   error:
                     type: string
                     example: "Token is expired."
+
+
   /api/v1/user/forgot-password:
     post:
       summary: Submit email address to reset the password on an account
@@ -395,6 +422,8 @@ paths:
                   error:
                     type: string
                     example: "User with that email does not exist"
+
+
   /api/v1/user/reset-password:
     post:
       summary: Validate the reset password token received by email after submitting to the /api/v1/user/forgot-password route
@@ -448,6 +477,186 @@ paths:
                   message:
                     type: string
                     example: "User doesnot exist."
+
+  /api/v1/user/change-password/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: User id
+        required: true
+        example: "5eb12e197e06a76ccdefc121"
+        schema:
+          type: string
+    patch:
+      summary: Changing the password of a specified user.
+      tags: [Users]
+      description: Regular users are allowed to change their own account password.
+      operationId: changePassword
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Password will be changed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Password changed successfully."
+
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+           $ref: "#/components/responses/ForbiddenError"
+
+
+
+  /api/v1/user/change-user-details/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: User id
+        required: true
+        example: "5eb12e197e06a76ccdefc121"
+        schema:
+          type: string
+    patch:
+      summary: Update any username, firstName and lastName of user.
+      tags: [Users]
+      description: Admin users can update any account including role, regular users are restricted to their own account and cannot update role.
+      operationId: updateAccount
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "MrJason"
+                firstName:
+                  type: string
+                  example: "Jason"
+                lastName:
+                  type: string
+                  example: "Watmore"
+
+                updatedDate:
+                  type: string
+                  example: "2020-05-08T03:11:21.553Z"
+                role:
+                  type: string
+                  enum: [Admin, Freelancer, Client]
+      responses:
+        "200":
+          description: User updated successfully. The details of the updated account are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User updated successfully"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+         $ref: "#/components/responses/UnauthorizedError"
+
+        "403":
+           $ref: "#/components/responses/ForbiddenError"
+
+
+  /api/v1/user/change-email/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: User id
+        required: true
+        example: "5eb12e197e06a76ccdefc121"
+        schema:
+          type: string
+    patch:
+      summary: Update email and verify the email.
+      tags: [Users]
+      description: Only the same user can update their email.
+      operationId: updateEmail
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: email
+                  example: "MrJ@test.com"
+
+      responses:
+        "200":
+          description: Email updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Confirmation email is sent! Please check your email."
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+         $ref: "#/components/responses/UnauthorizedError"
+
+        "403":
+           $ref: "#/components/responses/ForbiddenError"
+
+
+
+  /api/v1/user/verify-email/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: User id
+        required: true
+        example: "5eb12e197e06a76ccdefc121"
+        schema:
+          type: string
+    get:
+      summary: Send verification email.
+      tags: [Users]
+      description: Only the same user can verify their email.
+      operationId: verifyEmail
+      security:
+        - bearerAuth: []
+
+      responses:
+        "200":
+          description: Verification email is sent.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Confirmation email is sent! Please check your email."
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+         $ref: "#/components/responses/UnauthorizedError"
+
+        "403":
+           $ref: "#/components/responses/ForbiddenError"
 
 
   /api/v1/user/{id}:
@@ -505,61 +714,8 @@ paths:
           $ref: "#/components/responses/NotFoundError"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
-
-  /api/v1/user/change-user-details/{id}:
-    parameters:
-      - in: path
-        name: id
-        description: User id
-        required: true
-        example: "5eb12e197e06a76ccdefc121"
-        schema:
-          type: string
-    patch:
-      summary: Update any username, firstName and lastName of user.
-      tags: [Users]
-      description: Admin users can update any account including role, regular users are restricted to their own account and cannot update role.
-      operationId: updateAccount
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                  example: "MrJason"
-                firstName:
-                  type: string
-                  example: "Jason"
-                lastName:
-                  type: string
-                  example: "Watmore"
-
-                updatedDate:
-                  type: string
-                  example: "2020-05-08T03:11:21.553Z"
-                role:
-                  type: string
-                  enum: [Admin, Freelancer, Client]
-      responses:
-        "200":
-          description: User updated successfully. The details of the updated account are returned.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "User updated successfully"
-        "404":
-          $ref: "#/components/responses/NotFoundError"
-        "401":
-         $ref: "#/components/responses/UnauthorizedError"
+        "403":
+           $ref: "#/components/responses/ForbiddenError"
 
   /api/v1/user/delete/{id}:
     parameters:
@@ -604,6 +760,9 @@ paths:
           $ref: "#/components/responses/NotFoundError"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+        "403":
+           $ref: "#/components/responses/ForbiddenError"
+
 
 components:
   securitySchemes:
@@ -632,3 +791,13 @@ components:
               error:
                 type: string
                 example: "Not Found"
+    ForbiddenError:
+      description: Access Denied
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Token is not verified."

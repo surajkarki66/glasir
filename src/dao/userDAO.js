@@ -34,6 +34,8 @@ class UsersDAO {
         password,
         role,
         isActive,
+        joinedDate,
+        updatedDate,
       } = userInfo;
       const result = await UsersDAO.#users.insertOne({
         email: email,
@@ -43,7 +45,8 @@ class UsersDAO {
         password: password,
         role: role,
         isActive: isActive,
-        joinedDate: new Date(),
+        joinedDate: joinedDate,
+        updatedDate: updatedDate,
       });
       if (result) {
         const data = result.ops[0];
