@@ -13,5 +13,14 @@ const onlySameUserCanDoThisAction = (req, res, next) => {
     return;
   }
 };
+const onlyAdminCanDoThisAction = (req, res, next) => {
+  const role = req.jwt.role;
+  if (role === "admin") {
+    return next();
+  } else {
+    next(ApiError.forbidden("Access denied."));
+    return;
+  }
+};
 
-export { onlySameUserCanDoThisAction };
+export { onlySameUserCanDoThisAction, onlyAdminCanDoThisAction };
