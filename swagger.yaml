@@ -65,10 +65,10 @@ paths:
                           type: string
                           enum: [Admin, Freelancer, Client]
                           example: "Admin"
-                        joinedDate:
+                        createdAt:
                           type: string
                           example: "2020-05-05T09:12:57.848Z"
-                        updatedDate:
+                        updatedAt:
                           type: string
                           example: "2020-05-08T03:11:21.553Z"
                         isActive:

@@ -51,6 +51,7 @@ class UserController {
       });
       if (result.success) {
         const users = {
+          status: "success",
           users: result.data,
           page: Number(page),
           filters: {},
@@ -74,85 +75,49 @@ class UserController {
 
   static async login(req, res, next) {
     try {
+      let userData;
       const { username, email, password } = req.body;
       if (username) {
-        const userData = await usersDAO.getUserByUsername(username);
+        userData = await usersDAO.getUserByUsername(username);
         if (!userData) {
           next(ApiError.badRequest("Make sure your username is correct."));
           return;
-        } else {
-          const user = new User(userData);
-          if (!(await user.comparePassword(password))) {
-            next(ApiError.badRequest("Make sure your password is correct."));
-            return;
-          }
-          const accessToken = await signToken(
-            user._id,
-            user.role,
-            "ACCESS",
-            "1h"
-          );
-          const refreshToken = await signToken(
-            user._id,
-            user.role,
-            "REFRESH",
-            "7d"
-          );
-          const data = {
-            message: "Login successfull.",
-            accessToken: accessToken,
-            refreshToken: refreshToken,
-          };
-          res.cookie("AccessToken", accessToken, {
-            httpOnly: true,
-            maxAge: 3600000,
-          });
-          res.cookie("RefreshToken", refreshToken, {
-            httpOnly: true,
-            maxAge: 604800000,
-          });
-          return writeServerResponse(res, data, 200, "application/json");
         }
       }
       if (email) {
-        const userData = await usersDAO.getUserByEmail(email);
+        userData = await usersDAO.getUserByEmail(email);
         if (!userData) {
           next(ApiError.badRequest("Make sure your email is correct."));
           return;
-        } else {
-          const user = new User(userData);
-          if (!(await user.comparePassword(password))) {
-            next(ApiError.badRequest("Make sure your password is correct."));
-            return;
-          }
-          const accessToken = await signToken(
-            user._id,
-            user.role,
-            "ACCESS",
-            "1h"
-          );
-          const refreshToken = await signToken(
-            user._id,
-            user.role,
-            "REFRESH",
-            "7d"
-          );
-          const data = {
-            message: "Login successfull.",
-            accessToken: accessToken,
-            refreshToken: refreshToken,
-          };
-          res.cookie("AccessToken", accessToken, {
-            httpOnly: true,
-            maxAge: 3600000,
-          });
-          res.cookie("RefreshToken", refreshToken, {
-            httpOnly: true,
-            maxAge: 604800000,
-          });
-          return writeServerResponse(res, data, 200, "application/json");
         }
       }
+      const user = new User(userData);
+      if (!(await user.comparePassword(password))) {
+        next(ApiError.badRequest("Make sure your password is correct."));
+        return;
+      }
+      const accessToken = await signToken(user._id, user.role, "ACCESS", "1h");
+      const refreshToken = await signToken(
+        user._id,
+        user.role,
+        "REFRESH",
+        "7d"
+      );
+      const data = {
+        status: "success",
+        message: "Login successfull.",
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      };
+      res.cookie("AccessToken", accessToken, {
+        httpOnly: true,
+        maxAge: 3600000,
+      });
+      res.cookie("RefreshToken", refreshToken, {
+        httpOnly: true,
+        maxAge: 604800000,
+      });
+      return writeServerResponse(res, data, 200, "application/json");
     } catch (e) {
       next(ApiError.internal(`Something went wrong: ${e.message}`));
       return;
@@ -170,7 +135,11 @@ class UserController {
 
       const accessToken = await signToken(aud, role, "ACCESS", "1h");
       const refToken = await signToken(aud, role, "REFRESH", "7d");
-      const data = { accessToken: accessToken, refreshToken: refToken };
+      const data = {
+        status: "success",
+        accessToken: accessToken,
+        refreshToken: refToken,
+      };
       res.cookie("AccessToken", accessToken, {
         httpOnly: true,
         maxAge: 3600000,
@@ -216,8 +185,8 @@ class UserController {
           ...userFromBody,
           password: await User.hashPassword(userFromBody.password),
           isActive: false,
-          joinedDate: new Date(),
-          updatedDate: null,
+          createdAt: new Date(),
+          updatedAt: null,
         };
         const insertResult = await usersDAO.createUser(userInfo);
 
@@ -249,6 +218,7 @@ class UserController {
               return;
             }
             const data = {
+              status: "success",
               message:
                 "Account created successfully.Please check your email for verification.",
             };
@@ -283,12 +253,14 @@ class UserController {
       const userId = result.aud;
       const updateObject = {
         isActive: true,
+        updatedAt: new Date(),
       };
       const user = await usersDAO.updateUser(userId, updateObject);
       if (user.success) {
         return writeServerResponse(
           res,
           {
+            status: "success",
             message: "User activated successfully.",
           },
           user.statusCode,
@@ -307,18 +279,18 @@ class UserController {
   static async logout(req, res, next) {
     try {
       const { refreshToken } = req.body;
-      const userId = await verifyRefreshToken(
+      const { aud } = await verifyRefreshToken(
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET
       );
-      client.del(userId, (err, val) => {
+      client.del(aud, (err, val) => {
         if (err) {
           next(ApiError.internal("Something went wrong."));
           return;
         }
         return writeServerResponse(
           res,
-          { message: "Logout successfully." },
+          { status: "success", message: "Logout successfully." },
           200,
           "application/json"
         );
@@ -366,6 +338,7 @@ class UserController {
             return;
           }
           const data = {
+            status: "success",
             message: `Email has been sent to ${email}. Follow the instruction to reset your password.`,
           };
           return writeServerResponse(res, data, 200, "application/json");
@@ -389,14 +362,16 @@ class UserController {
         return;
       }
       const userId = result.aud;
-      const updatedPassword = {
+      const updatedObject = {
         password: await User.hashPassword(newPassword),
+        updatedAt: new Date(),
       };
-      const user = await usersDAO.updateUser(userId, updatedPassword);
+      const user = await usersDAO.updateUser(userId, updatedObject);
       if (user.success) {
         return writeServerResponse(
           res,
           {
+            status: "success",
             message: "Great! Now you can login with your new password",
           },
           user.statusCode,
@@ -424,15 +399,16 @@ class UserController {
           next(ApiError.unauthorized("Make sure your password is correct."));
           return;
         }
-        const updatedPassword = {
-          updatedDate: new Date(),
+        const updatedObject = {
           password: await User.hashPassword(newPassword),
+          updatedAt: new Date(),
         };
-        const user = await usersDAO.updateUser(id, updatedPassword);
+        const user = await usersDAO.updateUser(id, updatedObject);
         if (user.success) {
           return writeServerResponse(
             res,
             {
+              status: "success",
               message: "Password changed successfully.",
             },
             user.statusCode,
@@ -456,7 +432,7 @@ class UserController {
     try {
       const userDetails = req.body;
       const { id } = req.params;
-      let updateObject = userDetails;
+      let updateObject = { ...userDetails, updatedAt: new Date() };
 
       if (updateObject.username) {
         const { username } = updateObject;
@@ -472,6 +448,7 @@ class UserController {
         return writeServerResponse(
           res,
           {
+            status: "success",
             message: "Update successfully.",
           },
           result.statusCode,
@@ -500,7 +477,7 @@ class UserController {
       const updateObject = {
         email: email,
         isActive: false,
-        updatedDate: new Date(),
+        updatedAt: new Date(),
       };
       const result = await usersDAO.updateUser(id, updateObject);
       if (result.success) {
@@ -524,6 +501,7 @@ class UserController {
             return;
           }
           const data = {
+            status: "success",
             message: "Confirmation email is sent! Please check your email.",
           };
           return writeServerResponse(
@@ -576,6 +554,7 @@ class UserController {
               return;
             }
             const data = {
+              status: "success",
               message: "Confirmation email is sent! Please check your email.",
             };
             return writeServerResponse(
@@ -588,7 +567,7 @@ class UserController {
         } else {
           return writeServerResponse(
             res,
-            { message: "Email is already verified." },
+            { status: "success", message: "Email is already verified." },
             result.statusCode,
             "application/json"
           );
@@ -607,7 +586,7 @@ class UserController {
       const id = req.params.id;
       const result = await usersDAO.getUserById(id);
       if (result.success) {
-        const { data } = result;
+        const data = { status: "success", ...result.data };
         return writeServerResponse(
           res,
           data,
@@ -639,7 +618,7 @@ class UserController {
         if (deleteResult.success) {
           return writeServerResponse(
             res,
-            { message: "Deleted successfully." },
+            { status: "success", message: "Deleted successfully." },
             deleteResult.statusCode,
             "application/json"
           );

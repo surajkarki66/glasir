@@ -2,6 +2,8 @@ import Joi from "joi";
 
 const schemas = {
   userSIGNUP: Joi.object().keys({
+    firstName: Joi.string().min(2).max(20).required(),
+    lastName: Joi.string().min(2).max(20).required(),
     username: Joi.string().min(4).max(20).required(),
     email: Joi.string()
       .email({
@@ -11,13 +13,11 @@ const schemas = {
         },
       })
       .required(),
-    firstName: Joi.string().min(2).max(20).required(),
-    lastName: Joi.string().min(2).max(20).required(),
-    role: Joi.string().valid("freelancer", "client", "admin").required(),
     password: Joi.string()
       .min(8)
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
       .required(),
+    role: Joi.string().valid("freelancer", "client", "admin").required(),
   }),
   userACTIVATION: Joi.object().keys({
     token: [Joi.string().required(), Joi.number().required()],

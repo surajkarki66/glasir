@@ -5,14 +5,14 @@ function apiErrorHandler(err, req, res, next) {
   if (err instanceof ApiError) {
     return writeServerResponse(
       res,
-      { error: err.message },
+      { status: "failed", error: err.message },
       err.code,
       "application/json"
     );
   }
   return writeServerResponse(
     res,
-    { error: "Something went wrong." },
+    { status: "failed", error: "Something went wrong." },
     500,
     "application/json"
   );
