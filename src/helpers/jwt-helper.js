@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import createError from "http-errors";
 
-import client from "../helpers/init_redis";
+import { client } from "../utils/redis";
 
 const sign = (payload, secret, options, isRefresh) => {
   return new Promise((resolve, reject) => {

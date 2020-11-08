@@ -2,102 +2,98 @@ import { Router } from "express";
 import YAML from "yamljs";
 import swaggerUi from "swagger-ui-express";
 
+import { Schemas } from "../helpers/schemas/index";
 import { UserController } from "../controllers/index";
-import { userSchema } from "../helpers/index";
-import dataValidation from "../middlewares/data-validation";
-import { checkAuth } from "../middlewares/auth-validation";
-import {
-  onlySameUserCanDoThisAction,
-  onlyAdminCanDoThisAction,
-  onlySameUserOrAdminCanDoThisAction,
-} from "../middlewares/auth-permission";
+import { Permissions } from "../middlewares/index";
+import { dataValidation } from "../middlewares/index";
+import { AuthValidation } from "../middlewares/index";
 
 const router = new Router();
 const swaggerDocument = YAML.load("./swagger.yaml");
 
 router
   .route("/get-users")
-  .get(checkAuth)
-  .get(onlyAdminCanDoThisAction)
-  .get(dataValidation(userSchema.userLIST, "query"))
+  .get(AuthValidation.checkAuth)
+  .get(Permissions.onlyAdminCanDoThisAction)
+  .get(dataValidation(Schemas.userSchema.userLIST, "query"))
   .get(UserController.getUsers);
 
 router
   .route("/login")
-  .post(dataValidation(userSchema.userLOGIN, "body"))
+  .post(dataValidation(Schemas.userSchema.userLOGIN, "body"))
   .post(UserController.login);
 
 router
   .route("/refresh-token")
-  .post(dataValidation(userSchema.refreshTOKEN, "body"))
+  .post(dataValidation(Schemas.userSchema.refreshTOKEN, "body"))
   .post(UserController.refreshToken);
 
 router
   .route("/signup")
-  .post(dataValidation(userSchema.userSIGNUP, "body"))
+  .post(dataValidation(Schemas.userSchema.userSIGNUP, "body"))
   .post(UserController.signup);
 
 router
   .route("/activate")
-  .patch(dataValidation(userSchema.userACTIVATION, "body"))
+  .patch(dataValidation(Schemas.userSchema.userACTIVATION, "body"))
   .patch(UserController.activation);
 
 router
   .route("/logout")
-  .post(checkAuth)
-  .post(dataValidation(userSchema.userLOGOUT, "body"))
+  .post(AuthValidation.checkAuth)
+  .post(dataValidation(Schemas.userSchema.userLOGOUT, "body"))
   .post(UserController.logout);
 
 router
   .route("/forgot-password")
-  .post(dataValidation(userSchema.passwordFORGOT, "body"))
+  .post(dataValidation(Schemas.userSchema.passwordFORGOT, "body"))
   .post(UserController.forgotPassword);
 
 router
   .route("/reset-password")
-  .post(dataValidation(userSchema.passwordRESET, "body"))
+  .post(dataValidation(Schemas.userSchema.passwordRESET, "body"))
   .post(UserController.resetPassword);
 
 router
   .route("/change-password/:id")
-  .patch(checkAuth)
-  .patch(onlySameUserCanDoThisAction)
-  .patch(dataValidation(userSchema.passwordCHANGE, "body"))
+  .patch(AuthValidation.checkAuth)
+  .patch(Permissions.onlySameUserCanDoThisAction)
+  .patch(dataValidation(Schemas.userSchema.passwordCHANGE, "body"))
   .patch(UserController.changePassword);
 
 router
   .route("/change-user-details/:id")
-  .patch(checkAuth)
-  .patch(onlySameUserCanDoThisAction)
-  .patch(dataValidation(userSchema.userDetailsCHANGE, "body"))
+  .patch(AuthValidation.checkAuth)
+  .patch(Permissions.onlySameUserCanDoThisAction)
+  .patch(dataValidation(Schemas.userSchema.userDetailsCHANGE, "body"))
   .patch(UserController.changeUserDetails);
 
 router
   .route("/change-email/:id")
-  .patch(checkAuth)
-  .patch(onlySameUserCanDoThisAction)
-  .patch(dataValidation(userSchema.emailCHANGE, "body"))
+  .patch(AuthValidation.checkAuth)
+  .patch(Permissions.onlySameUserCanDoThisAction)
+  .patch(dataValidation(Schemas.userSchema.emailCHANGE, "body"))
   .patch(UserController.changeEmail);
 
 router
   .route("/verify-email/:id")
-  .get(checkAuth)
-  .get(onlySameUserCanDoThisAction)
-  .get(dataValidation(userSchema.userACTIVATIONEMAIL, "params"))
+  .get(AuthValidation.checkAuth)
+  .get(Permissions.onlySameUserCanDoThisAction)
+  .get(dataValidation(Schemas.userSchema.userACTIVATIONEMAIL, "params"))
   .get(UserController.verifyEmail);
 
 router
   .route("/delete/:id")
-  .delete(checkAuth)
-  .delete(onlySameUserOrAdminCanDoThisAction)
-  .delete(dataValidation(userSchema.userDELETE, "body"))
-  .delete(UserController.delete);
+  .delete(AuthValidation.checkAuth)
+  .delete(Permissions.onlySameUserOrAdminCanDoThisAction)
+  .delete(dataValidation(Schemas.userSchema.userDELETE, "body"))
+  .delete(UserController.deleteUser);
 
 router
   .route("/:id")
-  .get(checkAuth)
-  .get(onlySameUserOrAdminCanDoThisAction)
-  .get(dataValidation(userSchema.userDETAILS, "params"))
+  .get(AuthValidation.checkAuth)
+  .get(Permissions.onlySameUserOrAdminCanDoThisAction)
+  .get(dataValidation(Schemas.userSchema.userDETAILS, "params"))
   .get(UserController.getUserDetails);
 
 router.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));

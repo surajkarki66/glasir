@@ -2,9 +2,9 @@ import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 
 // Local Module
-import logger from "./utils/logger";
 import app from "./server";
-import { usersDAO } from "./dao/index.js";
+import { DAOs } from "./dao/index";
+import logger from "./utils/logger";
 
 // .env config
 dotenv.config();
@@ -17,11 +17,11 @@ MongoClient.connect(process.env.MONGO_URI, {
 })
   .then((client) => {
     // inject db
-    usersDAO.injectDB(client);
+    DAOs.usersDAO.injectDB(client);
     logger.info("Database connected successfully.");
 
     // Create redis server
-    require("./helpers/init_redis");
+    require("./utils/redis");
 
     // Node Server
     const port = process.env.PORT || 8000;

@@ -14,4 +14,4 @@ const dataValidation = (schema, property) => {
   };
 };
 
-export default dataValidation;
+export { dataValidation };

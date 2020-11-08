@@ -1,7 +1,10 @@
-function writeServerResponse(...args) {
-  const [response, data, statusCode, header] = args;
-  response.setHeader("Content-Type", header);
-  return response.status(statusCode).json(data);
+import bcrypt from "bcryptjs";
+
+async function comparePassword(plainText, actualPassword) {
+  return await bcrypt.compare(plainText, actualPassword);
+}
+async function hashPassword(password) {
+  return await bcrypt.hash(password, 10);
 }
 
-export default writeServerResponse;
+export { comparePassword, hashPassword };

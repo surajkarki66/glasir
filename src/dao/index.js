@@ -1,3 +1,3 @@
 import usersDAO from "./userDAO";
 
-export { usersDAO };
+export const DAOs = { usersDAO };

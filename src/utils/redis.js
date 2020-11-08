@@ -1,6 +1,6 @@
 import redis from "redis";
 
-import logger from "../utils/logger";
+import logger from "./logger";
 
 const client = redis.createClient();
 
@@ -24,4 +24,4 @@ process.on("SIGINT", () => {
   client.quit();
 });
 
-export default client;
+export { client };
