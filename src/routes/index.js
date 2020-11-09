@@ -1,4 +1,6 @@
 import swaggerRoutes from "./swagger.routes";
 import userRoutes from "./user.routes";
 
-export { swaggerRoutes, userRoutes };
+const routes = { swaggerRoutes, userRoutes };
+
+export default routes;

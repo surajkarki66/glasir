@@ -3,7 +3,7 @@ import { MongoClient } from "mongodb";
 
 // Local Module
 import app from "./server";
-import { DAOs } from "./dao/index";
+import DAOs from "./dao/index";
 import logger from "./utils/logger";
 
 // .env config
@@ -18,6 +18,7 @@ MongoClient.connect(process.env.MONGO_URI, {
   .then((client) => {
     // inject db
     DAOs.usersDAO.injectDB(client);
+    DAOs.freelancersDAO.injectDB(client);
     logger.info("Database connected successfully.");
 
     // Create redis server

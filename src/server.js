@@ -5,7 +5,7 @@ import compression from "compression";
 import cookieParser from "cookie-parser";
 
 import apiErrorHandler from "./error/api-error-handler";
-import { userRoutes, swaggerRoutes } from "./routes/index";
+import routes from "./routes/index";
 
 const app = express();
 
@@ -34,10 +34,10 @@ app.use(
 );
 
 // Routes
-app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/user", routes.userRoutes);
 
 // swagger docs route
-app.use("/api-docs", swaggerRoutes);
+app.use("/api-docs", routes.swaggerRoutes);
 
 app.use(apiErrorHandler);
 

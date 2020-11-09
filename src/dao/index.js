@@ -1,3 +1,6 @@
 import usersDAO from "./usersDAO";
+import freelancersDAO from "./freelancersDAO";
 
-export const DAOs = { usersDAO };
+const DAOs = { usersDAO, freelancersDAO };
+
+export default DAOs;

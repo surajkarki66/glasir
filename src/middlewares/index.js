@@ -7,10 +7,11 @@ import {
 import { checkAuth } from "./auth-validation";
 import { dataValidation } from "./data-validation";
 
-export const permissions = {
+const permissions = {
   onlySameUserCanDoThisAction,
   onlyAdminCanDoThisAction,
   onlySameUserOrAdminCanDoThisAction,
 };
-export const authValidation = { checkAuth };
-export { dataValidation };
+const authValidation = { checkAuth };
+
+export { permissions, authValidation, dataValidation };

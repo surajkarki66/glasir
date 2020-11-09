@@ -3,7 +3,7 @@ import {
   verifyToken,
   verifyRefreshToken,
 } from "../../helpers/jwt-helper";
-import { DAOs } from "../../dao/index";
+import DAOs from "../../dao/index";
 import mg from "../../helpers/mailgun";
 import { client } from "../../utils/redis";
 import ApiError from "../../error/ApiError";
