@@ -1,6 +1,6 @@
 import ApiError from "../error/ApiError";
 
-const dataValidation = (schema, property) => {
+export const dataValidation = (schema, property) => {
   return async (req, res, next) => {
     try {
       await schema.validateAsync(req[property]);
@@ -13,5 +13,3 @@ const dataValidation = (schema, property) => {
     }
   };
 };
-
-export { dataValidation };

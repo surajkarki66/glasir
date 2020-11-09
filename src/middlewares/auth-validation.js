@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 import ApiError from "../error/ApiError";
 
-const checkAuth = async (req, res, next) => {
+export const checkAuth = async (req, res, next) => {
   if (req.headers["authorization"]) {
     const authorization = req.headers["authorization"].split(" ");
     if (authorization[0] !== "Bearer") {
@@ -27,4 +27,3 @@ const checkAuth = async (req, res, next) => {
     return;
   }
 };
-export { checkAuth };

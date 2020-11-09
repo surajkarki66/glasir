@@ -4,17 +4,19 @@ import swaggerUi from "swagger-ui-express";
 
 import { Schemas } from "../helpers/schemas/index";
 import { UserController } from "../controllers/index";
-import { Permissions } from "../middlewares/index";
-import { dataValidation } from "../middlewares/index";
-import { AuthValidation } from "../middlewares/index";
+import {
+  permissions,
+  authValidation,
+  dataValidation,
+} from "../middlewares/index";
 
 const router = new Router();
 const swaggerDocument = YAML.load("./swagger.yaml");
 
 router
   .route("/get-users")
-  .get(AuthValidation.checkAuth)
-  .get(Permissions.onlyAdminCanDoThisAction)
+  .get(authValidation.checkAuth)
+  .get(permissions.onlyAdminCanDoThisAction)
   .get(dataValidation(Schemas.userSchema.userLIST, "query"))
   .get(UserController.getUsers);
 
@@ -40,7 +42,7 @@ router
 
 router
   .route("/logout")
-  .post(AuthValidation.checkAuth)
+  .post(authValidation.checkAuth)
   .post(dataValidation(Schemas.userSchema.userLOGOUT, "body"))
   .post(UserController.logout);
 
@@ -56,43 +58,43 @@ router
 
 router
   .route("/change-password/:id")
-  .patch(AuthValidation.checkAuth)
-  .patch(Permissions.onlySameUserCanDoThisAction)
+  .patch(authValidation.checkAuth)
+  .patch(permissions.onlySameUserCanDoThisAction)
   .patch(dataValidation(Schemas.userSchema.passwordCHANGE, "body"))
   .patch(UserController.changePassword);
 
 router
   .route("/change-user-details/:id")
-  .patch(AuthValidation.checkAuth)
-  .patch(Permissions.onlySameUserCanDoThisAction)
+  .patch(authValidation.checkAuth)
+  .patch(permissions.onlySameUserCanDoThisAction)
   .patch(dataValidation(Schemas.userSchema.userDetailsCHANGE, "body"))
   .patch(UserController.changeUserDetails);
 
 router
   .route("/change-email/:id")
-  .patch(AuthValidation.checkAuth)
-  .patch(Permissions.onlySameUserCanDoThisAction)
+  .patch(authValidation.checkAuth)
+  .patch(permissions.onlySameUserCanDoThisAction)
   .patch(dataValidation(Schemas.userSchema.emailCHANGE, "body"))
   .patch(UserController.changeEmail);
 
 router
   .route("/verify-email/:id")
-  .get(AuthValidation.checkAuth)
-  .get(Permissions.onlySameUserCanDoThisAction)
+  .get(authValidation.checkAuth)
+  .get(permissions.onlySameUserCanDoThisAction)
   .get(dataValidation(Schemas.userSchema.userACTIVATIONEMAIL, "params"))
   .get(UserController.verifyEmail);
 
 router
   .route("/delete/:id")
-  .delete(AuthValidation.checkAuth)
-  .delete(Permissions.onlySameUserOrAdminCanDoThisAction)
+  .delete(authValidation.checkAuth)
+  .delete(permissions.onlySameUserOrAdminCanDoThisAction)
   .delete(dataValidation(Schemas.userSchema.userDELETE, "body"))
   .delete(UserController.deleteUser);
 
 router
   .route("/:id")
-  .get(AuthValidation.checkAuth)
-  .get(Permissions.onlySameUserOrAdminCanDoThisAction)
+  .get(authValidation.checkAuth)
+  .get(permissions.onlySameUserOrAdminCanDoThisAction)
   .get(dataValidation(Schemas.userSchema.userDETAILS, "params"))
   .get(UserController.getUserDetails);
 

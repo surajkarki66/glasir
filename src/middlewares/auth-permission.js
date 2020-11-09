@@ -1,6 +1,6 @@
 import ApiError from "../error/ApiError";
 
-const onlySameUserOrAdminCanDoThisAction = (req, res, next) => {
+export const onlySameUserOrAdminCanDoThisAction = (req, res, next) => {
   const role = req.jwt.role;
   const userId = req.jwt.userId;
   if (req.params && req.params.id === userId) {
@@ -18,7 +18,7 @@ const onlySameUserOrAdminCanDoThisAction = (req, res, next) => {
     }
   }
 };
-const onlySameUserCanDoThisAction = (req, res, next) => {
+export const onlySameUserCanDoThisAction = (req, res, next) => {
   const userId = req.jwt.aud;
   if (req.params && req.params.id === userId) {
     return next();
@@ -31,7 +31,7 @@ const onlySameUserCanDoThisAction = (req, res, next) => {
     return;
   }
 };
-const onlyAdminCanDoThisAction = (req, res, next) => {
+export const onlyAdminCanDoThisAction = (req, res, next) => {
   const role = req.jwt.role;
   if (role === "admin") {
     return next();
@@ -39,10 +39,4 @@ const onlyAdminCanDoThisAction = (req, res, next) => {
     next(ApiError.forbidden("Access denied."));
     return;
   }
-};
-
-export {
-  onlySameUserCanDoThisAction,
-  onlyAdminCanDoThisAction,
-  onlySameUserOrAdminCanDoThisAction,
 };
