@@ -10,7 +10,7 @@ import ApiError from "../../error/ApiError";
 import writeServerResponse from "../../helpers/response";
 import { comparePassword, hashPassword } from "../../utils/utils";
 
-async function getUsers(req, res, next) {
+export async function getUsers(req, res, next) {
   try {
     const { page, usersPerPage } = req.query;
     const result = await DAOs.usersDAO.getUsers({
@@ -41,7 +41,7 @@ async function getUsers(req, res, next) {
   }
 }
 
-async function login(req, res, next) {
+export async function login(req, res, next) {
   try {
     let userData;
     const { username, email, password } = req.body;
@@ -91,7 +91,7 @@ async function login(req, res, next) {
   }
 }
 
-async function refreshToken(req, res, next) {
+export async function refreshToken(req, res, next) {
   try {
     const { refreshToken } = req.body;
     const result = await verifyRefreshToken(
@@ -134,7 +134,7 @@ async function refreshToken(req, res, next) {
   }
 }
 
-async function signup(req, res, next) {
+export async function signup(req, res, next) {
   try {
     const userFromBody = req.body;
     const { email, username } = userFromBody;
@@ -200,7 +200,7 @@ async function signup(req, res, next) {
     return;
   }
 }
-async function activation(req, res, next) {
+export async function activation(req, res, next) {
   try {
     const { token } = req.body;
     const result = await verifyToken(
@@ -237,7 +237,7 @@ async function activation(req, res, next) {
   }
 }
 
-async function logout(req, res, next) {
+export async function logout(req, res, next) {
   try {
     const { refreshToken } = req.body;
     const { aud } = await verifyRefreshToken(
@@ -274,7 +274,7 @@ async function logout(req, res, next) {
   }
 }
 
-async function forgotPassword(req, res, next) {
+export async function forgotPassword(req, res, next) {
   try {
     const { email } = req.body;
     const result = await DAOs.usersDAO.getUserByEmail(email);
@@ -314,7 +314,7 @@ async function forgotPassword(req, res, next) {
   }
 }
 
-async function resetPassword(req, res, next) {
+export async function resetPassword(req, res, next) {
   try {
     const { newPassword, token } = req.body;
     const result = await verifyToken(token, process.env.FORGOT_TOKEN_SECRET);
@@ -348,7 +348,7 @@ async function resetPassword(req, res, next) {
   }
 }
 
-async function changePassword(req, res, next) {
+export async function changePassword(req, res, next) {
   try {
     const { id } = req.params;
     const { oldPassword, newPassword } = req.body;
@@ -389,7 +389,7 @@ async function changePassword(req, res, next) {
   }
 }
 
-async function changeUserDetails(req, res, next) {
+export async function changeUserDetails(req, res, next) {
   try {
     const userDetails = req.body;
     const { id } = req.params;
@@ -424,7 +424,7 @@ async function changeUserDetails(req, res, next) {
     return;
   }
 }
-async function changeEmail(req, res, next) {
+export async function changeEmail(req, res, next) {
   try {
     const { email } = req.body;
     const { id } = req.params;
@@ -482,7 +482,7 @@ async function changeEmail(req, res, next) {
   }
 }
 
-async function verifyEmail(req, res, next) {
+export async function verifyEmail(req, res, next) {
   try {
     const { id } = req.params;
     const result = await DAOs.usersDAO.getUserById(id);
@@ -536,7 +536,7 @@ async function verifyEmail(req, res, next) {
     return;
   }
 }
-async function getUserDetails(req, res, next) {
+export async function getUserDetails(req, res, next) {
   try {
     const id = req.params.id;
     const result = await DAOs.usersDAO.getUserById(id);
@@ -557,7 +557,7 @@ async function getUserDetails(req, res, next) {
     return;
   }
 }
-async function deleteUser(req, res, next) {
+export async function deleteUser(req, res, next) {
   try {
     const { password } = req.body;
     const { id } = req.params;
@@ -588,20 +588,3 @@ async function deleteUser(req, res, next) {
     return;
   }
 }
-
-export {
-  getUsers,
-  login,
-  refreshToken,
-  signup,
-  activation,
-  logout,
-  forgotPassword,
-  resetPassword,
-  changePassword,
-  changeUserDetails,
-  changeEmail,
-  verifyEmail,
-  deleteUser,
-  getUserDetails,
-};
