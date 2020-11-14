@@ -14,8 +14,8 @@ const schemas = {
             "Writing"
           )
           .required(),
-        serviceType: Joi.array().items(Joi.string()).length(4).required(),
-        skills: Joi.array().items(Joi.string()).length(9).required(),
+        serviceType: Joi.array().items(Joi.string()).max(4).required(),
+        skills: Joi.array().items(Joi.string()).max(9).required(),
         expertiseLevel: Joi.string()
           .valid("Entry level", "Intermediate", "Expert")
           .required(),
@@ -23,59 +23,59 @@ const schemas = {
       .required(),
     education: Joi.array()
       .items(
-        Joi.object.keys({
-          school: Joi.string().length(50).required(),
-          areaOfStudy: Joi.string(30),
-          degree: Joi.string().length(30),
+        Joi.object().keys({
+          school: Joi.string().max(30).required(),
+          areaOfStudy: Joi.string().max(20),
+          degree: Joi.string().max(30),
           datesAttended: Joi.object().keys({
             from: Joi.date().iso().required(),
             to: Joi.date().iso().greater(Joi.ref("from")).required(),
           }),
-          description: Joi.string().length(50),
+          description: Joi.string().max(50),
         })
       )
-      .length(4),
+      .max(4),
     employement: Joi.array()
       .items(
         Joi.object().keys({
-          company: Joi.string().length(30).required(),
+          company: Joi.string().max(30).required(),
           location: Joi.object()
             .keys({
-              country: Joi.string().length(15).required(),
-              city: Joi.string().length(15).required(),
+              country: Joi.string().max(15).required(),
+              city: Joi.string().max(15).required(),
             })
             .required(),
-          title: Joi.string().length(10).required(),
+          title: Joi.string().max(10).required(),
           period: Joi.object()
             .keys({
               from: Joi.date().iso().required(),
               to: Joi.date().iso().greater(Joi.ref("from")),
             })
             .required(),
-          description: Joi.string().length(50),
+          description: Joi.string().max(50),
         })
       )
-      .length(10),
+      .max(10),
     languages: Joi.array()
       .items(
         Joi.object().keys({
-          name: Joi.string().length(10).required(),
+          name: Joi.string().required(),
           proficiency: Joi.string()
             .valid("Basic", "Conversational", "Fluent", "Native or Bilingual")
             .required(),
         })
       )
-      .length(10)
+      .max(10)
       .required(),
     hourlyRate: Joi.number().greater(0).required(),
-    title: Joi.string().length(10).required(),
-    overview: Joi.string().length(20).required(),
+    title: Joi.string().max(10).required(),
+    overview: Joi.string().max(20).required(),
     profilePic: Joi.string(),
     location: Joi.object()
       .keys({
-        country: Joi.string().default("Nepal"),
-        street: Joi.string().length(20).required(),
-        city: Joi.string().length(20).required(),
+        country: Joi.string().required(),
+        street: Joi.string().max(20).required(),
+        city: Joi.string().max(20).required(),
         zip: Joi.number().required(),
         province: Joi.string()
           .valid(
@@ -93,7 +93,7 @@ const schemas = {
     phone: Joi.number().required(),
     citizenship: Joi.string().required(),
     cv: Joi.string().required(),
-    isVerified: Joi.boolean().default(false).required(),
+    isVerified: Joi.boolean().required(),
   }),
 };
 export default schemas;
