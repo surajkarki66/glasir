@@ -1,3 +1,5 @@
+import { ObjectId } from "bson";
+
 import logger from "../utils/logger";
 
 class FreelancersDAO {
@@ -25,7 +27,30 @@ class FreelancersDAO {
   }
   static async createProfile(profileInfo) {
     try {
+      const info = {
+        user: ObjectId(profileInfo.user),
+        ...profileInfo,
+      };
+      const result = await FreelancersDAO.#freelancers.insertOne(info);
+      if (result && result.insertedCount === 1) {
+        const data = result.ops[0];
+        return {
+          success: true,
+          data: data,
+          statusCode: 201,
+        };
+      }
     } catch (error) {
+      if (String(error).startsWith("MongoError: E11000 duplicate key error")) {
+        logger.error(
+          `Error occurred while adding new profile, ${error.message}.`
+        );
+        return {
+          success: false,
+          error: "A freelancer with the given user id or phone already exists.",
+          statusCode: 409,
+        };
+      }
       logger.error(
         `Error occurred while adding new profile, ${error.message}.`
       );
