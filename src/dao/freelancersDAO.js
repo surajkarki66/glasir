@@ -23,6 +23,15 @@ class FreelancersDAO {
       throw e;
     }
   }
+  static async createProfile(profileInfo) {
+    try {
+    } catch (error) {
+      logger.error(
+        `Error occurred while adding new profile, ${error.message}.`
+      );
+      return { success: false, error: error.message, statusCode: 500 };
+    }
+  }
 }
 
 export default FreelancersDAO;

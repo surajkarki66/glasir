@@ -1,30 +1,20 @@
 import dotenv from "dotenv";
-import { MongoClient } from "mongodb";
 
-// Local Module
 import app from "./server";
 import DAOs from "./dao/index";
 import logger from "./utils/logger";
+import { getDB } from "./utils/db";
 
-// .env config
 dotenv.config();
 
-MongoClient.connect(process.env.MONGO_URI, {
-  wtimeout: 2500,
-  w: "majority",
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+getDB()
   .then((client) => {
-    // inject db
     DAOs.usersDAO.injectDB(client);
     DAOs.freelancersDAO.injectDB(client);
     logger.info("Database connected successfully.");
 
-    // Create redis server
     require("./utils/redis");
 
-    // Node Server
     const port = process.env.PORT || 8000;
     app.listen(port, () => {
       logger.info(`Listening on PORT ${port}.`);

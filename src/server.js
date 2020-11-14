@@ -9,10 +9,8 @@ import routes from "./routes/index";
 
 const app = express();
 
-// Config .env
 dotenv.config();
 
-// Middlewares
 app.use(express.json());
 app.use(
   express.urlencoded({
@@ -33,15 +31,12 @@ app.use(
   })
 );
 
-// Routes
 app.use("/api/v1/user", routes.userRoutes);
 
-// swagger docs route
 app.use("/api-docs", routes.swaggerRoutes);
 
 app.use(apiErrorHandler);
 
-// Development
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
