@@ -2,7 +2,7 @@ import Joi from "joi";
 
 const schemas = {
   createProfile: Joi.object().keys({
-    user: Joi.string().length(24).required(),
+    user: Joi.string().length(24),
     expertise: Joi.object()
       .keys({
         service: Joi.string()

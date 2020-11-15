@@ -40,3 +40,12 @@ export const onlyAdminCanDoThisAction = (req, res, next) => {
     return;
   }
 };
+
+export const onlyFreelancerCanDoThisAction = (req, res, next) => {
+  const role = req.jwt.role;
+  if (role === "freelancer") {
+    return next();
+  }
+  next(ApiError.forbidden("Access denied."));
+  return;
+};
