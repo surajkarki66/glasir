@@ -1,3 +1,5 @@
+import moment from "moment";
+
 import {
   signToken,
   verifyToken,
@@ -197,6 +199,32 @@ export async function signup(req, res, next) {
     }
   } catch (e) {
     next(ApiError.internal(`Something went wrong: ${e.message}`));
+    return;
+  }
+}
+
+export async function uploadAvatar(req, res, next) {
+  try {
+    const { avatar } = req.body;
+    const { id } = req.params;
+    const updateObject = { avatar: avatar, updatedAt: new Date() };
+    const user = await DAOs.usersDAO.updateUser(id, updateObject);
+    if (user.success) {
+      return writeServerResponse(
+        res,
+        {
+          status: "success",
+          message: "Avatar uploaded successfully.",
+        },
+        user.statusCode,
+        "application/json"
+      );
+    } else {
+      next(ApiError.notfound(user.data.message));
+      return;
+    }
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong. ${err.message}`));
     return;
   }
 }

@@ -1,4 +1,6 @@
+import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
 import express from "express";
 import morgan from "morgan";
 import compression from "compression";
@@ -18,6 +20,7 @@ app.use(
   })
 );
 app.use(cookieParser());
+app.use(cors());
 app.use(
   compression({
     level: 6,
@@ -31,11 +34,20 @@ app.use(
   })
 );
 
+// Static routes
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname + "/../public/uploads"))
+);
+
+// Controller routes
 app.use("/api/v1/user", routes.userRoutes);
 app.use("/api/v1/freelancer", routes.freelancerRoutes);
 
+// Swagger routes
 app.use("/api-docs", routes.swaggerRoutes);
 
+// Error middleware
 app.use(apiErrorHandler);
 
 if (process.env.NODE_ENV === "development") {

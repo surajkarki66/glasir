@@ -12,6 +12,7 @@ import {
   changeEmail,
   verifyEmail,
   deleteUser,
+  uploadAvatar,
   getUserDetails,
 } from "./user/user.controller";
 
@@ -32,6 +33,7 @@ export const UserController = {
   verifyEmail,
   deleteUser,
   getUserDetails,
+  uploadAvatar,
 };
 
-export const FreelancerController = { makeProfile };
+export const FreelancerController = { makeProfile, uploadAvatar };

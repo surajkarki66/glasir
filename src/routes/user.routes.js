@@ -8,6 +8,8 @@ import {
   permissions,
   authValidation,
   dataValidation,
+  fileUpload,
+  imageValidation,
 } from "../middlewares/index";
 
 const router = new Router();
@@ -35,6 +37,18 @@ router
   .post(dataValidation(Schemas.userSchema.userSIGNUP, "body"))
   .post(UserController.signup);
 
+router
+  .route("/upload-avatar/:id")
+  .patch(authValidation.checkAuth)
+  .patch(permissions.onlySameUserCanDoThisAction)
+  .patch(
+    fileUpload("../../../public/uploads/", ["image/jpeg", "image/jpg"]).single(
+      "avatar"
+    )
+  )
+  .patch(imageValidation)
+  .patch(dataValidation(Schemas.userSchema.avatarUPLOAD, "body"))
+  .patch(UserController.uploadAvatar);
 router
   .route("/activate")
   .patch(dataValidation(Schemas.userSchema.userACTIVATION, "body"))

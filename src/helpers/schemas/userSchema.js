@@ -5,6 +5,7 @@ const schemas = {
     firstName: Joi.string().min(2).max(20).required(),
     lastName: Joi.string().min(2).max(20).required(),
     username: Joi.string().min(4).max(20).required(),
+    avatar: Joi.string().required(),
     email: Joi.string()
       .email({
         minDomainSegments: 2,
@@ -100,6 +101,9 @@ const schemas = {
         },
       })
       .required(),
+  }),
+  avatarUPLOAD: Joi.object().keys({
+    avatar: Joi.string().required(),
   }),
 };
 export default schemas;
