@@ -103,7 +103,7 @@ const schemas = {
       .required(),
   }),
   avatarUPLOAD: Joi.object().keys({
-    avatar: Joi.string().required(),
+    id: Joi.string().required(),
   }),
 };
 export default schemas;

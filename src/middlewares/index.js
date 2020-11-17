@@ -6,7 +6,7 @@ import {
 } from "./auth-permission";
 
 import { checkAuth } from "./auth-validation";
-import { dataValidation, imageValidation } from "./validation";
+import { dataValidation } from "./validation";
 import { fileUpload } from "./upload";
 
 const permissions = {
@@ -17,10 +17,4 @@ const permissions = {
 };
 const authValidation = { checkAuth };
 
-export {
-  permissions,
-  authValidation,
-  dataValidation,
-  fileUpload,
-  imageValidation,
-};
+export { permissions, authValidation, dataValidation, fileUpload };

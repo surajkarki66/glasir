@@ -13,13 +13,3 @@ export const dataValidation = (schema, property) => {
     }
   };
 };
-
-export const imageValidation = (req, res, next) => {
-  const file = req.file;
-  if (!file) {
-    next(ApiError.unprocessable("No image selected."));
-    return;
-  }
-  req.body = { avatar: file.filename };
-  next();
-};

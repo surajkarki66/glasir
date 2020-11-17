@@ -205,9 +205,13 @@ export async function signup(req, res, next) {
 
 export async function uploadAvatar(req, res, next) {
   try {
-    const { avatar } = req.body;
+    const file = req.file;
+    if (!file) {
+      next(ApiError.unprocessable("No image selected."));
+      return;
+    }
     const { id } = req.params;
-    const updateObject = { avatar: avatar, updatedAt: new Date() };
+    const updateObject = { avatar: file.filename, updatedAt: new Date() };
     const user = await DAOs.usersDAO.updateUser(id, updateObject);
     if (user.success) {
       return writeServerResponse(
