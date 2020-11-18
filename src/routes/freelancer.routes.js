@@ -6,22 +6,27 @@ import {
   dataValidation,
   authValidation,
   permissions,
-  fileUpload,
+  file,
 } from "../middlewares/index";
 
 const router = new Router();
 
 router
   .route("/make-profile")
-  //.post(authValidation.checkAuth)
-  //.post(permissions.onlyFreelancerCanDoThisAction)
+  .post(authValidation.checkAuth)
+  .post(permissions.onlyFreelancerCanDoThisAction)
   .post(
-    fileUpload("../../../public/uploads/", ["image/jpeg", "image/jpg"]).fields([
-      { name: "avatar", maxCount: 1 },
-      { name: "citizenship", maxCount: 2 },
-    ])
+    file
+      .fileUpload("../../../public/uploads/", [
+        "application/pdf",
+        "application/docx",
+      ])
+      .fields([
+        { name: "citizenship", maxCount: 1 },
+        { name: "cv", maxCount: 1 },
+      ])
   )
-
+  .post(file.fileMiddleware)
   .post(dataValidation(Schemas.freelancerSchema.createProfile, "body"))
   .post(FreelancerController.makeProfile);
 

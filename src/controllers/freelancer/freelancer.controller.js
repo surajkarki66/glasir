@@ -36,16 +36,3 @@ export async function makeProfile(req, res, next) {
     return;
   }
 }
-export async function uploadAvatar(req, res, next) {
-  const file = req.file;
-  if (!file) {
-    next(ApiError.unprocessable("Choose an image."));
-    return;
-  }
-  const data = {
-    status: "success",
-    message: "Avatar uploaded successfully.",
-    file: file.filename,
-  };
-  return writeServerResponse(res, data, 201, "application/json");
-}

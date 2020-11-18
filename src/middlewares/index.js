@@ -7,14 +7,14 @@ import {
 
 import { checkAuth } from "./auth-validation";
 import { dataValidation } from "./validation";
-import { fileUpload } from "./upload";
+import { fileUpload, fileMiddleware } from "./upload";
 
-const permissions = {
+export const permissions = {
   onlySameUserCanDoThisAction,
   onlyAdminCanDoThisAction,
   onlySameUserOrAdminCanDoThisAction,
   onlyFreelancerCanDoThisAction,
 };
-const authValidation = { checkAuth };
-
-export { permissions, authValidation, dataValidation, fileUpload };
+export const authValidation = { checkAuth };
+export const file = { fileUpload, fileMiddleware };
+export { dataValidation };

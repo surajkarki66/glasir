@@ -69,7 +69,6 @@ const schemas = {
     hourlyRate: Joi.number().greater(0).required(),
     title: Joi.string().max(10).required(),
     overview: Joi.string().max(20).required(),
-    profilePic: Joi.string(),
     location: Joi.object()
       .keys({
         country: Joi.string().required(),
