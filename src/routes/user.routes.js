@@ -8,7 +8,7 @@ import {
   permissions,
   authValidation,
   dataValidation,
-  fileUpload,
+  file,
 } from "../middlewares/index";
 
 const router = new Router();
@@ -105,9 +105,9 @@ router
   .patch(permissions.onlySameUserCanDoThisAction)
   .patch(dataValidation(Schemas.userSchema.avatarUPLOAD, "params"))
   .patch(
-    fileUpload("../../../public/uploads/", ["image/jpeg", "image/jpg"]).single(
-      "avatar"
-    )
+    file
+      .fileUpload("../../../public/uploads/", ["image/jpeg", "image/jpg"])
+      .single("avatar")
   )
   .patch(UserController.uploadAvatar);
 

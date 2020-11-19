@@ -22,7 +22,7 @@ export async function getUsers(req, res, next) {
     if (result.success) {
       const users = {
         status: "success",
-        users: result.data,
+        data: result.data,
         page: Number(page),
         filters: {},
         entries_per_page: Number(usersPerPage),
@@ -73,9 +73,11 @@ export async function login(req, res, next) {
 
     const data = {
       status: "success",
-      message: "Login successfull.",
-      accessToken: accessToken,
-      refreshToken: refreshToken,
+      data: {
+        message: "Login successfull.",
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      },
     };
     res.cookie("AccessToken", accessToken, {
       httpOnly: true,
@@ -106,8 +108,7 @@ export async function refreshToken(req, res, next) {
     const refToken = await signToken(aud, role, "REFRESH", "7d");
     const data = {
       status: "success",
-      accessToken: accessToken,
-      refreshToken: refToken,
+      data: { accessToken: accessToken, refreshToken: refToken },
     };
     res.cookie("AccessToken", accessToken, {
       httpOnly: true,
@@ -182,8 +183,10 @@ export async function signup(req, res, next) {
           }
           const data = {
             status: "success",
-            message:
-              "Account created successfully.Please check your email for verification.",
+            data: {
+              message:
+                "Account created successfully.Please check your email for verification.",
+            },
           };
           return writeServerResponse(
             res,
@@ -214,12 +217,13 @@ export async function uploadAvatar(req, res, next) {
     const updateObject = { avatar: file.filename, updatedAt: new Date() };
     const user = await DAOs.usersDAO.updateUser(id, updateObject);
     if (user.success) {
+      const data = {
+        status: "success",
+        data: { message: "Avatar uploaded successfully." },
+      };
       return writeServerResponse(
         res,
-        {
-          status: "success",
-          message: "Avatar uploaded successfully.",
-        },
+        data,
         user.statusCode,
         "application/json"
       );
@@ -250,12 +254,13 @@ export async function activation(req, res, next) {
     };
     const user = await DAOs.usersDAO.updateUser(userId, updateObject);
     if (user.success) {
+      const data = {
+        status: "success",
+        data: { message: "User activated successfully." },
+      };
       return writeServerResponse(
         res,
-        {
-          status: "success",
-          message: "User activated successfully.",
-        },
+        data,
         user.statusCode,
         "application/json"
       );
@@ -281,12 +286,11 @@ export async function logout(req, res, next) {
         next(ApiError.internal("Something went wrong."));
         return;
       }
-      return writeServerResponse(
-        res,
-        { status: "success", message: "Logout successfully." },
-        200,
-        "application/json"
-      );
+      const data = {
+        status: "success",
+        data: { message: "Logout successfully." },
+      };
+      return writeServerResponse(res, data, 200, "application/json");
     });
   } catch (error) {
     if (String(error).startsWith("UnauthorizedError")) {
@@ -332,7 +336,9 @@ export async function forgotPassword(req, res, next) {
         }
         const data = {
           status: "success",
-          message: `Email has been sent to ${email}. Follow the instruction to reset your password.`,
+          data: {
+            message: `Email has been sent to ${email}. Follow the instruction to reset your password.`,
+          },
         };
         return writeServerResponse(res, data, 200, "application/json");
       });
@@ -361,12 +367,13 @@ export async function resetPassword(req, res, next) {
     };
     const user = await DAOs.usersDAO.updateUser(userId, updatedObject);
     if (user.success) {
+      const data = {
+        status: "success",
+        data: { message: "Great! Now you can login with your new password" },
+      };
       return writeServerResponse(
         res,
-        {
-          status: "success",
-          message: "Great! Now you can login with your new password",
-        },
+        data,
         user.statusCode,
         "application/json"
       );
@@ -398,12 +405,13 @@ export async function changePassword(req, res, next) {
       };
       const user = await DAOs.usersDAO.updateUser(id, updatedObject);
       if (user.success) {
+        const data = {
+          status: "success",
+          data: { message: "Password changed successfully." },
+        };
         return writeServerResponse(
           res,
-          {
-            status: "success",
-            message: "Password changed successfully.",
-          },
+          data,
           user.statusCode,
           "application/json"
         );
@@ -438,12 +446,13 @@ export async function changeUserDetails(req, res, next) {
     }
     const result = await DAOs.usersDAO.updateUser(id, updateObject);
     if (result.success) {
+      const data = {
+        status: "success",
+        data: { message: "Update successfully." },
+      };
       return writeServerResponse(
         res,
-        {
-          status: "success",
-          message: "Update successfully.",
-        },
+        data,
         result.statusCode,
         "application/json"
       );
@@ -495,7 +504,9 @@ export async function changeEmail(req, res, next) {
         }
         const data = {
           status: "success",
-          message: "Confirmation email is sent! Please check your email.",
+          data: {
+            message: "Confirmation email is sent! Please check your email.",
+          },
         };
         return writeServerResponse(
           res,
@@ -542,7 +553,9 @@ export async function verifyEmail(req, res, next) {
           }
           const data = {
             status: "success",
-            message: "Confirmation email is sent! Please check your email.",
+            data: {
+              message: "Confirmation email is sent! Please check your email.",
+            },
           };
           return writeServerResponse(
             res,
@@ -552,9 +565,13 @@ export async function verifyEmail(req, res, next) {
           );
         });
       } else {
+        const data = {
+          status: "success",
+          data: { message: "Email is already verified." },
+        };
         return writeServerResponse(
           res,
-          { status: "success", message: "Email is already verified." },
+          data,
           result.statusCode,
           "application/json"
         );
@@ -573,7 +590,10 @@ export async function getUserDetails(req, res, next) {
     const id = req.params.id;
     const result = await DAOs.usersDAO.getUserById(id);
     if (result.success) {
-      const data = { status: "success", ...result.data };
+      const data = {
+        status: "success",
+        data: { ...result.data, password: null },
+      };
       return writeServerResponse(
         res,
         data,
@@ -603,9 +623,13 @@ export async function deleteUser(req, res, next) {
       }
       const deleteResult = await DAOs.usersDAO.deleteUser(id);
       if (deleteResult.success) {
+        const data = {
+          status: "success",
+          data: { message: "Deleted successfully." },
+        };
         return writeServerResponse(
           res,
-          { status: "success", message: "Deleted successfully." },
+          data,
           deleteResult.statusCode,
           "application/json"
         );

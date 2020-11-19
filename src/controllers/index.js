@@ -16,7 +16,7 @@ import {
   getUserDetails,
 } from "./user/user.controller";
 
-import { makeProfile } from "./freelancer/freelancer.controller";
+import { makeProfile, me } from "./freelancer/freelancer.controller";
 
 export const UserController = {
   getUsers,
@@ -36,4 +36,4 @@ export const UserController = {
   uploadAvatar,
 };
 
-export const FreelancerController = { makeProfile, uploadAvatar };
+export const FreelancerController = { makeProfile, uploadAvatar, me };

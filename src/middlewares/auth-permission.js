@@ -2,7 +2,7 @@ import ApiError from "../error/ApiError";
 
 export const onlySameUserOrAdminCanDoThisAction = (req, res, next) => {
   const role = req.jwt.role;
-  const userId = req.jwt.userId;
+  const userId = req.jwt.aud;
   if (req.params && req.params.id === userId) {
     return next();
   } else if (req.body.id && req.body.id === userId) {

@@ -74,7 +74,7 @@ class FreelancersDAO {
         logger.error(message, "getFreelancerByUserId()");
         return {
           success: false,
-          data: [],
+          data: {},
           statusCode: 404,
         };
       }
@@ -83,6 +83,51 @@ class FreelancersDAO {
         `Unable to convert cursor to array or problem counting documents, ${e.message}`,
         "getFreelancerByUserId"
       );
+      throw e;
+    }
+  }
+  static async me(userId) {
+    try {
+      const pipeline = [
+        {
+          $match: {
+            user: ObjectId(userId),
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+      ];
+      const profile = await FreelancersDAO.#freelancers
+        .aggregate(pipeline)
+        .next();
+      let profileObj;
+
+      if (profile) {
+        const user = profile.user[0];
+        const data = { ...profile, user: user };
+        profileObj = { success: true, data: data, statusCode: 200 };
+        return profileObj;
+      }
+      profileObj = { success: false, data: {}, statusCode: 404 };
+      return profileObj;
+    } catch (e) {
+      if (
+        e
+          .toString()
+          .startsWith(
+            "Error: Argument passed in must be a single String of 12 bytes or a string of 24 hex characters"
+          )
+      ) {
+        return null;
+      }
+
+      logger.error(`Something went wrong: ${e}`);
       throw e;
     }
   }
