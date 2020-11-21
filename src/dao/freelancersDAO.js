@@ -47,14 +47,17 @@ class FreelancersDAO {
         );
         return {
           success: false,
-          error: "A freelancer with the given user id or phone already exists.",
+          data: {
+            error:
+              "A freelancer with the given user id or phone already exists.",
+          },
           statusCode: 409,
         };
       }
       logger.error(
         `Error occurred while adding new profile, ${error.message}.`
       );
-      return { success: false, error: error.message, statusCode: 500 };
+      throw error;
     }
   }
   static async getFreelancerByUserId(userId) {

@@ -40,11 +40,11 @@ const schemas = {
           company: Joi.string().max(30).required(),
           location: Joi.object()
             .keys({
-              country: Joi.string().max(15).required(),
-              city: Joi.string().max(15).required(),
+              country: Joi.string().max(20).required(),
+              city: Joi.string().max(20).required(),
             })
             .required(),
-          title: Joi.string().max(10).required(),
+          title: Joi.string().max(30).required(),
           period: Joi.object()
             .keys({
               from: Joi.date().iso().required(),
@@ -67,8 +67,8 @@ const schemas = {
       .max(10)
       .required(),
     hourlyRate: Joi.number().greater(0).required(),
-    title: Joi.string().max(10).required(),
-    overview: Joi.string().max(20).required(),
+    title: Joi.string().max(20).required(),
+    overview: Joi.string().max(50).required(),
     location: Joi.object()
       .keys({
         country: Joi.string().required(),
