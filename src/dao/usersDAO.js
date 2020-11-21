@@ -39,11 +39,11 @@ class UsersDAO {
         updatedAt,
       } = userInfo;
       const result = await UsersDAO.#users.insertOne({
-        email: email,
         firstName: firstName,
         lastName: lastName,
-        avatar: avatar,
         username: username,
+        email: email,
+        avatar: avatar,
         password: password,
         role: role,
         isActive: isActive,
@@ -59,15 +59,15 @@ class UsersDAO {
         };
       }
     } catch (e) {
-      if (String(e).startsWith("MongoError: E11000 duplicate key error")) {
+      if (String(e).startsWith("MongoError: Document failed validation")) {
         return {
           success: false,
-          error: "A user with the given email or username already exists.",
-          statusCode: 409,
+          data: { error: "Document failed validation" },
+          statusCode: 422,
         };
       }
       logger.error(`Error occurred while adding new user, ${e}.`);
-      return { success: false, error: e, statusCode: 500 };
+      throw e;
     }
   }
   static async getUsers({ page = 0, usersPerPage = 10 } = {}) {
@@ -132,7 +132,7 @@ class UsersDAO {
         logger.error(message, "getUserById()");
         return {
           success: false,
-          data: [],
+          data: {},
           statusCode: 404,
         };
       }
@@ -170,7 +170,7 @@ class UsersDAO {
       return {
         success: false,
         data: {
-          message: "No user exist with this userid.",
+          error: "No user exist with this userid.",
         },
         statusCode: 404,
       };
@@ -193,7 +193,7 @@ class UsersDAO {
       return {
         success: false,
         data: {
-          message: "No user exist with this userid.",
+          error: "No user exist with this userid.",
         },
         statusCode: 404,
       };

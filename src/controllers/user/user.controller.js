@@ -156,7 +156,7 @@ export async function signup(req, res, next) {
         password: await hashPassword(userFromBody.password),
         isActive: false,
         createdAt: new Date(),
-        updatedAt: null,
+        updatedAt: new Date(),
       };
       const insertResult = await DAOs.usersDAO.createUser(userInfo);
 
@@ -196,7 +196,7 @@ export async function signup(req, res, next) {
           );
         });
       } else {
-        next(ApiError.conflict(insertResult.error));
+        next(ApiError.unprocessable(insertResult.data.error));
         return;
       }
     }
@@ -228,7 +228,7 @@ export async function uploadAvatar(req, res, next) {
         "application/json"
       );
     } else {
-      next(ApiError.notfound(user.data.message));
+      next(ApiError.notfound(user.data.error));
       return;
     }
   } catch (error) {
@@ -265,7 +265,7 @@ export async function activation(req, res, next) {
         "application/json"
       );
     } else {
-      next(ApiError.notfound(user.data.message));
+      next(ApiError.notfound(user.data.error));
       return;
     }
   } catch (err) {
@@ -378,7 +378,7 @@ export async function resetPassword(req, res, next) {
         "application/json"
       );
     } else {
-      next(ApiError.notfound(result.data.message));
+      next(ApiError.notfound(result.data.error));
       return;
     }
   } catch (error) {
@@ -416,7 +416,7 @@ export async function changePassword(req, res, next) {
           "application/json"
         );
       } else {
-        next(ApiError.notfound(user.data.message));
+        next(ApiError.notfound(user.data.error));
         return;
       }
     } else {
@@ -457,7 +457,7 @@ export async function changeUserDetails(req, res, next) {
         "application/json"
       );
     } else {
-      next(ApiError.notfound(result.data.message));
+      next(ApiError.notfound(result.data.error));
       return;
     }
   } catch (error) {
@@ -516,7 +516,7 @@ export async function changeEmail(req, res, next) {
         );
       });
     } else {
-      next(ApiError.notfound(result.data.message));
+      next(ApiError.notfound(result.data.error));
       return;
     }
   } catch (error) {
@@ -634,7 +634,7 @@ export async function deleteUser(req, res, next) {
           "application/json"
         );
       }
-      next(ApiError.notfound("User doesnot exist."));
+      next(ApiError.notfound(deleteResult.data.error));
       return;
     }
     next(ApiError.notfound("User doesnot exist."));
