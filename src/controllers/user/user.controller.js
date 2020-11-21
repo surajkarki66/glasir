@@ -33,7 +33,7 @@ export async function getUsers(req, res, next) {
         "application/json"
       );
     }
-    next(ApiError.notFound("Users not found."));
+    next(ApiError.notFound("Not found"));
     return;
   } catch (e) {
     next(ApiError.internal(`Something went wrong: ${e.message}`));

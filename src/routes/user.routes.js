@@ -111,6 +111,6 @@ router
   )
   .patch(UserController.uploadAvatar);
 
-//router.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+router.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 export default router;

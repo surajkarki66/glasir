@@ -27,12 +27,14 @@ class UsersDAO {
   static async createUser(userInfo) {
     try {
       const result = await UsersDAO.#users.insertOne(userInfo);
-      const data = result.ops[0];
-      return {
-        success: true,
-        data: data,
-        statusCode: 201,
-      };
+      if (result.insertedCount === 1) {
+        const data = result.ops[0];
+        return {
+          success: true,
+          data: data,
+          statusCode: 201,
+        };
+      }
     } catch (e) {
       if (String(e).startsWith("MongoError: Document failed validation")) {
         return {
