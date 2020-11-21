@@ -26,38 +26,13 @@ class UsersDAO {
   }
   static async createUser(userInfo) {
     try {
-      const {
-        email,
-        firstName,
-        lastName,
-        avatar,
-        username,
-        password,
-        role,
-        isActive,
-        createdAt,
-        updatedAt,
-      } = userInfo;
-      const result = await UsersDAO.#users.insertOne({
-        firstName: firstName,
-        lastName: lastName,
-        username: username,
-        email: email,
-        avatar: avatar,
-        password: password,
-        role: role,
-        isActive: isActive,
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-      });
-      if (result) {
-        const data = result.ops[0];
-        return {
-          success: true,
-          data: data,
-          statusCode: 201,
-        };
-      }
+      const result = await UsersDAO.#users.insertOne(userInfo);
+      const data = result.ops[0];
+      return {
+        success: true,
+        data: data,
+        statusCode: 201,
+      };
     } catch (e) {
       if (String(e).startsWith("MongoError: Document failed validation")) {
         return {
@@ -165,15 +140,15 @@ class UsersDAO {
           },
           statusCode: 201,
         };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No user exist with this userid.",
+          },
+          statusCode: 404,
+        };
       }
-
-      return {
-        success: false,
-        data: {
-          error: "No user exist with this userid.",
-        },
-        statusCode: 404,
-      };
     } catch (e) {
       logger.error(`Error occurred while updating user, ${e}`, "updateUser()");
       throw e;
@@ -188,15 +163,15 @@ class UsersDAO {
           data: { message: "Deleted successfully." },
           statusCode: 200,
         };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No user exist with this userid.",
+          },
+          statusCode: 404,
+        };
       }
-
-      return {
-        success: false,
-        data: {
-          error: "No user exist with this userid.",
-        },
-        statusCode: 404,
-      };
     } catch (e) {
       logger.error(`Error occurred while deleting user, ${e}`, "deleteUser()");
       throw e;
