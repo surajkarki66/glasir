@@ -4,6 +4,7 @@ import logger from "../utils/logger";
 
 class FreelancersDAO {
   static #freelancers;
+  static #DEFAULT_SORT = [["user.username", -1]];
 
   static async injectDB(conn) {
     if (FreelancersDAO.#freelancers) {
@@ -66,6 +67,37 @@ class FreelancersDAO {
       );
       throw error;
     }
+  }
+  static async getFreelancers({
+    filters = null,
+    page = 0,
+    freelancersPerPage = 20,
+  } = {}) {
+    let queryParams = {};
+    const {
+      query = {},
+      project = {},
+      sort = FreelancersDAO.#DEFAULT_SORT,
+    } = queryParams;
+
+    const pipeline = [
+      {
+        $match: query,
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $project: project },
+      { $sort: sort },
+    ];
+    const freelancers = await FreelancersDAO.#freelancers
+      .aggregate(pipeline)
+      .next();
   }
 }
 
