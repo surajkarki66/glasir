@@ -14,9 +14,9 @@ import {
   deleteUser,
   uploadAvatar,
   getUserDetails,
-} from "./user/user.controller";
+} from "./user";
 
-import { makeProfile, me } from "./freelancer/freelancer.controller";
+import { makeProfile } from "./freelancer";
 
 export const UserController = {
   getUsers,
@@ -36,4 +36,4 @@ export const UserController = {
   uploadAvatar,
 };
 
-export const FreelancerController = { makeProfile, uploadAvatar, me };
+export const FreelancerController = { makeProfile, uploadAvatar };

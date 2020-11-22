@@ -30,10 +30,4 @@ router
   .post(dataValidation(Schemas.freelancerSchema.createProfile, "body"))
   .post(FreelancerController.makeProfile);
 
-router
-  .route("/me")
-  .get(authValidation.checkAuth)
-  .get(permissions.onlyFreelancerCanDoThisAction)
-  .get(FreelancerController.me);
-
 export default router;

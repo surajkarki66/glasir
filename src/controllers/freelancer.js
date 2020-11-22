@@ -1,8 +1,8 @@
 import { ObjectId } from "bson";
 
-import DAOs from "../../dao/index";
-import ApiError from "../../error/ApiError";
-import writeServerResponse from "../../helpers/response";
+import DAOs from "../dao/index";
+import ApiError from "../error/ApiError";
+import writeServerResponse from "../helpers/response";
 
 export async function makeProfile(req, res, next) {
   try {

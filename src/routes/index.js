@@ -1,6 +1,6 @@
-import swaggerRoutes from "./swagger.routes";
-import userRoutes from "./user.routes";
-import freelancerRoutes from "./freelancer.routes";
+import swaggerRoutes from "./swagger";
+import userRoutes from "./user";
+import freelancerRoutes from "./freelancer";
 
 const routes = { swaggerRoutes, userRoutes, freelancerRoutes };
 

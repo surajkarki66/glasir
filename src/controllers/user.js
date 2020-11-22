@@ -2,13 +2,13 @@ import {
   signToken,
   verifyToken,
   verifyRefreshToken,
-} from "../../helpers/jwt-helper";
-import DAOs from "../../dao/index";
-import mg from "../../helpers/mailgun";
-import { client } from "../../utils/redis";
-import ApiError from "../../error/ApiError";
-import writeServerResponse from "../../helpers/response";
-import { comparePassword, hashPassword } from "../../utils/utils";
+} from "../helpers/jwt-helper";
+import DAOs from "../dao/index";
+import mg from "../helpers/mailgun";
+import { client } from "../utils/redis";
+import ApiError from "../error/ApiError";
+import writeServerResponse from "../helpers/response";
+import { comparePassword, hashPassword } from "../utils/utils";
 
 export async function getUsers(req, res, next) {
   try {
