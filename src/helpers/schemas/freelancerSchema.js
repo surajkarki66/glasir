@@ -23,14 +23,14 @@ const schemas = {
     education: Joi.array()
       .items(
         Joi.object().keys({
-          school: Joi.string().max(30).required(),
-          areaOfStudy: Joi.string().max(20),
-          degree: Joi.string().max(30),
+          school: Joi.string().max(80).required(),
+          areaOfStudy: Joi.string().max(50),
+          degree: Joi.string().max(50),
           datesAttended: Joi.object().keys({
             from: Joi.date().iso().required(),
             to: Joi.date().iso().greater(Joi.ref("from")).required(),
           }),
-          description: Joi.string().max(50),
+          description: Joi.string().max(80),
         })
       )
       .max(4),
@@ -41,7 +41,7 @@ const schemas = {
           location: Joi.object()
             .keys({
               country: Joi.string().max(20).required(),
-              city: Joi.string().max(20).required(),
+              city: Joi.string().max(30).required(),
             })
             .required(),
           title: Joi.string().max(30).required(),
@@ -51,7 +51,7 @@ const schemas = {
               to: Joi.date().iso().greater(Joi.ref("from")),
             })
             .required(),
-          description: Joi.string().max(50),
+          description: Joi.string().max(80),
         })
       )
       .max(10),
@@ -67,13 +67,13 @@ const schemas = {
       .max(10)
       .required(),
     hourlyRate: Joi.number().greater(0).required(),
-    title: Joi.string().max(20).required(),
-    overview: Joi.string().max(50).required(),
+    title: Joi.string().max(30).required(),
+    overview: Joi.string().max(80).required(),
     location: Joi.object()
       .keys({
         country: Joi.string().required(),
-        street: Joi.string().max(20).required(),
-        city: Joi.string().max(20).required(),
+        street: Joi.string().max(30).required(),
+        city: Joi.string().max(30).required(),
         zip: Joi.number().required(),
         province: Joi.string()
           .valid(

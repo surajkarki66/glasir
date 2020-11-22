@@ -15,7 +15,7 @@ export async function makeProfile(req, res, next) {
         user: ObjectId(aud),
         ...profileInfo,
         createdAt: new Date(),
-        updatedAt: null,
+        updatedAt: new Date(),
       };
       const result = await DAOs.freelancersDAO.createProfile(info);
       if (result.success) {
