@@ -27,8 +27,12 @@ export async function makeProfile(req, res, next) {
           "application/json"
         );
       }
-      next(ApiError.conflict(result.error));
-      return;
+      return writeServerResponse(
+        res,
+        result.data.error,
+        result.statusCode,
+        "application/json"
+      );
     } else {
       next(ApiError.badRequest("No user exist with that user id."));
       return;

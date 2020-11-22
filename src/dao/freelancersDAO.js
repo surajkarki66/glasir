@@ -41,6 +41,13 @@ class FreelancersDAO {
         };
       }
     } catch (error) {
+      if (String(e).startsWith("MongoError: Document failed validation")) {
+        return {
+          success: false,
+          data: { error: "Document failed validation" },
+          statusCode: 422,
+        };
+      }
       if (String(error).startsWith("MongoError: E11000 duplicate key error")) {
         logger.error(
           `Error occurred while adding new profile, ${error.message}.`
