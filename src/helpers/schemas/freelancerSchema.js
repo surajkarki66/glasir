@@ -6,9 +6,11 @@ const schemas = {
       .keys({
         service: Joi.string()
           .valid(
+            "Administration",
             "Design & Creative",
             "Engineering & Architecture",
             "IT & Networking",
+            "Marketing",
             "Web, Mobile & Software Dev",
             "Writing"
           )

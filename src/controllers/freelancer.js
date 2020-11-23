@@ -41,6 +41,8 @@ export async function makeProfile(req, res, next) {
   }
 }
 export async function getFreelancers(req, res, next) {
-  const FREELANCERS_PER_PAGE = 20;
-  await DAOs.freelancersDAO.getMovies();
+  const { page, freelancersPerPage } = req.query;
+  console.log(
+    await DAOs.freelancersDAO.getFreelancers({ page, freelancersPerPage })
+  );
 }

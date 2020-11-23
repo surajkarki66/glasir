@@ -4,7 +4,16 @@ import logger from "../utils/logger";
 
 class FreelancersDAO {
   static #freelancers;
-  static #DEFAULT_SORT = [["user.username", -1]];
+  static #defaultProject = {
+    "user.firstName": 1,
+    "user.lastName": 1,
+    "user.username": 1,
+    "user.avatar": 1,
+    expertise: 1,
+    hourlyRate: 1,
+    title: 1,
+  };
+  static #defaultSort = { "user.username": -1 };
 
   static async injectDB(conn) {
     if (FreelancersDAO.#freelancers) {
@@ -76,8 +85,8 @@ class FreelancersDAO {
     let queryParams = {};
     const {
       query = {},
-      project = {},
-      sort = FreelancersDAO.#DEFAULT_SORT,
+      project = FreelancersDAO.#defaultProject,
+      sort = FreelancersDAO.#defaultSort,
     } = queryParams;
 
     const pipeline = [
@@ -95,9 +104,39 @@ class FreelancersDAO {
       { $project: project },
       { $sort: sort },
     ];
-    const freelancers = await FreelancersDAO.#freelancers
-      .aggregate(pipeline)
-      .next();
+    let cursor;
+    try {
+      cursor = await FreelancersDAO.#freelancers.aggregate(pipeline);
+    } catch (e) {
+      logger.error(`Unable to issue find command, ${e}`);
+      return {
+        success: false,
+        data: [],
+        totalNumFreelancers: 0,
+        statusCode: 404,
+      };
+    }
+    const displayCursor = cursor
+      .skip(parseInt(page) * parseInt(freelancersPerPage))
+      .limit(parseInt(freelancersPerPage));
+    try {
+      const freelancersList = await displayCursor.toArray();
+      const totalNumFreelancers =
+        parseInt(page) === 0
+          ? await FreelancersDAO.#freelancers.countDocuments(query)
+          : 0;
+      return {
+        success: true,
+        data: freelancersList,
+        totalNumFreelancers,
+        statusCode: freelancersList.length > 0 ? 200 : 404,
+      };
+    } catch (e) {
+      logger.error(
+        `Unable to convert cursor to array or problem counting documents, ${e.message}`
+      );
+      throw e;
+    }
   }
 }
 

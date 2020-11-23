@@ -30,4 +30,6 @@ router
   .post(dataValidation(Schemas.freelancerSchema.createProfile, "body"))
   .post(FreelancerController.makeProfile);
 
+router.route("/").get(FreelancerController.getFreelancers);
+
 export default router;

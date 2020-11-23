@@ -2,9 +2,9 @@ import Joi from "joi";
 
 const schemas = {
   userSIGNUP: Joi.object().keys({
-    firstName: Joi.string().min(2).max(20).required(),
-    lastName: Joi.string().min(2).max(20).required(),
-    username: Joi.string().min(4).max(20).required(),
+    firstName: Joi.string().min(2).max(32).required(),
+    lastName: Joi.string().min(2).max(32).required(),
+    username: Joi.string().min(4).max(32).required(),
     avatar: Joi.string().required(),
     email: Joi.string()
       .email({
@@ -28,7 +28,7 @@ const schemas = {
   }),
   userLOGIN: Joi.object()
     .keys({
-      username: Joi.string().min(4).max(20),
+      username: Joi.string().min(4).max(32),
       email: Joi.string().email({
         minDomainSegments: 2,
         tlds: {
@@ -88,9 +88,9 @@ const schemas = {
       .required(),
   }),
   userDetailsCHANGE: Joi.object().keys({
-    firstName: Joi.string().min(2).max(20),
-    lastName: Joi.string().min(2).max(20),
-    username: Joi.string().min(4).max(20),
+    firstName: Joi.string().min(2).max(32),
+    lastName: Joi.string().min(2).max(32),
+    username: Joi.string().min(4).max(32),
   }),
   emailCHANGE: Joi.object().keys({
     email: Joi.string()
