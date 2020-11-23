@@ -25,42 +25,42 @@ const schemas = {
     education: Joi.array()
       .items(
         Joi.object().keys({
-          school: Joi.string().max(80).required(),
-          areaOfStudy: Joi.string().max(50),
-          degree: Joi.string().max(50),
+          school: Joi.string().max(200).required(),
+          areaOfStudy: Joi.string().max(70),
+          degree: Joi.string(),
           datesAttended: Joi.object().keys({
             from: Joi.date().iso().required(),
             to: Joi.date().iso().greater(Joi.ref("from")).required(),
           }),
-          description: Joi.string().max(80),
+          description: Joi.string(),
         })
       )
       .max(4),
     employement: Joi.array()
       .items(
         Joi.object().keys({
-          company: Joi.string().max(30).required(),
+          company: Joi.string().max(200).required(),
           location: Joi.object()
             .keys({
-              country: Joi.string().max(20).required(),
-              city: Joi.string().max(30).required(),
+              country: Joi.string().max(70).required(),
+              city: Joi.string().max(70).required(),
             })
             .required(),
-          title: Joi.string().max(30).required(),
+          title: Joi.string().max(70).required(),
           period: Joi.object()
             .keys({
               from: Joi.date().iso().required(),
               to: Joi.date().iso().greater(Joi.ref("from")),
             })
             .required(),
-          description: Joi.string().max(80),
+          description: Joi.string().max(255),
         })
       )
       .max(10),
     languages: Joi.array()
       .items(
         Joi.object().keys({
-          name: Joi.string().required(),
+          name: Joi.string().max(255).required(),
           proficiency: Joi.string()
             .valid("Basic", "Conversational", "Fluent", "Native or Bilingual")
             .required(),
@@ -69,14 +69,14 @@ const schemas = {
       .max(10)
       .required(),
     hourlyRate: Joi.number().greater(0).required(),
-    title: Joi.string().max(30).required(),
-    overview: Joi.string().max(80).required(),
+    title: Joi.string().max(70).required(),
+    overview: Joi.string().max(5000).required(),
     location: Joi.object()
       .keys({
-        country: Joi.string().required(),
-        street: Joi.string().max(30).required(),
-        city: Joi.string().max(30).required(),
-        zip: Joi.number().required(),
+        country: Joi.string().valid("Nepal").required(),
+        street: Joi.string().max(70).required(),
+        city: Joi.string().max(70).required(),
+        zip: Joi.number().integer().required(),
         province: Joi.string()
           .valid(
             "Province No. 1",
@@ -90,7 +90,7 @@ const schemas = {
           .required(),
       })
       .required(),
-    phone: Joi.number().required(),
+    phone: Joi.number().integer().precision(10).required(),
     citizenship: Joi.string().required(),
     cv: Joi.string().required(),
     isVerified: Joi.boolean().required(),
