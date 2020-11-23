@@ -2,6 +2,34 @@ import Joi from "joi";
 
 const schemas = {
   createProfile: Joi.object().keys({
+    title: Joi.string().max(70).required(),
+    overview: Joi.string().max(5000).required(),
+    hourlyRate: Joi.number().greater(0).required(),
+    location: Joi.object()
+      .keys({
+        country: Joi.string().valid("Nepal").required(),
+        street: Joi.string().max(70).required(),
+        city: Joi.string().max(70).required(),
+        zip: Joi.number().integer().required(),
+        province: Joi.string()
+          .valid(
+            "Province No. 1",
+            "Province No. 2",
+            "Bagmati Province",
+            "Gandaki Province",
+            "Lumbini Province",
+            "Karnali Province",
+            "Sudurpashchim Province"
+          )
+          .required(),
+      })
+      .required(),
+    phone: Joi.string().max(14).required(),
+    citizenship: Joi.object().keys({
+      citizenshipNumber: Joi.string().max(50).required(),
+      citizenshipUrl: Joi.string().required(),
+    }),
+    resume: Joi.string(),
     expertise: Joi.object()
       .keys({
         service: Joi.string()
@@ -68,31 +96,7 @@ const schemas = {
       )
       .max(10)
       .required(),
-    hourlyRate: Joi.number().greater(0).required(),
-    title: Joi.string().max(70).required(),
-    overview: Joi.string().max(5000).required(),
-    location: Joi.object()
-      .keys({
-        country: Joi.string().valid("Nepal").required(),
-        street: Joi.string().max(70).required(),
-        city: Joi.string().max(70).required(),
-        zip: Joi.number().integer().required(),
-        province: Joi.string()
-          .valid(
-            "Province No. 1",
-            "Province No. 2",
-            "Bagmati Province",
-            "Gandaki Province",
-            "Lumbini Province",
-            "Karnali Province",
-            "Sudurpashchim Province"
-          )
-          .required(),
-      })
-      .required(),
-    phone: Joi.number().integer().precision(10).required(),
-    citizenship: Joi.string().required(),
-    cv: Joi.string().required(),
+
     isVerified: Joi.boolean().required(),
   }),
 };
