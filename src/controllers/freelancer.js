@@ -14,7 +14,8 @@ export async function makeProfile(req, res, next) {
     const phoneNumber = parsePhoneNumber(phone.phoneNumber);
     if (phoneNumber && phoneNumber.isValid()) {
       const newHourlyRate =
-        profileInfo.hourlyRate - process.env.RATE * profileInfo.hourlyRate;
+        profileInfo.hourlyRate -
+        process.env.SERVICE_FEE_RATE * profileInfo.hourlyRate;
       const info = {
         ...profileInfo,
         user: ObjectId(aud),
