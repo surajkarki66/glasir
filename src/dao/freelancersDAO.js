@@ -41,7 +41,7 @@ class FreelancersDAO {
         };
       }
     } catch (error) {
-      if (String(e).startsWith("MongoError: Document failed validation")) {
+      if (String(error).startsWith("MongoError: Document failed validation")) {
         return {
           success: false,
           data: { error: "Document failed validation" },
@@ -66,6 +66,11 @@ class FreelancersDAO {
       );
       throw error;
     }
+  }
+  static async getFreelancerByPhone(phoneNumber) {
+    return await FreelancersDAO.#freelancers.findOne({
+      "phone.phoneNumber": phoneNumber,
+    });
   }
 }
 

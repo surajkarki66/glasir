@@ -3,7 +3,7 @@ import createError from "http-errors";
 
 import { client } from "../utils/redis";
 
-const sign = (payload, secret, options, isRefresh) => {
+export const sign = (payload, secret, options, isRefresh) => {
   return new Promise((resolve, reject) => {
     jwt.sign(payload, secret, options, (err, token) => {
       if (err) {
@@ -30,7 +30,7 @@ const sign = (payload, secret, options, isRefresh) => {
     });
   });
 };
-const signToken = (userId, role, type, expiresIn) => {
+export const signToken = (userId, role, type, expiresIn) => {
   let secret;
   let options;
   let payload = {};
@@ -77,7 +77,7 @@ const signToken = (userId, role, type, expiresIn) => {
     // pass
   }
 };
-const verifyToken = async (token, secretKey) => {
+export const verifyToken = async (token, secretKey) => {
   return jwt.verify(token, secretKey, (error, response) => {
     if (error) {
       if (String(error).startsWith("TokenExpiredError")) {
@@ -91,7 +91,7 @@ const verifyToken = async (token, secretKey) => {
   });
 };
 
-const verifyRefreshToken = (refreshToken, secretKey) => {
+export const verifyRefreshToken = (refreshToken, secretKey) => {
   return new Promise((resolve, reject) => {
     jwt.verify(refreshToken, secretKey, (err, payload) => {
       if (err) {
@@ -118,5 +118,3 @@ const verifyRefreshToken = (refreshToken, secretKey) => {
     });
   });
 };
-
-export { signToken, verifyToken, verifyRefreshToken };

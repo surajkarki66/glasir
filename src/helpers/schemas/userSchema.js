@@ -19,9 +19,13 @@ const schemas = {
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
       .required(),
     role: Joi.string().valid("freelancer", "client", "admin").required(),
+    isActive: Joi.boolean().default(false),
+    createdAt: Joi.date().iso().default(new Date()),
+    updatedAt: Joi.date().iso().default(new Date()),
   }),
   userACTIVATION: Joi.object().keys({
     token: [Joi.string().required(), Joi.number().required()],
+    updatedAt: Joi.date().iso().default(new Date()),
   }),
   userACTIVATIONEMAIL: Joi.object().keys({
     id: Joi.string().required(),
@@ -69,6 +73,7 @@ const schemas = {
       .min(8)
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
       .required(),
+    updatedAt: Joi.date().iso().default(new Date()),
   }),
   passwordFORGOT: Joi.object().keys({
     email: Joi.string()
@@ -86,11 +91,13 @@ const schemas = {
       .min(8)
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
       .required(),
+    updatedAt: Joi.date().iso().default(new Date()),
   }),
   userDetailsCHANGE: Joi.object().keys({
     firstName: Joi.string().min(2).max(32),
     lastName: Joi.string().min(2).max(32),
     username: Joi.string().min(4).max(32),
+    updatedAt: Joi.date().iso().default(new Date()),
   }),
   emailCHANGE: Joi.object().keys({
     email: Joi.string()
@@ -101,6 +108,7 @@ const schemas = {
         },
       })
       .required(),
+    updatedAt: Joi.date().iso().default(new Date()),
   }),
   avatarUPLOAD: Joi.object().keys({
     id: Joi.string().required(),

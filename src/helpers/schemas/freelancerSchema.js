@@ -24,11 +24,11 @@ const schemas = {
           .required(),
       })
       .required(),
-    phone: Joi.string().max(14).required(),
-    citizenship: Joi.object().keys({
-      citizenshipNumber: Joi.string().max(50).required(),
-      citizenshipUrl: Joi.string().required(),
+    phone: Joi.object().keys({
+      phoneNumber: Joi.string().required(),
+      isVerified: Joi.boolean().default(false),
     }),
+    citizenship: Joi.string(),
     resume: Joi.string(),
     expertise: Joi.object()
       .keys({
@@ -63,6 +63,7 @@ const schemas = {
           description: Joi.string(),
         })
       )
+
       .max(4),
     employement: Joi.array()
       .items(
@@ -84,6 +85,7 @@ const schemas = {
           description: Joi.string().max(255),
         })
       )
+
       .max(10),
     languages: Joi.array()
       .items(
@@ -97,7 +99,9 @@ const schemas = {
       .max(10)
       .required(),
 
-    isVerified: Joi.boolean().required(),
+    isVerified: Joi.boolean().default(false),
+    createdAt: Joi.date().iso().default(new Date()),
+    updatedAt: Joi.date().iso().default(new Date()),
   }),
 };
 export default schemas;

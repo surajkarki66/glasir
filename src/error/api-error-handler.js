@@ -1,5 +1,5 @@
 import ApiError from "./ApiError";
-import writeServerResponse from "../helpers/response";
+import { writeServerResponse } from "../helpers/response";
 
 function apiErrorHandler(err, req, res, next) {
   if (err instanceof ApiError) {

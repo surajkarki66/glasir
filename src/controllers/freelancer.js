@@ -1,40 +1,53 @@
 import { ObjectId } from "bson";
+import parsePhoneNumber from "libphonenumber-js";
 
 import DAOs from "../dao/index";
 import ApiError from "../error/ApiError";
-import writeServerResponse from "../helpers/response";
+import { writeServerResponse } from "../helpers/response";
 
 export async function makeProfile(req, res, next) {
   try {
     const profileInfo = req.body;
     const { aud } = req.jwt;
-    const info = {
-      user: ObjectId(aud),
-      ...profileInfo,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    const result = await DAOs.freelancersDAO.createProfile(info);
-    if (result.success) {
-      const data = {
-        status: "success",
-        data: {
-          message: "Your profile created successfully.",
-        },
+    const { phone } = profileInfo;
+
+    const phoneNumber = parsePhoneNumber(phone.phoneNumber);
+    if (phoneNumber && phoneNumber.isValid()) {
+      const rate = 0.05;
+      const newHourlyRate =
+        profileInfo.hourlyRate - rate * profileInfo.hourlyRate;
+      const info = {
+        ...profileInfo,
+        user: ObjectId(aud),
+        hourlyRate: newHourlyRate,
       };
+
+      if (await DAOs.freelancersDAO.getFreelancerByPhone(phone.phoneNumber)) {
+        next(ApiError.conflict("Phone number is already used."));
+        return;
+      }
+      const result = await DAOs.freelancersDAO.createProfile(info);
+      if (result.success) {
+        const data = {
+          status: "success",
+          data: { message: "Profile is created successfully." },
+        };
+        return writeServerResponse(
+          res,
+          data,
+          result.statusCode,
+          "application/json"
+        );
+      }
       return writeServerResponse(
         res,
-        data,
+        { status: "failed", data: result.data },
         result.statusCode,
         "application/json"
       );
     }
-    return writeServerResponse(
-      res,
-      { status: "failed", data: result.data },
-      result.statusCode,
-      "application/json"
-    );
+    next(ApiError.unprocessable("Invalid phone number."));
+    return;
   } catch (error) {
     next(ApiError.internal(`Something went wrong: ${error.message}`));
     return;

@@ -4,10 +4,10 @@ import {
   verifyRefreshToken,
 } from "../helpers/jwt-helper";
 import DAOs from "../dao/index";
-import mg from "../helpers/mailgun";
+import { mg } from "../helpers/mailgun";
 import { client } from "../utils/redis";
 import ApiError from "../error/ApiError";
-import writeServerResponse from "../helpers/response";
+import { writeServerResponse } from "../helpers/response";
 import { comparePassword, hashPassword } from "../utils/utils";
 
 export async function getUsers(req, res, next) {
@@ -152,9 +152,6 @@ export async function signup(req, res, next) {
       const userInfo = {
         ...userFromBody,
         password: await hashPassword(userFromBody.password),
-        isActive: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
       const insertResult = await DAOs.usersDAO.createUser(userInfo);
 
@@ -236,7 +233,7 @@ export async function uploadAvatar(req, res, next) {
 }
 export async function activation(req, res, next) {
   try {
-    const { token } = req.body;
+    const { token, updatedAt } = req.body;
     const result = await verifyToken(
       token,
       process.env.ACTIVATION_TOKEN_SECRET
@@ -248,7 +245,7 @@ export async function activation(req, res, next) {
     const userId = result.aud;
     const updateObject = {
       isActive: true,
-      updatedAt: new Date(),
+      updatedAt: updatedAt,
     };
     const user = await DAOs.usersDAO.updateUser(userId, updateObject);
     if (user.success) {
@@ -352,7 +349,7 @@ export async function forgotPassword(req, res, next) {
 
 export async function resetPassword(req, res, next) {
   try {
-    const { newPassword, token } = req.body;
+    const { newPassword, token, updatedAt } = req.body;
     const result = await verifyToken(token, process.env.FORGOT_TOKEN_SECRET);
     if (result.error) {
       next(ApiError.badRequest(result.error));
@@ -361,7 +358,7 @@ export async function resetPassword(req, res, next) {
     const userId = result.aud;
     const updatedObject = {
       password: await hashPassword(newPassword),
-      updatedAt: new Date(),
+      updatedAt: updatedAt,
     };
     const user = await DAOs.usersDAO.updateUser(userId, updatedObject);
     if (user.success) {
@@ -388,7 +385,7 @@ export async function resetPassword(req, res, next) {
 export async function changePassword(req, res, next) {
   try {
     const { id } = req.params;
-    const { oldPassword, newPassword } = req.body;
+    const { oldPassword, newPassword, updatedAt } = req.body;
     const result = await DAOs.usersDAO.getUserById(id);
     if (result.success) {
       const { password } = result.data;
@@ -399,7 +396,7 @@ export async function changePassword(req, res, next) {
       }
       const updatedObject = {
         password: await hashPassword(newPassword),
-        updatedAt: new Date(),
+        updatedAt: updatedAt,
       };
       const user = await DAOs.usersDAO.updateUser(id, updatedObject);
       if (user.success) {
@@ -431,7 +428,7 @@ export async function changeUserDetails(req, res, next) {
   try {
     const userDetails = req.body;
     const { id } = req.params;
-    let updateObject = { ...userDetails, updatedAt: new Date() };
+    let updateObject = userDetails;
 
     if (updateObject.username) {
       const { username } = updateObject;
@@ -465,7 +462,7 @@ export async function changeUserDetails(req, res, next) {
 }
 export async function changeEmail(req, res, next) {
   try {
-    const { email } = req.body;
+    const { email, updatedAt } = req.body;
     const { id } = req.params;
     const user = await DAOs.usersDAO.getUserByEmail(email);
     const { role } = req.jwt;
@@ -477,7 +474,7 @@ export async function changeEmail(req, res, next) {
     const updateObject = {
       email: email,
       isActive: false,
-      updatedAt: new Date(),
+      updatedAt: updatedAt,
     };
     const result = await DAOs.usersDAO.updateUser(id, updateObject);
     if (result.success) {

@@ -3,9 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const mg = mailgun({
+export const mg = mailgun({
   apiKey: process.env.MAIL_GUN_API_KEY,
   domain: process.env.MAIL_GUN_DOMAIN,
 });
-
-export default mg;
