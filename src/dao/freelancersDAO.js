@@ -72,6 +72,44 @@ class FreelancersDAO {
       "phone.phoneNumber": phoneNumber,
     });
   }
+  static async updateFreelancer(id, updateObject) {
+    try {
+      const result = await FreelancersDAO.#freelancers.updateOne(
+        {
+          _id: ObjectId(id),
+        },
+        {
+          $set: updateObject,
+        }
+      );
+      if (
+        (result.modifiedCount === 1 && result.matchedCount === 1) ||
+        result.matchedCount === 1
+      ) {
+        return {
+          success: true,
+          data: {
+            message: "Updated successfully.",
+          },
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No freelancer exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while updating user, ${e}`,
+        "updateFreelancer()"
+      );
+      throw e;
+    }
+  }
 }
 
 export default FreelancersDAO;
