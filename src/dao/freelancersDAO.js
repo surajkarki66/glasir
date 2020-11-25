@@ -72,6 +72,11 @@ class FreelancersDAO {
       "phone.phoneNumber": phoneNumber,
     });
   }
+  static async getFreelancerByUserId(userId) {
+    return await FreelancersDAO.#freelancers.findOne({
+      user: ObjectId(userId),
+    });
+  }
   static async updateFreelancer(id, updateObject) {
     try {
       const result = await FreelancersDAO.#freelancers.updateOne(

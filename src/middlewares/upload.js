@@ -38,25 +38,3 @@ export function fileUpload(destination, fileType) {
 
   return upload;
 }
-
-export function fileMiddleware(req, res, next) {
-  const files = req.files;
-  if (!files) {
-    next(ApiError.unprocessable("No file chosen"));
-    return;
-  }
-  const { cv, citizenship } = req.files;
-  const { obj } = req.body;
-  if (!obj) {
-    next(ApiError.unprocessable("No profile info given"));
-    return;
-  }
-  const profileObj = JSON.parse(obj);
-  const profile = {
-    ...profileObj,
-    cv: cv.filename,
-    citizenship: citizenship.filename,
-  };
-  req.body = profile;
-  next();
-}

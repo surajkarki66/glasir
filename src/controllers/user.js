@@ -191,7 +191,7 @@ export async function signup(req, res, next) {
           );
         });
       } else {
-        next(ApiError.unprocessable(insertResult.data.error));
+        next(ApiError.badRequest(insertResult.data.error));
         return;
       }
     }
@@ -205,10 +205,10 @@ export async function uploadAvatar(req, res, next) {
   try {
     const file = req.file;
     if (!file) {
-      next(ApiError.unprocessable("No image selected."));
+      next(ApiError.badRequest("No image selected."));
       return;
     }
-    const { id } = req.params;
+    const { userId } = req.params;
     const updateObject = { avatar: file.filename, updatedAt: new Date() };
     const user = await DAOs.usersDAO.updateUser(id, updateObject);
     if (user.success) {
@@ -384,9 +384,8 @@ export async function resetPassword(req, res, next) {
 
 export async function changePassword(req, res, next) {
   try {
-    const { id } = req.params;
-    const { oldPassword, newPassword, updatedAt } = req.body;
-    const result = await DAOs.usersDAO.getUserById(id);
+    const { userId, oldPassword, newPassword, updatedAt } = req.body;
+    const result = await DAOs.usersDAO.getUserById(userId);
     if (result.success) {
       const { password } = result.data;
 
@@ -398,7 +397,7 @@ export async function changePassword(req, res, next) {
         password: await hashPassword(newPassword),
         updatedAt: updatedAt,
       };
-      const user = await DAOs.usersDAO.updateUser(id, updatedObject);
+      const user = await DAOs.usersDAO.updateUser(userId, updatedObject);
       if (user.success) {
         const data = {
           status: "success",
@@ -427,19 +426,19 @@ export async function changePassword(req, res, next) {
 export async function changeUserDetails(req, res, next) {
   try {
     const userDetails = req.body;
-    const { id } = req.params;
+    const { userId } = req.params;
     let updateObject = userDetails;
 
     if (updateObject.username) {
       const { username } = updateObject;
       const user = await DAOs.usersDAO.getUserByUsername(username);
-      if (user && user._id.toString() !== id) {
+      if (user && user._id.toString() !== userId) {
         next(ApiError.conflict("Username is already taken."));
         return;
       }
       updateObject = { ...updateObject, username: username };
     }
-    const result = await DAOs.usersDAO.updateUser(id, updateObject);
+    const result = await DAOs.usersDAO.updateUser(userId, updateObject);
     if (result.success) {
       const data = {
         status: "success",
@@ -462,23 +461,22 @@ export async function changeUserDetails(req, res, next) {
 }
 export async function changeEmail(req, res, next) {
   try {
-    const { email, updatedAt } = req.body;
-    const { id } = req.params;
+    const { userId, email, updatedAt, isActive } = req.body;
     const user = await DAOs.usersDAO.getUserByEmail(email);
     const { role } = req.jwt;
 
-    if (user && user._id.toString() !== id) {
+    if (user && user._id.toString() !== userId) {
       next(ApiError.conflict("Email is already taken."));
       return;
     }
     const updateObject = {
       email: email,
-      isActive: false,
+      isActive: isActive,
       updatedAt: updatedAt,
     };
-    const result = await DAOs.usersDAO.updateUser(id, updateObject);
+    const result = await DAOs.usersDAO.updateUser(userId, updateObject);
     if (result.success) {
-      const token = await signToken(id, role, "ACTIVATION", "5m");
+      const token = await signToken(userId, role, "ACTIVATION", "5m");
       const mailOptions = {
         from: `Glasir <${process.env.COMPANY}>`,
         to: email,
@@ -522,8 +520,8 @@ export async function changeEmail(req, res, next) {
 
 export async function verifyEmail(req, res, next) {
   try {
-    const { id } = req.params;
-    const result = await DAOs.usersDAO.getUserById(id);
+    const { userId } = req.body;
+    const result = await DAOs.usersDAO.getUserById(userId);
     if (result.success) {
       if (!result.data.isActive) {
         const { _id, role, email } = result.data;
@@ -582,7 +580,7 @@ export async function verifyEmail(req, res, next) {
 }
 export async function getUserDetails(req, res, next) {
   try {
-    const id = req.params.id;
+    const id = req.params.userId;
     const result = await DAOs.usersDAO.getUserById(id);
     if (result.success) {
       const data = {
@@ -607,8 +605,8 @@ export async function getUserDetails(req, res, next) {
 export async function deleteUser(req, res, next) {
   try {
     const { password } = req.body;
-    const { id } = req.params;
-    const result = await DAOs.usersDAO.getUserById(id);
+    const { userId } = req.params;
+    const result = await DAOs.usersDAO.getUserById(userId);
     if (result.success) {
       const actualPassword = result.data.password;
 
@@ -616,7 +614,7 @@ export async function deleteUser(req, res, next) {
         next(ApiError.unauthorized("Make sure your password is correct."));
         return;
       }
-      const deleteResult = await DAOs.usersDAO.deleteUser(id);
+      const deleteResult = await DAOs.usersDAO.deleteUser(userId);
       if (deleteResult.success) {
         const data = {
           status: "success",

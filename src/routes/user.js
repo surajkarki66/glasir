@@ -58,49 +58,49 @@ router
   .post(UserController.resetPassword);
 
 router
-  .route("/change-password/:id")
+  .route("/change-password")
   .patch(authValidation.checkAuth)
   .patch(permissions.onlySameUserCanDoThisAction)
   .patch(dataValidation(Schemas.userSchema.passwordCHANGE, "body"))
   .patch(UserController.changePassword);
 
 router
-  .route("/change-user-details/:id")
+  .route("/change-user-details/:userId")
   .patch(authValidation.checkAuth)
   .patch(permissions.onlySameUserCanDoThisAction)
   .patch(dataValidation(Schemas.userSchema.userDetailsCHANGE, "body"))
   .patch(UserController.changeUserDetails);
 
 router
-  .route("/change-email/:id")
+  .route("/change-email")
   .patch(authValidation.checkAuth)
   .patch(permissions.onlySameUserCanDoThisAction)
   .patch(dataValidation(Schemas.userSchema.emailCHANGE, "body"))
   .patch(UserController.changeEmail);
 
 router
-  .route("/verify-email/:id")
-  .get(authValidation.checkAuth)
-  .get(permissions.onlySameUserCanDoThisAction)
-  .get(dataValidation(Schemas.userSchema.userACTIVATIONEMAIL, "params"))
-  .get(UserController.verifyEmail);
+  .route("/verify-email")
+  .patch(authValidation.checkAuth)
+  .patch(permissions.onlySameUserCanDoThisAction)
+  .patch(dataValidation(Schemas.userSchema.userACTIVATIONEMAIL, "body"))
+  .patch(UserController.verifyEmail);
 
 router
-  .route("/delete/:id")
+  .route("/delete/:userId")
   .delete(authValidation.checkAuth)
   .delete(permissions.onlySameUserOrAdminCanDoThisAction)
   .delete(dataValidation(Schemas.userSchema.userDELETE, "body"))
   .delete(UserController.deleteUser);
 
 router
-  .route("/:id")
+  .route("/:userId")
   .get(authValidation.checkAuth)
   .get(permissions.onlySameUserOrAdminCanDoThisAction)
   .get(dataValidation(Schemas.userSchema.userDETAILS, "params"))
   .get(UserController.getUserDetails);
 
 router
-  .route("/upload-avatar/:id")
+  .route("/upload-avatar/:userId")
   .patch(authValidation.checkAuth)
   .patch(permissions.onlySameUserCanDoThisAction)
   .patch(dataValidation(Schemas.userSchema.avatarUPLOAD, "params"))
@@ -111,6 +111,6 @@ router
   )
   .patch(UserController.uploadAvatar);
 
-router.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+//router.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 export default router;

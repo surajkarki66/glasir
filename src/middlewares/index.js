@@ -2,19 +2,24 @@ import {
   onlySameUserCanDoThisAction,
   onlyAdminCanDoThisAction,
   onlySameUserOrAdminCanDoThisAction,
-  onlyFreelancerCanDoThisAction,
 } from "./auth-permission";
 
+import {
+  onlyFreelancerCanDoThisAction,
+  onlySameFreelancerCanDoThisAction,
+} from "./freelancer-permission";
+
 import { checkAuth } from "./auth-validation";
-import { dataValidation } from "./validation";
-import { fileUpload, fileMiddleware } from "./upload";
+import { dataValidation } from "./data-validation";
+import { fileUpload } from "./upload";
 
 export const permissions = {
   onlySameUserCanDoThisAction,
   onlyAdminCanDoThisAction,
   onlySameUserOrAdminCanDoThisAction,
   onlyFreelancerCanDoThisAction,
+  onlySameFreelancerCanDoThisAction,
 };
 export const authValidation = { checkAuth };
-export const file = { fileUpload, fileMiddleware };
+export const file = { fileUpload };
 export { dataValidation };

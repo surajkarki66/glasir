@@ -6,6 +6,7 @@ import {
   dataValidation,
   authValidation,
   permissions,
+  file,
 } from "../middlewares/index";
 
 const router = new Router();
@@ -16,5 +17,25 @@ router
   .post(permissions.onlyFreelancerCanDoThisAction)
   .post(dataValidation(Schemas.freelancerSchema.createProfile, "body"))
   .post(FreelancerController.makeProfile);
+
+router
+  .route("/upload-doc/:id")
+  .patch(authValidation.checkAuth)
+  .patch(
+    permissions.onlyFreelancerCanDoThisAction,
+    permissions.onlySameFreelancerCanDoThisAction
+  )
+  .patch(
+    file
+      .fileUpload("../../../public/uploads/", [
+        "application/pdf",
+        "application/docx",
+      ])
+      .fields([
+        { name: "citizenship", maxCount: 1 },
+        { name: "resume", maxCount: 1 },
+      ])
+  )
+  .patch(FreelancerController.uploadDocument);
 
 export default router;

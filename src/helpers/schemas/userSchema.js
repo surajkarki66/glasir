@@ -28,7 +28,7 @@ const schemas = {
     updatedAt: Joi.date().iso().default(new Date()),
   }),
   userACTIVATIONEMAIL: Joi.object().keys({
-    id: Joi.string().required(),
+    userId: Joi.string().length(24).hex().required(),
   }),
   userLOGIN: Joi.object()
     .keys({
@@ -62,9 +62,10 @@ const schemas = {
     usersPerPage: Joi.number().required(),
   }),
   userDETAILS: Joi.object().keys({
-    id: Joi.string().required(),
+    userId: Joi.string().length(24).hex().required(),
   }),
   passwordCHANGE: Joi.object().keys({
+    userId: Joi.string().length(24).hex().required(),
     oldPassword: Joi.string()
       .min(8)
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
@@ -100,6 +101,7 @@ const schemas = {
     updatedAt: Joi.date().iso().default(new Date()),
   }),
   emailCHANGE: Joi.object().keys({
+    userId: Joi.string().length(24).hex().required(),
     email: Joi.string()
       .email({
         minDomainSegments: 2,
@@ -108,6 +110,7 @@ const schemas = {
         },
       })
       .required(),
+    isActive: Joi.boolean().default(false).required(),
     updatedAt: Joi.date().iso().default(new Date()),
   }),
   avatarUPLOAD: Joi.object().keys({

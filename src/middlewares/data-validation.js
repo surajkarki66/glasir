@@ -9,7 +9,7 @@ export const dataValidation = (schema, property) => {
     } catch (err) {
       const { details } = err;
       const message = details.map((i) => i.message).join(",");
-      next(ApiError.unprocessable(message));
+      next(ApiError.badRequest(message));
       return;
     }
   };

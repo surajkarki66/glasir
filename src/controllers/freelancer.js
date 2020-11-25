@@ -46,8 +46,62 @@ export async function makeProfile(req, res, next) {
         "application/json"
       );
     }
-    next(ApiError.unprocessable("Invalid phone number."));
+    next(ApiError.badRequest("Invalid phone number."));
     return;
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+export async function uploadDocument(req, res, next) {
+  try {
+    if (!req.files) {
+      next(ApiError.badRequest("No file selected."));
+      return;
+    }
+    let updateObject = { updatedAt: new Date() };
+    const { citizenship, resume } = req.files;
+    const { id } = req.params;
+
+    if (citizenship && resume) {
+      updateObject = {
+        citizenship: citizenship[0].filename,
+        resume: resume[0].filename,
+        ...updateObject,
+      };
+    }
+    if (citizenship) {
+      updateObject = {
+        citizenship: citizenship[0].filename,
+        ...updateObject,
+      };
+    }
+    if (resume) {
+      updateObject = {
+        resume: resume[0].filename,
+        ...updateObject,
+      };
+    }
+
+    const freelancer = await DAOs.freelancersDAO.updateFreelancer(
+      id,
+      updateObject
+    );
+    if (freelancer.success) {
+      const data = {
+        status: "success",
+        data: { message: " Uploaded successfully." },
+      };
+      return writeServerResponse(
+        res,
+        data,
+        freelancer.statusCode,
+        "application/json"
+      );
+    } else {
+      next(ApiError.notfound(freelancer.data.error));
+      return;
+    }
   } catch (error) {
     next(ApiError.internal(`Something went wrong: ${error.message}`));
     return;
