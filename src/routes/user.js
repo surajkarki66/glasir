@@ -1,6 +1,4 @@
 import { Router } from "express";
-import YAML from "yamljs";
-import swaggerUi from "swagger-ui-express";
 
 import { Schemas } from "../helpers/schemas/index";
 import { UserController } from "../controllers/index";
@@ -12,7 +10,6 @@ import {
 } from "../middlewares/index";
 
 const router = new Router();
-const swaggerDocument = YAML.load("./swagger.yaml");
 
 router
   .route("/get-users")
@@ -110,7 +107,5 @@ router
       .single("avatar")
   )
   .patch(UserController.uploadAvatar);
-
-//router.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 export default router;

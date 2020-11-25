@@ -19,7 +19,7 @@ router
   .post(FreelancerController.makeProfile);
 
 router
-  .route("/upload-doc/:id")
+  .route("/upload-doc/:freelancerId")
   .patch(authValidation.checkAuth)
   .patch(
     permissions.onlyFreelancerCanDoThisAction,

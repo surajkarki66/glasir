@@ -11,8 +11,8 @@ export const onlyFreelancerCanDoThisAction = (req, res, next) => {
 };
 
 export const onlySameFreelancerCanDoThisAction = async (req, res, next) => {
-  const { role, aud } = req.jwt;
-  const freelancerId = req.params.id || req.body.freelancerId;
+  const { aud } = req.jwt;
+  const freelancerId = req.params.freelancerId || req.body.freelancerId;
   const result = await DAOs.freelancersDAO.getFreelancerByUserId(aud);
   if (result && result._id.toString() === freelancerId) {
     return next();

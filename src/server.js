@@ -44,9 +44,6 @@ app.use(
 app.use("/api/v1/user", routes.userRoutes);
 app.use("/api/v1/freelancer", routes.freelancerRoutes);
 
-// Swagger routes
-app.use("/api-docs", routes.swaggerRoutes);
-
 // Error middleware
 app.use(apiErrorHandler);
 
