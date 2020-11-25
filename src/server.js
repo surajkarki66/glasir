@@ -11,7 +11,8 @@ import compression from "compression";
 import cookieParser from "cookie-parser";
 
 import apiErrorHandler from "./error/api-error-handler";
-import routes from "./routes/index";
+import userRoutes from "./routes/user";
+import freelancerRoutes from "./routes/freelancer";
 
 const app = express();
 
@@ -69,8 +70,8 @@ app.use(
 );
 
 // Controller routes
-app.use("/api/v1/user", routes.userRoutes);
-app.use("/api/v1/freelancer", routes.freelancerRoutes);
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/freelancer", freelancerRoutes);
 
 // Error middleware
 app.use(apiErrorHandler);
