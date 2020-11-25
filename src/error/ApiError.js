@@ -1,4 +1,4 @@
-class ApiError {
+export default class ApiError {
   constructor(code, message) {
     this.code = code;
     this.message = message;
@@ -25,5 +25,3 @@ class ApiError {
     return new ApiError(404, msg);
   }
 }
-
-export default ApiError;

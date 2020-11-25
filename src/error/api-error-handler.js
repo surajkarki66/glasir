@@ -1,7 +1,7 @@
 import ApiError from "./ApiError";
 import { writeServerResponse } from "../helpers/response";
 
-function apiErrorHandler(err, req, res, next) {
+export function apiErrorHandler(err, req, res, next) {
   if (err instanceof ApiError) {
     return writeServerResponse(
       res,
@@ -17,5 +17,3 @@ function apiErrorHandler(err, req, res, next) {
     "application/json"
   );
 }
-
-export default apiErrorHandler;

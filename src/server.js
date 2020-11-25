@@ -10,7 +10,7 @@ import morgan from "morgan";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 
-import apiErrorHandler from "./error/api-error-handler";
+import { apiErrorHandler } from "./error/api-error-handler";
 import userRoutes from "./routes/user";
 import freelancerRoutes from "./routes/freelancer";
 
