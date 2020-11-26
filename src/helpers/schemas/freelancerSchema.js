@@ -2,19 +2,19 @@ import Joi from "joi";
 
 const schemas = {
   createProfile: Joi.object().keys({
-    title: Joi.string().max(70).required(),
-    overview: Joi.string().max(5000).required(),
+    title: Joi.string().min(10).max(70).required(),
+    overview: Joi.string().min(10).max(5000).required(),
     hourlyRate: Joi.number().greater(0).required(),
     location: Joi.object()
       .keys({
         country: Joi.string().valid("Nepal").required(),
-        street: Joi.string().max(70).required(),
-        city: Joi.string().max(70).required(),
+        street: Joi.string().min(5).max(70).required(),
+        city: Joi.string().min(5).max(70).required(),
         zip: Joi.number().integer().required(),
         province: Joi.string()
           .valid(
-            "Province No. 1",
-            "Province No. 2",
+            "Province No.1",
+            "Province No.2",
             "Bagmati Province",
             "Gandaki Province",
             "Lumbini Province",
@@ -43,8 +43,16 @@ const schemas = {
             "Writing"
           )
           .required(),
-        serviceType: Joi.array().items(Joi.string()).max(4).required(),
-        skills: Joi.array().items(Joi.string()).max(9).required(),
+        serviceType: Joi.array()
+          .items(Joi.string().min(2).max(200))
+          .min(1)
+          .max(4)
+          .required(),
+        skills: Joi.array()
+          .items(Joi.string().min(2).max(200))
+          .min(1)
+          .max(9)
+          .required(),
         expertiseLevel: Joi.string()
           .valid("Entry level", "Intermediate", "Expert")
           .required(),
@@ -53,14 +61,14 @@ const schemas = {
     education: Joi.array()
       .items(
         Joi.object().keys({
-          school: Joi.string().max(200).required(),
-          areaOfStudy: Joi.string().max(70),
-          degree: Joi.string(),
+          school: Joi.string().min(5).max(200).required(),
+          areaOfStudy: Joi.string().min(2).max(70),
+          degree: Joi.string().min(5).max(100),
           datesAttended: Joi.object().keys({
             from: Joi.date().iso().required(),
             to: Joi.date().iso().greater(Joi.ref("from")).required(),
           }),
-          description: Joi.string(),
+          description: Joi.string().min(5).max(200),
         })
       )
 
@@ -68,21 +76,21 @@ const schemas = {
     employement: Joi.array()
       .items(
         Joi.object().keys({
-          company: Joi.string().max(200).required(),
+          company: Joi.string().min(2).max(200).required(),
           location: Joi.object()
             .keys({
-              country: Joi.string().max(70).required(),
-              city: Joi.string().max(70).required(),
+              country: Joi.string().min(2).max(70).required(),
+              city: Joi.string().min(5).max(70).required(),
             })
             .required(),
-          title: Joi.string().max(70).required(),
+          title: Joi.string().min(5).max(70).required(),
           period: Joi.object()
             .keys({
               from: Joi.date().iso().required(),
               to: Joi.date().iso().greater(Joi.ref("from")),
             })
             .required(),
-          description: Joi.string().max(255),
+          description: Joi.string().min(5).max(255),
         })
       )
 
@@ -90,7 +98,7 @@ const schemas = {
     languages: Joi.array()
       .items(
         Joi.object().keys({
-          name: Joi.string().max(255).required(),
+          name: Joi.string().min(5).max(255).required(),
           proficiency: Joi.string()
             .valid("Basic", "Conversational", "Fluent", "Native or Bilingual")
             .required(),
