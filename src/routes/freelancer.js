@@ -38,4 +38,6 @@ router
   )
   .patch(FreelancerController.uploadDocument);
 
+router.route("/").get(FreelancerController.getFreelancers);
+
 export default router;

@@ -3,14 +3,25 @@ import { ObjectId } from "bson";
 import logger from "../utils/logger";
 
 class FreelancersDAO {
-  static #freelancers;
+  static freelancers;
+  static DEFAULT_PROJECT = {
+    "user.firstName": 1,
+    "user.lastName": 1,
+    "user.username": 1,
+    "user.avatar": 1,
+    expertise: 1,
+    hourlyRate: 1,
+    title: 1,
+  };
+
+  static DEFAULT_SORT = { "user.username": 1 };
 
   static async injectDB(conn) {
-    if (FreelancersDAO.#freelancers) {
+    if (FreelancersDAO.freelancers) {
       return;
     }
     try {
-      FreelancersDAO.#freelancers = await conn
+      FreelancersDAO.freelancers = await conn
         .db(process.env.DB)
         .collection("freelancers");
       logger.info(
@@ -31,7 +42,7 @@ class FreelancersDAO {
         user: ObjectId(profileInfo.user),
         ...profileInfo,
       };
-      const result = await FreelancersDAO.#freelancers.insertOne(info);
+      const result = await FreelancersDAO.freelancers.insertOne(info);
       if (result && result.insertedCount === 1) {
         const data = result.ops[0];
         return {
@@ -67,19 +78,80 @@ class FreelancersDAO {
       throw error;
     }
   }
+  static async getFreelancers({
+    filters = null,
+    page = 0,
+    freelancersPerPage = 20,
+  } = {}) {
+    let queryParams = {};
+    const {
+      query = {},
+      project = FreelancersDAO.DEFAULT_PROJECT,
+      sort = FreelancersDAO.DEFAULT_SORT,
+    } = queryParams;
+
+    const pipeline = [
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $project: project },
+      { $match: query },
+      { $sort: sort },
+    ];
+
+    let cursor;
+    try {
+      cursor = await FreelancersDAO.freelancers.aggregate(pipeline);
+    } catch (e) {
+      logger.error(`Unable to issue find command, ${e}`);
+      return {
+        success: false,
+        data: [],
+        totalNumFreelancers: 0,
+        statusCode: 404,
+      };
+    }
+
+    const displayCursor = cursor
+      .skip(parseInt(page) * parseInt(freelancersPerPage))
+      .limit(parseInt(freelancersPerPage));
+    try {
+      const freelancersList = await displayCursor.toArray();
+      const totalNumFreelancers =
+        parseInt(page) === 0
+          ? await FreelancersDAO.freelancers.countDocuments(query)
+          : 0;
+      return {
+        success: true,
+        data: freelancersList,
+        totalNumFreelancers,
+        statusCode: freelancersList.length > 0 ? 200 : 404,
+      };
+    } catch (e) {
+      logger.error(
+        `Unable to convert cursor to array or problem counting documents, ${e.message}`
+      );
+      throw e;
+    }
+  }
   static async getFreelancerByPhone(phoneNumber) {
-    return await FreelancersDAO.#freelancers.findOne({
+    return await FreelancersDAO.freelancers.findOne({
       "phone.phoneNumber": phoneNumber,
     });
   }
   static async getFreelancerByUserId(userId) {
-    return await FreelancersDAO.#freelancers.findOne({
+    return await FreelancersDAO.freelancers.findOne({
       user: ObjectId(userId),
     });
   }
   static async updateFreelancer(id, updateObject) {
     try {
-      const result = await FreelancersDAO.#freelancers.updateOne(
+      const result = await FreelancersDAO.freelancers.updateOne(
         {
           _id: ObjectId(id),
         },

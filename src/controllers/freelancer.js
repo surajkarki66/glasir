@@ -109,4 +109,8 @@ export async function uploadDocument(req, res, next) {
 }
 export async function getFreelancers(req, res, next) {
   const { page, freelancersPerPage } = req.query;
+  const data = await DAOs.freelancersDAO.getFreelancers({
+    page,
+    freelancersPerPage,
+  });
 }
