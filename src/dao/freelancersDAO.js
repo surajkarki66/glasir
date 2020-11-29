@@ -5,16 +5,14 @@ import logger from "../utils/logger";
 class FreelancersDAO {
   static freelancers;
   static DEFAULT_PROJECT = {
-    "user.firstName": 1,
-    "user.lastName": 1,
-    "user.username": 1,
-    "user.avatar": 1,
     expertise: 1,
     hourlyRate: 1,
     title: 1,
   };
 
-  static DEFAULT_SORT = { "user.username": 1 };
+  static DEFAULT_SORT = {
+    "user.username": 1,
+  };
 
   static async injectDB(conn) {
     if (FreelancersDAO.freelancers) {
@@ -78,12 +76,26 @@ class FreelancersDAO {
       throw error;
     }
   }
+  static textSearchQuery(text) {
+    const query = {
+      $or: [{ "user.fullName": text }, { "user.username": text }],
+    };
+    const sort = FreelancersDAO.DEFAULT_SORT;
+    const project = FreelancersDAO.DEFAULT_PROJECT;
+    return { query, project, sort };
+  }
+
   static async getFreelancers({
     filters = null,
     page = 0,
     freelancersPerPage = 20,
   } = {}) {
     let queryParams = {};
+    if (filters) {
+      if ("text" in filters) {
+        queryParams = this.textSearchQuery(filters["text"]);
+      }
+    }
     const {
       query = {},
       project = FreelancersDAO.DEFAULT_PROJECT,
@@ -99,7 +111,20 @@ class FreelancersDAO {
           as: "user",
         },
       },
-      { $project: project },
+      { $project: { ...project, user: { $arrayElemAt: ["$user", 0] } } },
+      {
+        $project: {
+          ...project,
+          "user.fullName": {
+            $concat: ["$user.firstName", " ", "$user.lastName"],
+          },
+          // "user.firstName": 1,
+          // "user.lastName": 1,
+          "user.username": 1,
+          "user.avatar": 1,
+          "user.role": 1,
+        },
+      },
       { $match: query },
       { $sort: sort },
     ];

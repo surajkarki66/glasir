@@ -28,13 +28,13 @@ export async function makeProfile(req, res, next) {
       }
       const result = await DAOs.freelancersDAO.createProfile(info);
       if (result.success) {
-        const data = {
+        const response = {
           status: "success",
           data: { message: "Profile is created successfully." },
         };
         return writeServerResponse(
           res,
-          data,
+          response,
           result.statusCode,
           "application/json"
         );
@@ -83,19 +83,16 @@ export async function uploadDocument(req, res, next) {
       };
     }
 
-    const freelancer = await DAOs.freelancersDAO.updateFreelancer(
-      id,
-      updateObject
-    );
-    if (freelancer.success) {
-      const data = {
+    const result = await DAOs.freelancersDAO.updateFreelancer(id, updateObject);
+    if (result.success) {
+      const response = {
         status: "success",
         data: { message: " Uploaded successfully." },
       };
       return writeServerResponse(
         res,
-        data,
-        freelancer.statusCode,
+        response,
+        result.statusCode,
         "application/json"
       );
     } else {
@@ -108,9 +105,28 @@ export async function uploadDocument(req, res, next) {
   }
 }
 export async function getFreelancers(req, res, next) {
-  const { page, freelancersPerPage } = req.query;
-  const data = await DAOs.freelancersDAO.getFreelancers({
-    page,
-    freelancersPerPage,
-  });
+  try {
+    const { page, freelancersPerPage } = req.query;
+    const result = await DAOs.freelancersDAO.getFreelancers({
+      page,
+      freelancersPerPage,
+    });
+    if (result.success) {
+      const { data, totalNumFreelancers, statusCode } = result;
+      const response = {
+        status: "success",
+        freelancers: data,
+        page: parseInt(page),
+        filters: {},
+        entries_per_page: parseInt(freelancersPerPage),
+        total_results: totalNumFreelancers,
+      };
+      return writeServerResponse(res, response, statusCode, "application/json");
+    }
+    next(ApiError.notfound("Freelancers are not found."));
+    return;
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
 }
