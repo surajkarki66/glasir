@@ -111,5 +111,9 @@ const schemas = {
     createdAt: Joi.date().iso().default(new Date()),
     updatedAt: Joi.date().iso().default(new Date()),
   }),
+  freelancerLIST: Joi.object().keys({
+    page: Joi.number().min(0).required(),
+    freelancersPerPage: Joi.number().min(1).required(),
+  }),
 };
 export default schemas;

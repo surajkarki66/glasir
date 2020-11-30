@@ -58,8 +58,8 @@ const schemas = {
       .required(),
   }),
   userLIST: Joi.object().keys({
-    page: Joi.number().required(),
-    usersPerPage: Joi.number().required(),
+    page: Joi.number().min(0).required(),
+    usersPerPage: Joi.number().min(1).required(),
   }),
   userDETAILS: Joi.object().keys({
     userId: Joi.string().length(24).hex().required(),

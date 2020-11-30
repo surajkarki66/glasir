@@ -130,3 +130,42 @@ export async function getFreelancers(req, res, next) {
     return;
   }
 }
+
+export async function searchFreelancer(req, res, next) {
+  try {
+    let filters = {};
+    const { page, freelancersPerPage, text } = req.query;
+
+    switch (searchType) {
+      case "text":
+        if (text !== "") {
+          filters.text = text;
+        }
+        break;
+      default:
+        filters = null;
+    }
+    const result = await DAOs.freelancersDAO.getFreelancers({
+      filters,
+      page,
+      freelancersPerPage,
+    });
+    if (result.success) {
+      const { data, totalNumFreelancers, statusCode } = result;
+      const response = {
+        status: "success",
+        freelancers: data,
+        page: parseInt(page),
+        filters: {},
+        entries_per_page: parseInt(freelancersPerPage),
+        total_results: totalNumFreelancers,
+      };
+      return writeServerResponse(res, response, statusCode, "application/json");
+    }
+    next(ApiError.notfound("Freelancers are not found."));
+    return;
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}

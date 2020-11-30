@@ -38,6 +38,10 @@ router
   )
   .patch(FreelancerController.uploadDocument);
 
-router.route("/").get(FreelancerController.getFreelancers);
+router
+  .route("/")
+  .get(authValidation.checkAuth)
+  .get(dataValidation(Schemas.freelancerSchema.freelancerLIST, "query"))
+  .get(FreelancerController.getFreelancers);
 
 export default router;
