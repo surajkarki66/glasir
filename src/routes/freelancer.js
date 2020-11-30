@@ -44,4 +44,9 @@ router
   .get(dataValidation(Schemas.freelancerSchema.freelancerLIST, "query"))
   .get(FreelancerController.getFreelancers);
 
+router
+  .route("/search")
+  .get(dataValidation(Schemas.freelancerSchema.freelancerSEARCH, "query"))
+  .get(FreelancerController.searchFreelancer);
+
 export default router;

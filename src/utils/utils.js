@@ -6,3 +6,7 @@ export async function comparePassword(plainText, actualPassword) {
 export async function hashPassword(password) {
   return await bcrypt.hash(password, 10);
 }
+
+export function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}

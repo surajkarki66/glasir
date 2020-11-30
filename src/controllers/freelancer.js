@@ -118,8 +118,8 @@ export async function getFreelancers(req, res, next) {
         freelancers: data,
         page: parseInt(page),
         filters: {},
-        entries_per_page: parseInt(freelancersPerPage),
-        total_results: totalNumFreelancers,
+        entriesPerPage: parseInt(freelancersPerPage),
+        totalResults: totalNumFreelancers,
       };
       return writeServerResponse(res, response, statusCode, "application/json");
     }
@@ -134,22 +134,24 @@ export async function getFreelancers(req, res, next) {
 export async function searchFreelancer(req, res, next) {
   try {
     let filters = {};
-    const { page, freelancersPerPage, text } = req.query;
+    const queryArry = Object.keys(req.query);
+    const { page, freelancersPerPage } = req.query;
 
-    switch (searchType) {
-      case "text":
-        if (text !== "") {
-          filters.text = text;
-        }
-        break;
-      default:
-        filters = null;
-    }
+    queryArry.some((query) => {
+      if (query === "page" || query === "freelancersPerPage") {
+        return false;
+      }
+      if (req.query[query] !== "") {
+        filters[query] = req.query[query];
+      }
+    });
+
     const result = await DAOs.freelancersDAO.getFreelancers({
       filters,
       page,
       freelancersPerPage,
     });
+
     if (result.success) {
       const { data, totalNumFreelancers, statusCode } = result;
       const response = {
@@ -157,8 +159,8 @@ export async function searchFreelancer(req, res, next) {
         freelancers: data,
         page: parseInt(page),
         filters: {},
-        entries_per_page: parseInt(freelancersPerPage),
-        total_results: totalNumFreelancers,
+        entriesPerPage: parseInt(freelancersPerPage),
+        totalResults: totalNumFreelancers,
       };
       return writeServerResponse(res, response, statusCode, "application/json");
     }

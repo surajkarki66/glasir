@@ -16,7 +16,12 @@ import {
   getUserDetails,
 } from "./user";
 
-import { makeProfile, uploadDocument, getFreelancers } from "./freelancer";
+import {
+  makeProfile,
+  uploadDocument,
+  getFreelancers,
+  searchFreelancer,
+} from "./freelancer";
 
 export const UserController = {
   getUsers,
@@ -40,4 +45,5 @@ export const FreelancerController = {
   makeProfile,
   uploadDocument,
   getFreelancers,
+  searchFreelancer,
 };

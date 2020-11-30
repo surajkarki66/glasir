@@ -1,6 +1,7 @@
 import { ObjectId } from "bson";
 
 import logger from "../utils/logger";
+import { escapeRegex } from "../utils/utils";
 
 class FreelancersDAO {
   static freelancers;
@@ -8,11 +9,9 @@ class FreelancersDAO {
     expertise: 1,
     hourlyRate: 1,
     title: 1,
+    "location.province": 1,
   };
-
-  static DEFAULT_SORT = {
-    "user.username": 1,
-  };
+  static DEFAULT_SORT = { _id: 1 };
 
   static async injectDB(conn) {
     if (FreelancersDAO.freelancers) {
@@ -78,11 +77,30 @@ class FreelancersDAO {
   }
   static textSearchQuery(text) {
     const query = {
-      $or: [{ "user.fullName": text }, { "user.username": text }],
+      $or: [
+        { "user.fullName": { $regex: new RegExp(escapeRegex(text), "gi") } },
+        { "user.username": { $regex: new RegExp(escapeRegex(text), "gi") } },
+      ],
     };
-    const sort = FreelancersDAO.DEFAULT_SORT;
-    const project = FreelancersDAO.DEFAULT_PROJECT;
-    return { query, project, sort };
+    return query;
+  }
+  static serviceSearchQuery(service) {
+    const query = {
+      "expertise.service": service,
+    };
+    return query;
+  }
+  static expertiseLevelSearchQuery(expertiseLevel) {
+    const query = {
+      "expertise.expertiseLevel": expertiseLevel,
+    };
+    return query;
+  }
+  static provinceSearchQuery(province) {
+    const query = {
+      "location.province": province,
+    };
+    return query;
   }
 
   static async getFreelancers({
@@ -91,9 +109,31 @@ class FreelancersDAO {
     freelancersPerPage = 20,
   } = {}) {
     let queryParams = {};
+
     if (filters) {
       if ("text" in filters) {
-        queryParams = this.textSearchQuery(filters["text"]);
+        const textQuery = this.textSearchQuery(filters["text"]);
+        queryParams = { query: { ...textQuery } };
+      }
+      if ("service" in filters) {
+        const serviceQuery = this.serviceSearchQuery(filters["service"]);
+        queryParams.query = { ...queryParams.query, ...serviceQuery };
+      }
+      if ("expertiseLevel" in filters) {
+        const expertiseLevelQuery = this.expertiseLevelSearchQuery(
+          filters["expertiseLevel"]
+        );
+        queryParams.query = {
+          ...queryParams.query,
+          ...expertiseLevelQuery,
+        };
+      }
+      if ("province" in filters) {
+        const provinceQuery = this.provinceSearchQuery(filters["province"]);
+        queryParams.query = {
+          ...queryParams.query,
+          ...provinceQuery,
+        };
       }
     }
     const {
@@ -118,8 +158,6 @@ class FreelancersDAO {
           "user.fullName": {
             $concat: ["$user.firstName", " ", "$user.lastName"],
           },
-          // "user.firstName": 1,
-          // "user.lastName": 1,
           "user.username": 1,
           "user.avatar": 1,
           "user.role": 1,
@@ -147,14 +185,10 @@ class FreelancersDAO {
       .limit(parseInt(freelancersPerPage));
     try {
       const freelancersList = await displayCursor.toArray();
-      const totalNumFreelancers =
-        parseInt(page) === 0
-          ? await FreelancersDAO.freelancers.countDocuments(query)
-          : 0;
       return {
         success: true,
         data: freelancersList,
-        totalNumFreelancers,
+        totalNumFreelancers: freelancersList.length,
         statusCode: freelancersList.length > 0 ? 200 : 404,
       };
     } catch (e) {

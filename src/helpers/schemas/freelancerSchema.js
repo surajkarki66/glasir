@@ -35,11 +35,11 @@ const schemas = {
         service: Joi.string()
           .valid(
             "Administration",
-            "Design & Creative",
-            "Engineering & Architecture",
-            "IT & Networking",
+            "Design And Creative",
+            "Engineering And Architecture",
+            "IT And Networking",
             "Marketing",
-            "Web, Mobile & Software Dev",
+            "Web,Mobile And Software Dev",
             "Writing"
           )
           .required(),
@@ -54,7 +54,7 @@ const schemas = {
           .max(9)
           .required(),
         expertiseLevel: Joi.string()
-          .valid("Entry level", "Intermediate", "Expert")
+          .valid("Beginner", "Intermediate", "Expert")
           .required(),
       })
       .required(),
@@ -100,7 +100,7 @@ const schemas = {
         Joi.object().keys({
           name: Joi.string().min(5).max(255).required(),
           proficiency: Joi.string()
-            .valid("Basic", "Conversational", "Fluent", "Native or Bilingual")
+            .valid("Basic", "Conversational", "Fluent", "Native Or Bilingual")
             .required(),
         })
       )
@@ -112,6 +112,38 @@ const schemas = {
     updatedAt: Joi.date().iso().default(new Date()),
   }),
   freelancerLIST: Joi.object().keys({
+    page: Joi.number().min(0).required(),
+    freelancersPerPage: Joi.number().min(1).required(),
+  }),
+  freelancerSEARCH: Joi.object().keys({
+    text: Joi.any().required(),
+    service: Joi.string()
+      .valid(
+        "Administration",
+        "Design And Creative",
+        "Engineering And Architecture",
+        "IT And Networking",
+        "Marketing",
+        "Web,Mobile And Software Dev",
+        "Writing",
+        ""
+      )
+      .required(),
+    expertiseLevel: Joi.string()
+      .valid("Beginner", "Intermediate", "Expert", "")
+      .required(),
+    province: Joi.string()
+      .valid(
+        "Province No.1",
+        "Province No.2",
+        "Bagmati Province",
+        "Gandaki Province",
+        "Lumbini Province",
+        "Karnali Province",
+        "Sudurpashchim Province",
+        ""
+      )
+      .required(),
     page: Joi.number().min(0).required(),
     freelancersPerPage: Joi.number().min(1).required(),
   }),
