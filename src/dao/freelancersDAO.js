@@ -10,9 +10,9 @@ class FreelancersDAO {
     hourlyRate: 1,
     title: 1,
     languages: 1,
-    "location.province": 1,
+    isVerified: 1,
   };
-  static DEFAULT_SORT = { _id: 1 };
+  static DEFAULT_SORT = { "user.fullName": 1 };
 
   static async injectDB(conn) {
     if (FreelancersDAO.freelancers) {
@@ -83,7 +83,9 @@ class FreelancersDAO {
         { "user.username": { $regex: new RegExp(escapeRegex(text), "gi") } },
       ],
     };
-    return query;
+    // TODO: Sort By Job Success Rate
+    const sort = { _id: 1 };
+    return { query, sort };
   }
   static serviceSearchQuery(service) {
     const query = {
@@ -123,8 +125,8 @@ class FreelancersDAO {
 
     if (filters) {
       if ("text" in filters) {
-        const textQuery = this.textSearchQuery(filters["text"]);
-        queryParams = { query: { ...textQuery } };
+        const { query, sort } = this.textSearchQuery(filters["text"]);
+        queryParams = { query: { ...query }, sort };
       }
       if ("service" in filters) {
         const serviceQuery = this.serviceSearchQuery(filters["service"]);
@@ -163,6 +165,7 @@ class FreelancersDAO {
     } = queryParams;
 
     const pipeline = [
+      { $match: { isVerified: true } },
       {
         $lookup: {
           from: "users",
@@ -171,13 +174,18 @@ class FreelancersDAO {
           as: "user",
         },
       },
-      { $project: { ...project, user: { $arrayElemAt: ["$user", 0] } } },
+      {
+        $addFields: {
+          user: { $arrayElemAt: ["$user", 0] },
+        },
+      },
       {
         $project: {
           ...project,
           "user.fullName": {
             $concat: ["$user.firstName", " ", "$user.lastName"],
           },
+          "location.province": 1,
           "user.username": 1,
           "user.avatar": 1,
           "user.role": 1,
@@ -240,7 +248,7 @@ class FreelancersDAO {
             as: "user",
           },
         },
-        { $project: { ...project, user: { $arrayElemAt: ["$user", 0] } } },
+        { $addFields: { user: { $arrayElemAt: ["$user", 0] } } },
       ];
 
       const freelancer = await FreelancersDAO.freelancers

@@ -151,9 +151,8 @@ export async function searchFreelancer(req, res, next) {
       page,
       freelancersPerPage,
     });
-
-    if (result.success) {
-      const { data, totalNumFreelancers, statusCode } = result;
+    const { success, data, totalNumFreelancers, statusCode } = result;
+    if (success) {
       const response = {
         status: "success",
         freelancers: data,
@@ -176,6 +175,16 @@ export async function getFreelancerDetails(req, res, next) {
   try {
     const id = req.params.freelancerId;
     const result = await DAOs.freelancersDAO.getFreelancerById(id);
+    const { success, data, statusCode } = result;
+    if (success) {
+      const response = {
+        status: "success",
+        data: data,
+      };
+      return writeServerResponse(res, response, statusCode, "application/json");
+    }
+    next(ApiError.notfound("User doesnot exist."));
+    return;
   } catch (error) {
     next(ApiError.internal(`Something went wrong: ${error.message}`));
     return;

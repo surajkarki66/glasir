@@ -148,5 +148,8 @@ const schemas = {
     page: Joi.number().min(0).required(),
     freelancersPerPage: Joi.number().min(1).required(),
   }),
+  freelancerDETAILS: Joi.object().keys({
+    freelancerId: Joi.string().length(24).hex().required(),
+  }),
 };
 export default schemas;

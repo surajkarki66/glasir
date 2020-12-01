@@ -21,6 +21,7 @@ import {
   uploadDocument,
   getFreelancers,
   searchFreelancer,
+  getFreelancerDetails,
 } from "./freelancer";
 
 export const UserController = {
@@ -46,4 +47,5 @@ export const FreelancerController = {
   uploadDocument,
   getFreelancers,
   searchFreelancer,
+  getFreelancerDetails,
 };

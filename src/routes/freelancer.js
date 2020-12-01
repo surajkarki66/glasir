@@ -50,4 +50,10 @@ router
   .get(dataValidation(Schemas.freelancerSchema.freelancerSEARCH, "query"))
   .get(FreelancerController.searchFreelancer);
 
+router
+  .route("/:freelancerId")
+  .get(authValidation.checkAuth)
+  .get(dataValidation(Schemas.freelancerSchema.freelancerDETAILS, "params"))
+  .get(FreelancerController.getFreelancerDetails);
+
 export default router;
