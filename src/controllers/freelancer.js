@@ -183,7 +183,7 @@ export async function getFreelancerDetails(req, res, next) {
       };
       return writeServerResponse(res, response, statusCode, "application/json");
     }
-    next(ApiError.notfound("User doesnot exist."));
+    next(ApiError.notfound("Freelancer doesnot exist."));
     return;
   } catch (error) {
     next(ApiError.internal(`Something went wrong: ${error.message}`));

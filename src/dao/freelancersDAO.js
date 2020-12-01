@@ -272,7 +272,7 @@ class FreelancersDAO {
     } catch (e) {
       logger.error(
         `Unable to convert cursor to array or problem counting documents, ${e.message}`,
-        "getUserById()"
+        "getFreelancerById()"
       );
       throw e;
     }
