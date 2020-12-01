@@ -46,6 +46,7 @@ router
 
 router
   .route("/search")
+  .get(authValidation.checkAuth)
   .get(dataValidation(Schemas.freelancerSchema.freelancerSEARCH, "query"))
   .get(FreelancerController.searchFreelancer);
 
