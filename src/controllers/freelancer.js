@@ -171,3 +171,13 @@ export async function searchFreelancer(req, res, next) {
     return;
   }
 }
+
+export async function getFreelancerDetails(req, res, next) {
+  try {
+    const id = req.params.freelancerId;
+    const result = await DAOs.freelancersDAO.getFreelancerById(id);
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
