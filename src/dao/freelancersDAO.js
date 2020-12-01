@@ -9,6 +9,7 @@ class FreelancersDAO {
     expertise: 1,
     hourlyRate: 1,
     title: 1,
+    languages: 1,
     "location.province": 1,
   };
   static DEFAULT_SORT = { _id: 1 };
@@ -103,6 +104,16 @@ class FreelancersDAO {
     return query;
   }
 
+  static englishProficiencySearchQuery(proficiency) {
+    const query = {
+      $and: [
+        { "languages.name": "English" },
+        { "languages.proficiency": proficiency },
+      ],
+    };
+    return query;
+  }
+
   static async getFreelancers({
     filters = null,
     page = 0,
@@ -133,6 +144,15 @@ class FreelancersDAO {
         queryParams.query = {
           ...queryParams.query,
           ...provinceQuery,
+        };
+      }
+      if ("englishProficiency" in filters) {
+        const proficiencyQuery = this.englishProficiencySearchQuery(
+          filters["englishProficiency"]
+        );
+        queryParams.query = {
+          ...queryParams.query,
+          ...proficiencyQuery,
         };
       }
     }

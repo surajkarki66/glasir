@@ -116,7 +116,7 @@ const schemas = {
     freelancersPerPage: Joi.number().min(1).required(),
   }),
   freelancerSEARCH: Joi.object().keys({
-    text: Joi.any().required(),
+    text: Joi.string().allow("").required(),
     service: Joi.string()
       .valid(
         "Administration",
@@ -144,6 +144,7 @@ const schemas = {
         ""
       )
       .required(),
+    englishProficiency: Joi.string().allow("").required(),
     page: Joi.number().min(0).required(),
     freelancersPerPage: Joi.number().min(1).required(),
   }),
