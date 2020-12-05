@@ -277,6 +277,36 @@ class FreelancersDAO {
       throw e;
     }
   }
+
+  static async getFreelancerByUserId(userId) {
+    try {
+      const query = {
+        user: ObjectId(userId),
+      };
+      const freelancer = await FreelancersDAO.#freelancers.findOne(query);
+      if (freelancer) {
+        return {
+          success: true,
+          data: freelancer,
+          statusCode: 200,
+        };
+      } else {
+        const message = "No document matching id: " + id + " could be found!";
+        logger.error(message, "getFreelancerByUserId()");
+        return {
+          success: false,
+          data: {},
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Unable to convert cursor to array or problem counting documents, ${e.message}`,
+        "getFreelancerByUserId"
+      );
+      throw e;
+    }
+  }
   static async updateFreelancer(id, updateObject) {
     try {
       const result = await FreelancersDAO.freelancers.updateOne(
