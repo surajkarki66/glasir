@@ -283,7 +283,7 @@ class FreelancersDAO {
       const query = {
         user: ObjectId(userId),
       };
-      const freelancer = await FreelancersDAO.#freelancers.findOne(query);
+      const freelancer = await FreelancersDAO.freelancers.findOne(query);
       if (freelancer) {
         return {
           success: true,
@@ -307,6 +307,51 @@ class FreelancersDAO {
       throw e;
     }
   }
+  static async me(userId) {
+    try {
+      const pipeline = [
+        {
+          $match: {
+            user: ObjectId(userId),
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        { $addFields: { user: { $arrayElemAt: ["$user", 0] } } },
+      ];
+      const profile = await FreelancersDAO.freelancers
+        .aggregate(pipeline)
+        .next();
+      let profileObj;
+
+      if (profile) {
+        profileObj = { success: true, data: profile, statusCode: 200 };
+        return profileObj;
+      }
+      profileObj = { success: false, data: {}, statusCode: 404 };
+      return profileObj;
+    } catch (e) {
+      if (
+        e
+          .toString()
+          .startsWith(
+            "Error: Argument passed in must be a single String of 12 bytes or a string of 24 hex characters"
+          )
+      ) {
+        return null;
+      }
+
+      logger.error(`Something went wrong: ${e}`);
+      throw e;
+    }
+  }
+
   static async updateFreelancer(id, updateObject) {
     try {
       const result = await FreelancersDAO.freelancers.updateOne(

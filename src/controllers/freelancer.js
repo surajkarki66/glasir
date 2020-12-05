@@ -190,3 +190,35 @@ export async function getFreelancerDetails(req, res, next) {
     return;
   }
 }
+
+export async function me(req, res, next) {
+  try {
+    const { aud } = req.jwt;
+    const result = await DAOs.freelancersDAO.me(aud);
+    if (result.success) {
+      const data = { status: "success", data: result.data };
+      return writeServerResponse(
+        res,
+        data,
+        result.statusCode,
+        "application/json"
+      );
+    }
+    const user = await DAOs.usersDAO.getUserById(aud);
+    if (user.success) {
+      const data = {
+        status: "success",
+        data: { ...user.data, password: null },
+      };
+      return writeServerResponse(
+        res,
+        data,
+        user.statusCode,
+        "application/json"
+      );
+    }
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}

@@ -39,6 +39,12 @@ router
   .patch(FreelancerController.uploadDocument);
 
 router
+  .route("/me")
+  .get(authValidation.checkAuth)
+  .get(permissions.onlyFreelancerCanDoThisAction)
+  .get(FreelancerController.me);
+
+router
   .route("/")
   .get(authValidation.checkAuth)
   .get(dataValidation(Schemas.freelancerSchema.freelancerLIST, "query"))
