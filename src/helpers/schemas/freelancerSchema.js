@@ -145,5 +145,77 @@ const schemas = {
   freelancerDETAILS: Joi.object().keys({
     freelancerId: Joi.string().length(24).hex().required(),
   }),
+  freelancerUPDATE: Joi.object().keys({
+    title: Joi.string().min(10).max(70),
+    overview: Joi.string().min(10).max(5000),
+    hourlyRate: Joi.number().greater(0),
+    location: Joi.object().keys({
+      country: Joi.string().valid("Nepal").required(),
+      street: Joi.string().min(5).max(70).required(),
+      city: Joi.string().min(5).max(70).required(),
+      zip: Joi.number().integer().required(),
+      province: Joi.string()
+        .valid(
+          "Province No.1",
+          "Province No.2",
+          "Bagmati Province",
+          "Gandaki Province",
+          "Lumbini Province",
+          "Karnali Province",
+          "Sudurpashchim Province"
+        )
+        .required(),
+    }),
+    phone: Joi.object().keys({
+      phoneNumber: Joi.string().required(),
+      isVerified: Joi.boolean().default(false),
+    }),
+    expertise: Joi.object().keys({
+      service: Joi.string()
+        .valid(
+          "Administration",
+          "Design And Creative",
+          "Engineering And Architecture",
+          "IT And Networking",
+          "Marketing",
+          "Web,Mobile And Software Dev",
+          "Writing"
+        )
+        .required(),
+      serviceType: Joi.array()
+        .items(Joi.string().min(2).max(200))
+        .min(1)
+        .max(4)
+        .required(),
+      skills: Joi.array()
+        .items(Joi.string().min(2).max(200))
+        .min(1)
+        .max(9)
+        .required(),
+      expertiseLevel: Joi.string()
+        .valid("Beginner", "Intermediate", "Expert")
+        .required(),
+    }),
+    education: Joi.object().keys({
+      school: Joi.string().min(5).max(200).required(),
+      areaOfStudy: Joi.string().min(2).max(70).required(),
+      degree: Joi.string().min(5).max(100).required(),
+      datesAttended: Joi.object()
+        .keys({
+          from: Joi.date().iso().required(),
+          to: Joi.date().iso().greater(Joi.ref("from")).required(),
+        })
+        .required(),
+      description: Joi.string().min(5).max(200).required(),
+    }),
+
+    englishLanguage: Joi.object().keys({
+      proficiency: Joi.string()
+        .valid("Basic", "Conversational", "Fluent", "Native Or Bilingual")
+        .required(),
+    }),
+    createdAt: Joi.date().iso().default(new Date()),
+    updatedAt: Joi.date().iso().default(new Date()),
+  }),
 };
 export default schemas;

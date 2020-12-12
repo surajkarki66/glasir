@@ -12,11 +12,23 @@ import {
 const router = new Router();
 
 router
-  .route("/make-profile")
+  .route("/")
   .post(authValidation.checkAuth)
   .post(permissions.onlyFreelancerCanDoThisAction)
   .post(dataValidation(Schemas.freelancerSchema.createProfile, "body"))
   .post(FreelancerController.makeProfile);
+
+router
+  .route("/")
+  .get(authValidation.checkAuth)
+  .get(dataValidation(Schemas.freelancerSchema.freelancerLIST, "query"))
+  .get(FreelancerController.getFreelancers);
+
+router
+  .route("/search")
+  .get(authValidation.checkAuth)
+  .get(dataValidation(Schemas.freelancerSchema.freelancerSEARCH, "query"))
+  .get(FreelancerController.searchFreelancer);
 
 router
   .route("/upload-doc/:freelancerId")
@@ -45,21 +57,19 @@ router
   .get(FreelancerController.me);
 
 router
-  .route("/")
-  .get(authValidation.checkAuth)
-  .get(dataValidation(Schemas.freelancerSchema.freelancerLIST, "query"))
-  .get(FreelancerController.getFreelancers);
-
-router
-  .route("/search")
-  .get(authValidation.checkAuth)
-  .get(dataValidation(Schemas.freelancerSchema.freelancerSEARCH, "query"))
-  .get(FreelancerController.searchFreelancer);
-
-router
   .route("/:freelancerId")
   .get(authValidation.checkAuth)
   .get(dataValidation(Schemas.freelancerSchema.freelancerDETAILS, "params"))
   .get(FreelancerController.getFreelancerDetails);
+
+router
+  .route("/:freelancerId")
+  .patch(authValidation.checkAuth)
+  .patch(
+    permissions.onlyFreelancerCanDoThisAction,
+    permissions.onlySameFreelancerCanDoThisAction
+  )
+  .patch(dataValidation(Schemas.freelancerSchema.freelancerUPDATE, "body"))
+  .patch(FreelancerController.changeFreelancerDetails);
 
 export default router;

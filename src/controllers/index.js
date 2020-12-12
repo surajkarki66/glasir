@@ -23,6 +23,7 @@ import {
   searchFreelancer,
   getFreelancerDetails,
   me,
+  changeFreelancerDetails,
 } from "./freelancer";
 
 export const UserController = {
@@ -50,4 +51,5 @@ export const FreelancerController = {
   searchFreelancer,
   getFreelancerDetails,
   me,
+  changeFreelancerDetails,
 };
