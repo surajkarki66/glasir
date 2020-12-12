@@ -61,7 +61,7 @@ export async function uploadDocument(req, res, next) {
     }
     let updateObject = { updatedAt: new Date() };
     const { citizenship, resume } = req.files;
-    const { id } = req.params;
+    const { freelancerId } = req.params;
 
     if (citizenship && resume) {
       updateObject = {
@@ -83,7 +83,10 @@ export async function uploadDocument(req, res, next) {
       };
     }
 
-    const result = await DAOs.freelancersDAO.updateFreelancer(id, updateObject);
+    const result = await DAOs.freelancersDAO.updateFreelancer(
+      freelancerId,
+      updateObject
+    );
     if (result.success) {
       const response = {
         status: "success",
@@ -216,6 +219,35 @@ export async function me(req, res, next) {
         user.statusCode,
         "application/json"
       );
+    }
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+
+export async function changeFreelancerDetails(req, res, next) {
+  try {
+    const { freelancerId } = req.params;
+    const freelancerDetails = req.body;
+    const result = await DAOs.freelancersDAO.updateFreelancer(
+      freelancerId,
+      freelancerDetails
+    );
+    if (result.success) {
+      const response = {
+        status: "success",
+        data: { message: "Updated successfully." },
+      };
+      return writeServerResponse(
+        res,
+        response,
+        result.statusCode,
+        "application/json"
+      );
+    } else {
+      next(ApiError.notfound(freelancer.data.error));
+      return;
     }
   } catch (error) {
     next(ApiError.internal(`Something went wrong: ${error.message}`));
