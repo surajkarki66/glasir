@@ -606,33 +606,33 @@ export async function deleteUser(req, res, next) {
   try {
     const { password } = req.body;
     const { userId } = req.params;
-    const result = await DAOs.usersDAO.getUserById(userId);
-    if (result.success) {
-      const actualPassword = result.data.password;
+    const user = await DAOs.usersDAO.getUserById(userId);
+    if (user.success) {
+      const actualPassword = user.data.password;
 
       if (!(await comparePassword(password, actualPassword))) {
         next(ApiError.unauthorized("Make sure your password is correct."));
         return;
       }
-      const deleteResult = await DAOs.usersDAO.deleteUser(userId);
-      if (deleteResult.success) {
+      const deleteUser = DAOs.usersDAO.deleteUser(userId);
+      const deleteFreelancer = DAOs.freelancersDAO.deleteFreelancerByUserId(
+        userId
+      );
+      const result = await Promise.all([deleteUser, deleteFreelancer]);
+      if (result) {
         const data = {
           status: "success",
           data: { message: "Deleted successfully." },
         };
-        return writeServerResponse(
-          res,
-          data,
-          deleteResult.statusCode,
-          "application/json"
-        );
+        return writeServerResponse(res, data, 200, "application/json");
       }
-      next(ApiError.notfound(deleteResult.data.error));
+      next(ApiError.notfound("User or Freelancer not found."));
       return;
     }
     next(ApiError.notfound("User doesnot exist."));
     return;
   } catch (e) {
+    console.log(e);
     next(ApiError.internal(`Something went wrong: ${e.message}`));
     return;
   }

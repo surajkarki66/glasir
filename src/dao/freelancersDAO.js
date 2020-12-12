@@ -385,6 +385,34 @@ class FreelancersDAO {
       throw e;
     }
   }
+  static async deleteFreelancerByUserId(userId) {
+    try {
+      const result = await FreelancersDAO.freelancers.deleteOne({
+        user: ObjectId(userId),
+      });
+      if (result.deletedCount === 1) {
+        return {
+          success: true,
+          data: { message: "Deleted successfully." },
+          statusCode: 200,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No freelancer exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while deleting user, ${e}`,
+        "deleteFreelancer()"
+      );
+      throw e;
+    }
+  }
 }
 
 export default FreelancersDAO;
