@@ -9,7 +9,7 @@ class FreelancersDAO {
     expertise: 1,
     hourlyRate: 1,
     title: 1,
-    languages: 1,
+    englishLanguage: 1,
     isVerified: 1,
   };
   static DEFAULT_SORT = { "user.fullName": 1 };
@@ -107,12 +107,7 @@ class FreelancersDAO {
   }
 
   static englishProficiencySearchQuery(proficiency) {
-    const query = {
-      $and: [
-        { "languages.name": "English" },
-        { "languages.proficiency": proficiency },
-      ],
-    };
+    const query = { "englishLanguage.proficiency": proficiency };
     return query;
   }
 

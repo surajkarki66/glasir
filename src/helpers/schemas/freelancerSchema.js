@@ -58,22 +58,19 @@ const schemas = {
           .required(),
       })
       .required(),
-    education: Joi.array()
-      .items(
-        Joi.object().keys({
-          school: Joi.string().min(5).max(200).required(),
-          areaOfStudy: Joi.string().min(2).max(70),
-          degree: Joi.string().min(5).max(100),
-          datesAttended: Joi.object().keys({
-            from: Joi.date().iso().required(),
-            to: Joi.date().iso().greater(Joi.ref("from")).required(),
-          }),
-          description: Joi.string().min(5).max(200),
-        })
-      )
 
-      .max(4),
-    employement: Joi.array()
+    education: Joi.object().keys({
+      school: Joi.string().min(5).max(200).required(),
+      areaOfStudy: Joi.string().min(2).max(70),
+      degree: Joi.string().min(5).max(100),
+      datesAttended: Joi.object().keys({
+        from: Joi.date().iso().required(),
+        to: Joi.date().iso().greater(Joi.ref("from")).required(),
+      }),
+      description: Joi.string().min(5).max(200),
+    }),
+
+    employements: Joi.array()
       .items(
         Joi.object().keys({
           company: Joi.string().min(2).max(200).required(),
@@ -93,18 +90,15 @@ const schemas = {
           description: Joi.string().min(5).max(255),
         })
       )
-
       .max(10),
-    languages: Joi.array()
-      .items(
-        Joi.object().keys({
-          name: Joi.string().min(5).max(255).required(),
-          proficiency: Joi.string()
-            .valid("Basic", "Conversational", "Fluent", "Native Or Bilingual")
-            .required(),
-        })
-      )
-      .max(10)
+
+    englishLanguage: Joi.object()
+      .keys({
+        proficiency: Joi.string()
+          .valid("Basic", "Conversational", "Fluent", "Native Or Bilingual")
+          .required(),
+      })
+
       .required(),
 
     isVerified: Joi.boolean().default(false),
