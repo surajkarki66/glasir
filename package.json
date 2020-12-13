@@ -11,12 +11,6 @@
 		"pre-run": "mkdir -p ./logs",
 		"dev": "yarn run pre-run && nodemon --exec babel-node src/index.js"
 	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "npm test"
-		}
-	},
-
 	"devDependencies": {
 		"@babel/core": "^7.12.3",
 		"@babel/node": "^7.12.1",
