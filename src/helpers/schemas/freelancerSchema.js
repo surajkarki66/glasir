@@ -70,7 +70,7 @@ const schemas = {
       description: Joi.string().min(5).max(200),
     }),
 
-    employements: Joi.array()
+    employments: Joi.array()
       .items(
         Joi.object().keys({
           company: Joi.string().min(2).max(200).required(),
@@ -222,7 +222,7 @@ const schemas = {
     updatedAt: Joi.date().iso().default(new Date()),
   }),
 
-  employementCREATE: Joi.object().keys({
+  employmentCREATE: Joi.object().keys({
     company: Joi.string().min(2).max(200).required(),
     location: Joi.object()
       .keys({
@@ -238,6 +238,26 @@ const schemas = {
       })
       .required(),
     description: Joi.string().min(5).max(255),
+  }),
+  employmentUPDATE: Joi.object().keys({
+    companyName: Joi.string().min(2).max(200).required(),
+    newEmployment: Joi.object().keys({
+      company: Joi.string().min(2).max(200).required(),
+      location: Joi.object()
+        .keys({
+          country: Joi.string().min(2).max(70).required(),
+          city: Joi.string().min(5).max(70).required(),
+        })
+        .required(),
+      title: Joi.string().min(5).max(70).required(),
+      period: Joi.object()
+        .keys({
+          from: Joi.date().iso().required(),
+          to: Joi.date().iso().greater(Joi.ref("from")),
+        })
+        .required(),
+      description: Joi.string().min(5).max(255),
+    }),
   }),
 };
 export default schemas;

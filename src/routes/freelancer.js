@@ -73,13 +73,23 @@ router
   .patch(FreelancerController.changeFreelancerDetails);
 
 router
-  .route("/addEmployement/:freelancerId")
+  .route("/addEmployment/:freelancerId")
   .patch(authValidation.checkAuth)
   .patch(
     permissions.onlyFreelancerCanDoThisAction,
     permissions.onlySameFreelancerCanDoThisAction,
   )
-  .patch(dataValidation(Schemas.freelancerSchema.employementCREATE, "body"))
-  .patch(FreelancerController.addEmployement);
+  .patch(dataValidation(Schemas.freelancerSchema.employmentCREATE, "body"))
+  .patch(FreelancerController.addEmployment);
+
+router
+  .route("/updateEmployment/:freelancerId")
+  .patch(authValidation.checkAuth)
+  .patch(
+    permissions.onlyFreelancerCanDoThisAction,
+    permissions.onlySameFreelancerCanDoThisAction,
+  )
+  .patch(dataValidation(Schemas.freelancerSchema.employmentUPDATE, "body"))
+  .patch(FreelancerController.updateEmployment);
 
 export default router;

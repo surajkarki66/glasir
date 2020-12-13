@@ -292,15 +292,45 @@ export async function changeFreelancerDetails(req, res, next) {
   }
 }
 
-export async function addEmployement(req, res, next) {
+export async function addEmployment(req, res, next) {
   try {
     const { freelancerId } = req.params;
-    const employement = req.body;
+    const employment = req.body;
     const {
       success,
       data,
       statusCode,
-    } = await DAOs.freelancersDAO.addEmployement(freelancerId, employement);
+    } = await DAOs.freelancersDAO.addEmployment(freelancerId, employment);
+    if (success) {
+      const serverResponse = { status: "success", data: data };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    }
+    next(ApiError.notfound(data.error));
+    return;
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+
+export async function updateEmployment(req, res, next) {
+  try {
+    const { freelancerId } = req.params;
+    const { companyName, newEmployment } = req.body;
+    const {
+      success,
+      data,
+      statusCode,
+    } = await DAOs.freelancersDAO.updateEmployment(
+      freelancerId,
+      companyName,
+      newEmployment,
+    );
     if (success) {
       const serverResponse = { status: "success", data: data };
       return writeServerResponse(

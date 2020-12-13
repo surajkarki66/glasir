@@ -385,7 +385,7 @@ class FreelancersDAO {
       throw e;
     }
   }
-  static async addEmployement(freelancerId, employement) {
+  static async addEmployment(freelancerId, employment) {
     try {
       const result = await FreelancersDAO.freelancers.updateOne(
         {
@@ -393,9 +393,10 @@ class FreelancersDAO {
         },
         {
           $push: {
-            employements: employement,
+            employments: employment,
           },
         },
+        { safe: true, upsert: true },
       );
       if (result.modifiedCount === 1 && result.matchedCount === 1) {
         return {
@@ -417,7 +418,58 @@ class FreelancersDAO {
     } catch (error) {
       logger.error(
         `Error occurred while updating adding new employment, ${error}`,
-        "addEmployement()",
+        "addEmployment()",
+      );
+      throw error;
+    }
+  }
+
+  static async updateEmployment(
+    freelancerId,
+    companyName,
+    newEmployment = null,
+  ) {
+    try {
+      const result = await FreelancersDAO.freelancers.updateOne(
+        newEmployment
+          ? {
+              $and: [
+                { _id: ObjectId(freelancerId) },
+                { employments: { $elemMatch: { company: companyName } } },
+              ],
+            }
+          : {
+              _id: ObjectId(freelancerId),
+            },
+        newEmployment
+          ? { $set: { "employments.$": newEmployment } }
+          : {
+              $pull: {
+                employments: { company: companyName },
+              },
+            },
+      );
+      if (result.modifiedCount === 1 && result.matchedCount === 1) {
+        return {
+          success: true,
+          data: {
+            message: "Employement updated successfully.",
+          },
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No Company exist with this name.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (error) {
+      logger.error(
+        `Error occurred while updating employment, ${error}`,
+        "updateEmployment()",
       );
       throw error;
     }
