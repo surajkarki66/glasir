@@ -26,7 +26,6 @@ const schemas = {
       .required(),
     phone: Joi.object().keys({
       phoneNumber: Joi.string().required(),
-      isVerified: Joi.boolean().default(false),
     }),
     citizenship: Joi.string(),
     resume: Joi.string(),
@@ -100,10 +99,6 @@ const schemas = {
       })
 
       .required(),
-
-    isVerified: Joi.boolean().default(false),
-    createdAt: Joi.date().iso().default(new Date()),
-    updatedAt: Joi.date().iso().default(new Date()),
   }),
 
   freelancerLIST: Joi.object().keys({
@@ -172,7 +167,6 @@ const schemas = {
     }),
     phone: Joi.object().keys({
       phoneNumber: Joi.string().required(),
-      isVerified: Joi.boolean().default(false),
     }),
     expertise: Joi.object().keys({
       service: Joi.string()
@@ -218,8 +212,6 @@ const schemas = {
         .valid("Basic", "Conversational", "Fluent", "Native Or Bilingual")
         .required(),
     }),
-    createdAt: Joi.date().iso().default(new Date()),
-    updatedAt: Joi.date().iso().default(new Date()),
   }),
 
   employmentCREATE: Joi.object().keys({
@@ -258,6 +250,14 @@ const schemas = {
         .required(),
       description: Joi.string().min(5).max(255),
     }),
+  }),
+  phoneNumberVERIFY: Joi.object().keys({
+    phoneNumber: Joi.string().required(),
+  }),
+  phoneNumberCONFIRM: Joi.object().keys({
+    token: Joi.string().required(),
+    id: Joi.string().required(),
+    freelancerId: Joi.string().length(24).hex().required(),
   }),
 };
 export default schemas;

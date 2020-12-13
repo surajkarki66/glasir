@@ -3,6 +3,7 @@ import parsePhoneNumber from "libphonenumber-js";
 
 import DAOs from "../dao/index";
 import ApiError from "../error/ApiError";
+import { mb } from "../helpers/messageBird";
 import { writeServerResponse } from "../helpers/response";
 
 export async function makeProfile(req, res, next) {
@@ -20,6 +21,10 @@ export async function makeProfile(req, res, next) {
         ...profileInfo,
         user: ObjectId(aud),
         hourlyRate: newHourlyRate,
+        phone: { ...phone, isVerified: false },
+        isVerified: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       if (await DAOs.freelancersDAO.getFreelancerByPhone(phone.phoneNumber)) {
@@ -262,7 +267,20 @@ export async function me(req, res, next) {
 export async function changeFreelancerDetails(req, res, next) {
   try {
     const { freelancerId } = req.params;
-    const freelancerDetails = req.body;
+    const { phone } = req.body;
+    let freelancerDetails = {
+      ...req.body,
+      isVerified: false,
+      updatedAt: new Date(),
+    };
+    if (phone) {
+      freelancerDetails = {
+        ...req.body,
+        isVerified: false,
+        phone: { ...phone, isVerified: false },
+        updatedAt: new Date(),
+      };
+    }
     const {
       success,
       data,
@@ -295,7 +313,9 @@ export async function changeFreelancerDetails(req, res, next) {
 export async function addEmployment(req, res, next) {
   try {
     const { freelancerId } = req.params;
-    const employment = req.body;
+    const employment = {
+      ...req.body,
+    };
     const {
       success,
       data,
@@ -342,6 +362,80 @@ export async function updateEmployment(req, res, next) {
     }
     next(ApiError.notfound(data.error));
     return;
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+
+export async function verifyPhoneNumber(req, res, next) {
+  try {
+    const { phoneNumber } = req.body;
+    const params = {
+      originator: "Glasir",
+      type: "sms",
+    };
+    mb.verify.create(phoneNumber, params, function (err, response) {
+      if (err) {
+        const { statusCode } = err;
+        if (statusCode === 422) {
+          next(ApiError.unprocessable("Invalid phone number."));
+          return;
+        }
+        next(ApiError.internal(`Something went wrong: ${err.message}`));
+        return;
+      }
+
+      const serverResponse = {
+        status: "success",
+        data: { message: "Verification code sent.", id: response.id },
+      };
+      return writeServerResponse(res, serverResponse, 200, "application/json");
+    });
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+
+export async function confirmPhoneNumber(req, res, next) {
+  try {
+    const { id, token, freelancerId } = req.body;
+    mb.verify.verify(id, token, function (err, response) {
+      if (err) {
+        const { statusCode } = err;
+        if (statusCode === 422) {
+          next(ApiError.unprocessable("The verification code is expired."));
+          return;
+        }
+        if (statusCode === 404) {
+          next(ApiError.notFound("The verification id is not found."));
+          return;
+        }
+        next(ApiError.internal(`Something went wrong`));
+        return;
+      }
+      const updateObject = { "phone.isVerified": true, updatedAt: new Date() };
+      DAOs.freelancersDAO
+        .updateFreelancer(freelancerId, updateObject)
+        .then((response) => {
+          const { success, statusCode, data } = response;
+          if (success) {
+            const serverResponse = {
+              status: "success",
+              data: { message: "Phone number is verified." },
+            };
+            return writeServerResponse(
+              res,
+              serverResponse,
+              statusCode,
+              "application/json",
+            );
+          }
+          next(ApiError.notfound(data.error));
+          return;
+        });
+    });
   } catch (error) {
     next(ApiError.internal(`Something went wrong: ${error.message}`));
     return;

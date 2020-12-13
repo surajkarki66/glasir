@@ -92,4 +92,20 @@ router
   .patch(dataValidation(Schemas.freelancerSchema.employmentUPDATE, "body"))
   .patch(FreelancerController.updateEmployment);
 
+router
+  .route("/verifyPhoneNumber")
+  .post(authValidation.checkAuth)
+  .post(dataValidation(Schemas.freelancerSchema.phoneNumberVERIFY, "body"))
+  .post(FreelancerController.verifyPhoneNumber);
+
+router
+  .route("/confirmPhoneNumber")
+  .post(dataValidation(Schemas.freelancerSchema.phoneNumberCONFIRM, "body"))
+  .post(authValidation.checkAuth)
+  .post(
+    permissions.onlyFreelancerCanDoThisAction,
+    permissions.onlySameFreelancerCanDoThisAction,
+  )
+  .post(FreelancerController.confirmPhoneNumber);
+
 export default router;

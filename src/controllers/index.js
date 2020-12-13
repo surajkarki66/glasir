@@ -26,6 +26,8 @@ import {
   changeFreelancerDetails,
   addEmployment,
   updateEmployment,
+  verifyPhoneNumber,
+  confirmPhoneNumber,
 } from "./freelancer";
 
 export const UserController = {
@@ -56,4 +58,6 @@ export const FreelancerController = {
   changeFreelancerDetails,
   addEmployment,
   updateEmployment,
+  verifyPhoneNumber,
+  confirmPhoneNumber,
 };
