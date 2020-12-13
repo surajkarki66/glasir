@@ -347,11 +347,11 @@ class FreelancersDAO {
 		}
 	}
 
-	static async updateFreelancer(id, updateObject) {
+	static async updateFreelancer(freelancerId, updateObject) {
 		try {
 			const result = await FreelancersDAO.freelancers.updateOne(
 				{
-					_id: ObjectId(id),
+					_id: ObjectId(freelancerId),
 				},
 				{
 					$set: updateObject,
@@ -381,6 +381,23 @@ class FreelancersDAO {
 			logger.error(
 				`Error occurred while updating user, ${e}`,
 				"updateFreelancer()",
+			);
+			throw e;
+		}
+	}
+	static async addEmployment(freelancerId, employment) {
+		try {
+			const result = await FreelancersDAO.freelancers.updateOne(
+				{
+					_id: ObjectId(freelancerId),
+				},
+				{ $push: { employments: employment } },
+			);
+			console.log(result);
+		} catch (error) {
+			logger.error(
+				`Error occurred while updating adding new employment, ${e}`,
+				"addEmployment()",
 			);
 			throw e;
 		}
