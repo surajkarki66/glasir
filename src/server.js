@@ -22,9 +22,9 @@ dotenv.config();
 // Body parser
 app.use(express.json());
 app.use(
-  express.urlencoded({
-    extended: false,
-  })
+	express.urlencoded({
+		extended: false,
+	}),
 );
 
 // Cookie parser
@@ -47,26 +47,26 @@ app.use(cors());
 
 // Compression
 app.use(
-  compression({
-    level: 6,
-    threshold: 100 * 100, // 100 KB
-    filter: (req, res) => {
-      if (req.headers["x-no-compression"]) {
-        return false;
-      }
-      return compression.filter(req, res);
-    },
-  })
+	compression({
+		level: 6,
+		threshold: 100 * 100, // 100 KB
+		filter: (req, res) => {
+			if (req.headers["x-no-compression"]) {
+				return false;
+			}
+			return compression.filter(req, res);
+		},
+	}),
 );
 
 if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
+	app.use(morgan("dev"));
 }
 
 // Static routes
 app.use(
-  "/uploads",
-  express.static(path.join(__dirname + "/../public/uploads"))
+	"/uploads",
+	express.static(path.join(__dirname + "/../public/uploads")),
 );
 
 // Controller routes

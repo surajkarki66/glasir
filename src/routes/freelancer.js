@@ -3,73 +3,73 @@ import { Router } from "express";
 import { FreelancerController } from "../controllers/index";
 import { Schemas } from "../helpers/schemas/index";
 import {
-  dataValidation,
-  authValidation,
-  permissions,
-  file,
+	dataValidation,
+	authValidation,
+	permissions,
+	file,
 } from "../middlewares/index";
 
 const router = new Router();
 
 router
-  .route("/")
-  .post(authValidation.checkAuth)
-  .post(permissions.onlyFreelancerCanDoThisAction)
-  .post(dataValidation(Schemas.freelancerSchema.createProfile, "body"))
-  .post(FreelancerController.makeProfile);
+	.route("/")
+	.post(authValidation.checkAuth)
+	.post(permissions.onlyFreelancerCanDoThisAction)
+	.post(dataValidation(Schemas.freelancerSchema.createProfile, "body"))
+	.post(FreelancerController.makeProfile);
 
 router
-  .route("/")
-  .get(authValidation.checkAuth)
-  .get(dataValidation(Schemas.freelancerSchema.freelancerLIST, "query"))
-  .get(FreelancerController.getFreelancers);
+	.route("/")
+	.get(authValidation.checkAuth)
+	.get(dataValidation(Schemas.freelancerSchema.freelancerLIST, "query"))
+	.get(FreelancerController.getFreelancers);
 
 router
-  .route("/search")
-  .get(authValidation.checkAuth)
-  .get(dataValidation(Schemas.freelancerSchema.freelancerSEARCH, "query"))
-  .get(FreelancerController.searchFreelancer);
+	.route("/search")
+	.get(authValidation.checkAuth)
+	.get(dataValidation(Schemas.freelancerSchema.freelancerSEARCH, "query"))
+	.get(FreelancerController.searchFreelancer);
 
 router
-  .route("/upload-doc/:freelancerId")
-  .patch(authValidation.checkAuth)
-  .patch(
-    permissions.onlyFreelancerCanDoThisAction,
-    permissions.onlySameFreelancerCanDoThisAction
-  )
-  .patch(
-    file
-      .fileUpload("../../../public/uploads/", [
-        "application/pdf",
-        "application/docx",
-      ])
-      .fields([
-        { name: "citizenship", maxCount: 1 },
-        { name: "resume", maxCount: 1 },
-      ])
-  )
-  .patch(FreelancerController.uploadDocument);
+	.route("/upload-doc/:freelancerId")
+	.patch(authValidation.checkAuth)
+	.patch(
+		permissions.onlyFreelancerCanDoThisAction,
+		permissions.onlySameFreelancerCanDoThisAction,
+	)
+	.patch(
+		file
+			.fileUpload("../../../public/uploads/", [
+				"application/pdf",
+				"application/docx",
+			])
+			.fields([
+				{ name: "citizenship", maxCount: 1 },
+				{ name: "resume", maxCount: 1 },
+			]),
+	)
+	.patch(FreelancerController.uploadDocument);
 
 router
-  .route("/me")
-  .get(authValidation.checkAuth)
-  .get(permissions.onlyFreelancerCanDoThisAction)
-  .get(FreelancerController.me);
+	.route("/me")
+	.get(authValidation.checkAuth)
+	.get(permissions.onlyFreelancerCanDoThisAction)
+	.get(FreelancerController.me);
 
 router
-  .route("/:freelancerId")
-  .get(authValidation.checkAuth)
-  .get(dataValidation(Schemas.freelancerSchema.freelancerDETAILS, "params"))
-  .get(FreelancerController.getFreelancerDetails);
+	.route("/:freelancerId")
+	.get(authValidation.checkAuth)
+	.get(dataValidation(Schemas.freelancerSchema.freelancerDETAILS, "params"))
+	.get(FreelancerController.getFreelancerDetails);
 
 router
-  .route("/:freelancerId")
-  .patch(authValidation.checkAuth)
-  .patch(
-    permissions.onlyFreelancerCanDoThisAction,
-    permissions.onlySameFreelancerCanDoThisAction
-  )
-  .patch(dataValidation(Schemas.freelancerSchema.freelancerUPDATE, "body"))
-  .patch(FreelancerController.changeFreelancerDetails);
+	.route("/:freelancerId")
+	.patch(authValidation.checkAuth)
+	.patch(
+		permissions.onlyFreelancerCanDoThisAction,
+		permissions.onlySameFreelancerCanDoThisAction,
+	)
+	.patch(dataValidation(Schemas.freelancerSchema.freelancerUPDATE, "body"))
+	.patch(FreelancerController.changeFreelancerDetails);
 
 export default router;
