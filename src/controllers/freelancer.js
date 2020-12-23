@@ -62,6 +62,40 @@ export async function makeProfile(req, res, next) {
     return;
   }
 }
+export async function uploadAvatar(req, res, next) {
+  try {
+    const file = req.file;
+    if (!file) {
+      next(ApiError.badRequest("No image selected."));
+      return;
+    }
+    const { freelancerId } = req.params;
+    const updateObject = { avatar: file.filename, updatedAt: new Date() };
+    const {
+      success,
+      data,
+      statusCode,
+    } = await DAOs.freelancersDAO.updateFreelancer(freelancerId, updateObject);
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: { message: "Avatar uploaded successfully." },
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    } else {
+      next(ApiError.notfound(data.error));
+      return;
+    }
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong. ${error.message}`));
+    return;
+  }
+}
 export async function uploadDocument(req, res, next) {
   try {
     if (!req.files) {

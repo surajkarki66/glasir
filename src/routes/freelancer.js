@@ -12,14 +12,14 @@ import {
 const router = new Router();
 
 router
-  .route("/")
+  .route("/create-profile")
   .post(authValidation.checkAuth)
   .post(permissions.onlyFreelancerCanDoThisAction)
   .post(dataValidation(Schemas.freelancerSchema.createProfile, "body"))
   .post(FreelancerController.makeProfile);
 
 router
-  .route("/")
+  .route("/get-freelancers")
   .get(authValidation.checkAuth)
   .get(dataValidation(Schemas.freelancerSchema.freelancerLIST, "query"))
   .get(FreelancerController.getFreelancers);
@@ -31,13 +31,28 @@ router
   .get(FreelancerController.searchFreelancer);
 
 router
-  .route("/upload-doc/:freelancerId")
-  .patch(authValidation.checkAuth)
-  .patch(
+  .route("/upload-avatar/:freelancerId")
+  .post(authValidation.checkAuth)
+  .post(dataValidation(Schemas.freelancerSchema.avatarUPLOAD, "params"))
+  .post(
     permissions.onlyFreelancerCanDoThisAction,
     permissions.onlySameFreelancerCanDoThisAction,
   )
-  .patch(
+  .post(
+    file
+      .fileUpload("../../../public/uploads/", ["image/jpeg", "image/jpg"])
+      .single("avatar"),
+  )
+  .post(FreelancerController.uploadAvatar);
+
+router
+  .route("/upload-doc/:freelancerId")
+  .post(authValidation.checkAuth)
+  .post(
+    permissions.onlyFreelancerCanDoThisAction,
+    permissions.onlySameFreelancerCanDoThisAction,
+  )
+  .post(
     file
       .fileUpload("../../../public/uploads/", [
         "application/pdf",
@@ -48,7 +63,7 @@ router
         { name: "resume", maxCount: 1 },
       ]),
   )
-  .patch(FreelancerController.uploadDocument);
+  .post(FreelancerController.uploadDocument);
 
 router
   .route("/me")
@@ -73,7 +88,7 @@ router
   .patch(FreelancerController.changeFreelancerDetails);
 
 router
-  .route("/addEmployment/:freelancerId")
+  .route("/add-employment/:freelancerId")
   .patch(authValidation.checkAuth)
   .patch(
     permissions.onlyFreelancerCanDoThisAction,
@@ -83,7 +98,7 @@ router
   .patch(FreelancerController.addEmployment);
 
 router
-  .route("/updateEmployment/:freelancerId")
+  .route("/update-employment/:freelancerId")
   .patch(authValidation.checkAuth)
   .patch(
     permissions.onlyFreelancerCanDoThisAction,
@@ -99,7 +114,7 @@ router
   .post(FreelancerController.verifyPhoneNumber);
 
 router
-  .route("/confirmPhoneNumber")
+  .route("/confirm-phone-number")
   .post(dataValidation(Schemas.freelancerSchema.phoneNumberCONFIRM, "body"))
   .post(authValidation.checkAuth)
   .post(

@@ -204,36 +204,6 @@ export async function signup(req, res, next) {
   }
 }
 
-export async function uploadAvatar(req, res, next) {
-  try {
-    const file = req.file;
-    if (!file) {
-      next(ApiError.badRequest("No image selected."));
-      return;
-    }
-    const { userId } = req.params;
-    const updateObject = { avatar: file.filename, updatedAt: new Date() };
-    const user = await DAOs.usersDAO.updateUser(userId, updateObject);
-    if (user.success) {
-      const data = {
-        status: "success",
-        data: { message: "Avatar uploaded successfully." },
-      };
-      return writeServerResponse(
-        res,
-        data,
-        user.statusCode,
-        "application/json",
-      );
-    } else {
-      next(ApiError.notfound(user.data.error));
-      return;
-    }
-  } catch (error) {
-    next(ApiError.internal(`Something went wrong. ${err.message}`));
-    return;
-  }
-}
 export async function activation(req, res, next) {
   try {
     const { token } = req.body;

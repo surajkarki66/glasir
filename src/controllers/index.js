@@ -12,12 +12,12 @@ import {
   changeEmail,
   verifyEmail,
   deleteUser,
-  uploadAvatar,
   getUserDetails,
 } from "./user";
 
 import {
   makeProfile,
+  uploadAvatar,
   uploadDocument,
   getFreelancers,
   searchFreelancer,
@@ -45,11 +45,11 @@ export const UserController = {
   verifyEmail,
   deleteUser,
   getUserDetails,
-  uploadAvatar,
 };
 
 export const FreelancerController = {
   makeProfile,
+  uploadAvatar,
   uploadDocument,
   getFreelancers,
   searchFreelancer,
