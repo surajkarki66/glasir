@@ -3,6 +3,7 @@ import Joi from "joi";
 const schemas = {
   createProfile: Joi.object().keys({
     title: Joi.string().min(10).max(70).required(),
+    avatar: Joi.string().required(),
     overview: Joi.string().min(10).max(5000).required(),
     hourlyRate: Joi.number().greater(0).required(),
     location: Joi.object()
@@ -143,7 +144,9 @@ const schemas = {
   freelancerDETAILS: Joi.object().keys({
     freelancerId: Joi.string().length(24).hex().required(),
   }),
-
+  avatarUPLOAD: Joi.object().keys({
+    id: Joi.string().required(),
+  }),
   freelancerUPDATE: Joi.object().keys({
     title: Joi.string().min(10).max(70),
     overview: Joi.string().min(10).max(5000),
