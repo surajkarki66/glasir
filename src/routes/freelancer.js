@@ -48,6 +48,7 @@ router
 router
   .route("/upload-doc/:freelancerId")
   .post(authValidation.checkAuth)
+  .post(dataValidation(Schemas.freelancerSchema.documentUPLOAD, "params"))
   .post(
     permissions.onlyFreelancerCanDoThisAction,
     permissions.onlySameFreelancerCanDoThisAction,
@@ -78,7 +79,7 @@ router
   .get(FreelancerController.getFreelancerDetails);
 
 router
-  .route("/:freelancerId")
+  .route("/update-profile/:freelancerId")
   .patch(authValidation.checkAuth)
   .patch(
     permissions.onlyFreelancerCanDoThisAction,
@@ -88,14 +89,14 @@ router
   .patch(FreelancerController.changeFreelancerDetails);
 
 router
-  .route("/add-employment/:freelancerId")
-  .patch(authValidation.checkAuth)
-  .patch(
+  .route("/add-employment")
+  .post(authValidation.checkAuth)
+  .post(dataValidation(Schemas.freelancerSchema.employmentCREATE, "body"))
+  .post(
     permissions.onlyFreelancerCanDoThisAction,
     permissions.onlySameFreelancerCanDoThisAction,
   )
-  .patch(dataValidation(Schemas.freelancerSchema.employmentCREATE, "body"))
-  .patch(FreelancerController.addEmployment);
+  .post(FreelancerController.addEmployment);
 
 router
   .route("/update-employment/:freelancerId")
@@ -108,7 +109,7 @@ router
   .patch(FreelancerController.updateEmployment);
 
 router
-  .route("/verifyPhoneNumber")
+  .route("/verify-phone-number")
   .post(authValidation.checkAuth)
   .post(dataValidation(Schemas.freelancerSchema.phoneNumberVERIFY, "body"))
   .post(FreelancerController.verifyPhoneNumber);

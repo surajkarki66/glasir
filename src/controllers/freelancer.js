@@ -346,10 +346,10 @@ export async function changeFreelancerDetails(req, res, next) {
 
 export async function addEmployment(req, res, next) {
   try {
-    const { freelancerId } = req.params;
-    const employment = {
-      ...req.body,
-    };
+    const { freelancerId } = req.body;
+    const employment = req.body;
+    delete employment.freelancerId;
+
     const {
       success,
       data,

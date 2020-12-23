@@ -147,6 +147,9 @@ const schemas = {
   avatarUPLOAD: Joi.object().keys({
     freelancerId: Joi.string().length(24).hex().required(),
   }),
+  documentUPLOAD: Joi.object().keys({
+    freelancerId: Joi.string().length(24).hex().required(),
+  }),
   freelancerUPDATE: Joi.object().keys({
     title: Joi.string().min(10).max(70),
     overview: Joi.string().min(10).max(5000),
@@ -218,6 +221,7 @@ const schemas = {
   }),
 
   employmentCREATE: Joi.object().keys({
+    freelancerId: Joi.string().length(24).hex().required(),
     company: Joi.string().min(2).max(200).required(),
     location: Joi.object()
       .keys({
