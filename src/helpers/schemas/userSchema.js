@@ -2,8 +2,8 @@ import Joi from "joi";
 
 const schemas = {
   userSIGNUP: Joi.object().keys({
-    firstName: Joi.string().min(2).max(32).required(),
-    lastName: Joi.string().min(2).max(32).required(),
+    // firstName: Joi.string().min(2).max(32).required(),
+    // lastName: Joi.string().min(2).max(32).required(),
     username: Joi.string().min(4).max(32).required(),
     email: Joi.string()
       .email({
@@ -88,9 +88,9 @@ const schemas = {
       .required(),
   }),
   userDetailsCHANGE: Joi.object().keys({
-    firstName: Joi.string().min(2).max(32),
-    lastName: Joi.string().min(2).max(32),
-    username: Joi.string().min(4).max(32),
+    // firstName: Joi.string().min(2).max(32),
+    // lastName: Joi.string().min(2).max(32),
+    username: Joi.string().min(4).max(32).required(),
   }),
   emailCHANGE: Joi.object().keys({
     userId: Joi.string().length(24).hex().required(),

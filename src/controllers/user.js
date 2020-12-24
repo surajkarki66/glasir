@@ -400,35 +400,32 @@ export async function changeUserDetails(req, res, next) {
   try {
     const userDetails = req.body;
     const { userId } = req.params;
-    let updateObject = { ...userDetails, updatedAt: new Date() };
+    const updateObject = { ...userDetails, updatedAt: new Date() };
 
-    if (updateObject.username) {
-      const { username } = updateObject;
-      const user = await DAOs.usersDAO.getUserByUsername(username);
-      if (user && user._id.toString() !== userId) {
-        next(ApiError.conflict("Username is already taken."));
-        return;
-      }
-      updateObject = {
-        ...updateObject,
-        username: username,
-        updatedAt: new Date(),
-      };
+    const { username } = updateObject;
+    const user = await DAOs.usersDAO.getUserByUsername(username);
+    if (user && user._id.toString() !== userId) {
+      next(ApiError.conflict("Username is already taken."));
+      return;
     }
-    const result = await DAOs.usersDAO.updateUser(userId, updateObject);
-    if (result.success) {
-      const data = {
+
+    const { success, data, statusCode } = await DAOs.usersDAO.updateUser(
+      userId,
+      updateObject,
+    );
+    if (success) {
+      const serverResponse = {
         status: "success",
         data: { message: "Update successfully." },
       };
       return writeServerResponse(
         res,
-        data,
-        result.statusCode,
+        serverResponse,
+        statusCode,
         "application/json",
       );
     } else {
-      next(ApiError.notfound(result.data.error));
+      next(ApiError.notfound(data.error));
       return;
     }
   } catch (error) {
