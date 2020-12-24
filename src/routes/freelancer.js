@@ -14,7 +14,10 @@ const router = new Router();
 router
   .route("/create-profile")
   .post(authValidation.checkAuth)
-  .post(permissions.onlyFreelancerCanDoThisAction)
+  .post(
+    permissions.onlyActiveUserCanDoThisAction,
+    permissions.onlyFreelancerCanDoThisAction,
+  )
   .post(dataValidation(Schemas.freelancerSchema.createProfile, "body"))
   .post(FreelancerController.makeProfile);
 
@@ -82,6 +85,7 @@ router
   .route("/update-profile/:freelancerId")
   .patch(authValidation.checkAuth)
   .patch(
+    permissions.onlyActiveUserCanDoThisAction,
     permissions.onlyFreelancerCanDoThisAction,
     permissions.onlySameFreelancerCanDoThisAction,
   )

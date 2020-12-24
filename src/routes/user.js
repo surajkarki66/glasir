@@ -54,7 +54,7 @@ router
   .post(UserController.resetPassword);
 
 router
-  .route("/change-password")
+  .route("/change-password/:userId")
   .patch(authValidation.checkAuth)
   .patch(permissions.onlySameUserCanDoThisAction)
   .patch(dataValidation(Schemas.userSchema.passwordCHANGE, "body"))
@@ -68,7 +68,7 @@ router
   .patch(UserController.changeUserDetails);
 
 router
-  .route("/change-email")
+  .route("/change-email/:userId")
   .patch(authValidation.checkAuth)
   .patch(permissions.onlySameUserCanDoThisAction)
   .patch(dataValidation(Schemas.userSchema.emailCHANGE, "body"))
@@ -76,10 +76,10 @@ router
 
 router
   .route("/verify-email")
-  .patch(authValidation.checkAuth)
-  .patch(permissions.onlySameUserCanDoThisAction)
-  .patch(dataValidation(Schemas.userSchema.userACTIVATIONEMAIL, "body"))
-  .patch(UserController.verifyEmail);
+  .post(authValidation.checkAuth)
+  .post(dataValidation(Schemas.userSchema.userACTIVATIONEMAIL, "body"))
+  .post(permissions.onlySameUserCanDoThisAction)
+  .post(UserController.verifyEmail);
 
 router
   .route("/delete/:userId")
@@ -89,7 +89,7 @@ router
   .delete(UserController.deleteUser);
 
 router
-  .route("/:userId")
+  .route("/details/:userId")
   .get(authValidation.checkAuth)
   .get(permissions.onlySameUserOrAdminCanDoThisAction)
   .get(dataValidation(Schemas.userSchema.userDETAILS, "params"))

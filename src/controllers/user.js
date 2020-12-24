@@ -13,25 +13,25 @@ import { comparePassword, hashPassword } from "../utils/utils";
 export async function getUsers(req, res, next) {
   try {
     const { page, usersPerPage } = req.query;
-    const result = await DAOs.usersDAO.getUsers({
+    const {
+      success,
+      data,
+      statusCode,
+      totalNumUsers,
+    } = await DAOs.usersDAO.getUsers({
       page,
       usersPerPage,
     });
-    if (result.success) {
+    if (success) {
       const users = {
         status: "success",
-        data: result.data,
+        data: data,
         page: Number(page),
         filters: {},
         entries_per_page: Number(usersPerPage),
-        totalResults: result.totalNumUsers,
+        totalResults: totalNumUsers,
       };
-      return writeServerResponse(
-        res,
-        users,
-        result.statusCode,
-        "application/json",
-      );
+      return writeServerResponse(res, users, statusCode, "application/json");
     }
     next(ApiError.notFound("Not found"));
     return;
@@ -60,16 +60,16 @@ export async function login(req, res, next) {
       }
     }
     const actualPassword = userData.password;
-    const { _id, role } = userData;
+    const { _id, role, isActive } = userData;
     if (!(await comparePassword(password, actualPassword))) {
       next(ApiError.badRequest("Make sure your password is correct."));
       return;
     }
+    const payload = { role, isActive };
+    const accessToken = await signToken(_id, payload, "ACCESS", "1h");
+    const refreshToken = await signToken(_id, payload, "REFRESH", "7d");
 
-    const accessToken = await signToken(_id, role, "ACCESS", "1h");
-    const refreshToken = await signToken(_id, role, "REFRESH", "7d");
-
-    const data = {
+    const serverResponse = {
       status: "success",
       data: {
         message: "Login successfull.",
@@ -86,7 +86,7 @@ export async function login(req, res, next) {
       maxAge: 604800000,
     });
 
-    return writeServerResponse(res, data, 200, "application/json");
+    return writeServerResponse(res, serverResponse, 200, "application/json");
   } catch (e) {
     next(ApiError.internal(`Something went wrong: ${e.message}`));
     return;
@@ -101,10 +101,10 @@ export async function refreshToken(req, res, next) {
       process.env.REFRESH_TOKEN_SECRET,
     );
     const { aud, role } = result;
-
-    const accessToken = await signToken(aud, role, "ACCESS", "1h");
-    const refToken = await signToken(aud, role, "REFRESH", "7d");
-    const data = {
+    const payload = { role };
+    const accessToken = await signToken(aud, payload, "ACCESS", "1h");
+    const refToken = await signToken(aud, payload, "REFRESH", "7d");
+    const serverResponse = {
       status: "success",
       data: { accessToken: accessToken, refreshToken: refToken },
     };
@@ -116,7 +116,7 @@ export async function refreshToken(req, res, next) {
       httpOnly: true,
       maxAge: 604800000,
     });
-    return writeServerResponse(res, data, 200, "application/json");
+    return writeServerResponse(res, serverResponse, 200, "application/json");
   } catch (error) {
     if (String(error).startsWith("UnauthorizedError")) {
       next(ApiError.unauthorized("Expired link. Signup again."));
@@ -156,11 +156,14 @@ export async function signup(req, res, next) {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      const insertResult = await DAOs.usersDAO.createUser(userInfo);
+      const { success, data, statusCode } = await DAOs.usersDAO.createUser(
+        userInfo,
+      );
 
-      if (insertResult.success) {
-        const { _id, email, role } = insertResult.data;
-        const token = await signToken(_id, role, "ACTIVATION", "5m");
+      if (success) {
+        const { _id, email, role } = data;
+        const payload = { role };
+        const token = await signToken(_id, payload, "ACTIVATION", "5m");
         const mailOptions = {
           from: `Glasir <${process.env.COMPANY}>`,
           to: email,
@@ -179,7 +182,7 @@ export async function signup(req, res, next) {
             next(ApiError.internal(`Something went wrong: ${error.message}`));
             return;
           }
-          const data = {
+          const serverResponse = {
             status: "success",
             data: {
               message:
@@ -188,13 +191,13 @@ export async function signup(req, res, next) {
           };
           return writeServerResponse(
             res,
-            data,
-            insertResult.statusCode,
+            serverResponse,
+            statusCode,
             "application/json",
           );
         });
       } else {
-        next(ApiError.badRequest(insertResult.data.error));
+        next(ApiError.badRequest(data.error));
         return;
       }
     }
@@ -220,20 +223,23 @@ export async function activation(req, res, next) {
       isActive: true,
       updatedAt: new Date(),
     };
-    const user = await DAOs.usersDAO.updateUser(userId, updateObject);
-    if (user.success) {
-      const data = {
+    const { success, data, statusCode } = await DAOs.usersDAO.updateUser(
+      userId,
+      updateObject,
+    );
+    if (success) {
+      const serverResponse = {
         status: "success",
         data: { message: "User activated successfully." },
       };
       return writeServerResponse(
         res,
-        data,
-        user.statusCode,
+        serverResponse,
+        statusCode,
         "application/json",
       );
     } else {
-      next(ApiError.notfound(user.data.error));
+      next(ApiError.notfound(data.error));
       return;
     }
   } catch (err) {
@@ -254,11 +260,11 @@ export async function logout(req, res, next) {
         next(ApiError.internal("Something went wrong."));
         return;
       }
-      const data = {
+      const serverResponse = {
         status: "success",
         data: { message: "Logout successfully." },
       };
-      return writeServerResponse(res, data, 200, "application/json");
+      return writeServerResponse(res, serverResponse, 200, "application/json");
     });
   } catch (error) {
     if (String(error).startsWith("UnauthorizedError")) {
@@ -284,7 +290,8 @@ export async function forgotPassword(req, res, next) {
     const result = await DAOs.usersDAO.getUserByEmail(email);
     if (result) {
       const { _id, role } = result;
-      const token = await signToken(_id, role, "FORGOT", "5m");
+      const payload = { role };
+      const token = await signToken(_id, payload, "FORGOT", "5m");
       const mailOptions = {
         from: `Glasir <${process.env.COMPANY}>`,
         to: email,
@@ -302,13 +309,18 @@ export async function forgotPassword(req, res, next) {
           next(ApiError.internal(`Something went wrong: ${error.message}`));
           return;
         }
-        const data = {
+        const serverResponse = {
           status: "success",
           data: {
             message: `Email has been sent to ${email}. Follow the instruction to reset your password.`,
           },
         };
-        return writeServerResponse(res, data, 200, "application/json");
+        return writeServerResponse(
+          res,
+          serverResponse,
+          200,
+          "application/json",
+        );
       });
     } else {
       next(ApiError.notfound("User with that email does not exist"));
@@ -333,20 +345,23 @@ export async function resetPassword(req, res, next) {
       password: await hashPassword(newPassword),
       updatedAt: new Date(),
     };
-    const user = await DAOs.usersDAO.updateUser(userId, updatedObject);
-    if (user.success) {
-      const data = {
+    const { success, statusCode, data } = await DAOs.usersDAO.updateUser(
+      userId,
+      updatedObject,
+    );
+    if (success) {
+      const serverResponse = {
         status: "success",
         data: { message: "Great! Now you can login with your new password" },
       };
       return writeServerResponse(
         res,
-        data,
-        user.statusCode,
+        serverResponse,
+        statusCode,
         "application/json",
       );
     } else {
-      next(ApiError.notfound(result.data.error));
+      next(ApiError.notfound(data.error));
       return;
     }
   } catch (error) {
@@ -357,10 +372,11 @@ export async function resetPassword(req, res, next) {
 
 export async function changePassword(req, res, next) {
   try {
-    const { userId, oldPassword, newPassword } = req.body;
-    const result = await DAOs.usersDAO.getUserById(userId);
-    if (result.success) {
-      const { password } = result.data;
+    const { userId } = req.params;
+    const { oldPassword, newPassword } = req.body;
+    const { success, data } = await DAOs.usersDAO.getUserById(userId);
+    if (success) {
+      const password = data.password;
 
       if (!(await comparePassword(oldPassword, password))) {
         next(ApiError.unauthorized("Make sure your password is correct."));
@@ -370,20 +386,23 @@ export async function changePassword(req, res, next) {
         password: await hashPassword(newPassword),
         updatedAt: new Date(),
       };
-      const user = await DAOs.usersDAO.updateUser(userId, updatedObject);
-      if (user.success) {
-        const data = {
+      const { success, data2, statusCode } = await DAOs.usersDAO.updateUser(
+        userId,
+        updatedObject,
+      );
+      if (success) {
+        const serverResponse = {
           status: "success",
           data: { message: "Password changed successfully." },
         };
         return writeServerResponse(
           res,
-          data,
-          user.statusCode,
+          serverResponse,
+          statusCode,
           "application/json",
         );
       } else {
-        next(ApiError.notfound(user.data.error));
+        next(ApiError.notfound(data2.error));
         return;
       }
     } else {
@@ -435,7 +454,8 @@ export async function changeUserDetails(req, res, next) {
 }
 export async function changeEmail(req, res, next) {
   try {
-    const { userId, email } = req.body;
+    const { userId } = req.params;
+    const { email } = req.body;
     const user = await DAOs.usersDAO.getUserByEmail(email);
     const { role } = req.jwt;
 
@@ -448,9 +468,13 @@ export async function changeEmail(req, res, next) {
       isActive: false,
       updatedAt: new Date(),
     };
-    const result = await DAOs.usersDAO.updateUser(userId, updateObject);
-    if (result.success) {
-      const token = await signToken(userId, role, "ACTIVATION", "5m");
+    const { success, statusCode, data } = await DAOs.usersDAO.updateUser(
+      userId,
+      updateObject,
+    );
+    if (success) {
+      const payload = { role };
+      const token = await signToken(userId, payload, "ACTIVATION", "5m");
       const mailOptions = {
         from: `Glasir <${process.env.COMPANY}>`,
         to: email,
@@ -469,7 +493,7 @@ export async function changeEmail(req, res, next) {
           next(ApiError.internal(`Something went wrong: ${error.message}`));
           return;
         }
-        const data = {
+        const serverResponse = {
           status: "success",
           data: {
             message: "Confirmation email is sent! Please check your email.",
@@ -477,13 +501,13 @@ export async function changeEmail(req, res, next) {
         };
         return writeServerResponse(
           res,
-          data,
-          result.statusCode,
+          serverResponse,
+          statusCode,
           "application/json",
         );
       });
     } else {
-      next(ApiError.notfound(result.data.error));
+      next(ApiError.notfound(data.error));
       return;
     }
   } catch (error) {
@@ -495,11 +519,14 @@ export async function changeEmail(req, res, next) {
 export async function verifyEmail(req, res, next) {
   try {
     const { userId } = req.body;
-    const result = await DAOs.usersDAO.getUserById(userId);
-    if (result.success) {
-      if (!result.data.isActive) {
-        const { _id, role, email } = result.data;
-        const token = await signToken(_id, role, "ACTIVATION", "5m");
+    const { success, data, statusCode } = await DAOs.usersDAO.getUserById(
+      userId,
+    );
+    if (success) {
+      if (!data.isActive) {
+        const { _id, role, email } = data;
+        const payload = { role };
+        const token = await signToken(_id, payload, "ACTIVATION", "5m");
         const mailOptions = {
           from: `Glasir <${process.env.COMPANY}>`,
           to: email,
@@ -518,7 +545,7 @@ export async function verifyEmail(req, res, next) {
             next(ApiError.internal(`Something went wrong: ${error.message}`));
             return;
           }
-          const data = {
+          const serverResponse = {
             status: "success",
             data: {
               message: "Confirmation email is sent! Please check your email.",
@@ -526,20 +553,20 @@ export async function verifyEmail(req, res, next) {
           };
           return writeServerResponse(
             res,
-            data,
-            result.statusCode,
+            serverResponse,
+            statusCode,
             "application/json",
           );
         });
       } else {
-        const data = {
+        const serverResponse = {
           status: "success",
           data: { message: "Email is already verified." },
         };
         return writeServerResponse(
           res,
-          data,
-          result.statusCode,
+          serverResponse,
+          statusCode,
           "application/json",
         );
       }
@@ -554,17 +581,19 @@ export async function verifyEmail(req, res, next) {
 }
 export async function getUserDetails(req, res, next) {
   try {
-    const id = req.params.userId;
-    const result = await DAOs.usersDAO.getUserById(id);
-    if (result.success) {
-      const data = {
+    const { userId } = req.params;
+    const { success, data, statusCode } = await DAOs.usersDAO.getUserById(
+      userId,
+    );
+    if (success) {
+      const serverResponse = {
         status: "success",
-        data: { ...result.data, password: null },
+        data: { ...data, password: null },
       };
       return writeServerResponse(
         res,
-        data,
-        result.statusCode,
+        serverResponse,
+        statusCode,
         "application/json",
       );
     } else {
@@ -580,9 +609,9 @@ export async function deleteUser(req, res, next) {
   try {
     const { password } = req.body;
     const { userId } = req.params;
-    const user = await DAOs.usersDAO.getUserById(userId);
-    if (user.success) {
-      const actualPassword = user.data.password;
+    const { success, data } = await DAOs.usersDAO.getUserById(userId);
+    if (success) {
+      const actualPassword = data.password;
 
       if (!(await comparePassword(password, actualPassword))) {
         next(ApiError.unauthorized("Make sure your password is correct."));
@@ -594,11 +623,16 @@ export async function deleteUser(req, res, next) {
       );
       const result = await Promise.all([deleteUser, deleteFreelancer]);
       if (result) {
-        const data = {
+        const serverResponse = {
           status: "success",
           data: { message: "Deleted successfully." },
         };
-        return writeServerResponse(res, data, 200, "application/json");
+        return writeServerResponse(
+          res,
+          serverResponse,
+          200,
+          "application/json",
+        );
       }
       next(ApiError.notfound("User or Freelancer not found."));
       return;

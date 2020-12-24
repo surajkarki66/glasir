@@ -2,8 +2,6 @@ import Joi from "joi";
 
 const schemas = {
   userSIGNUP: Joi.object().keys({
-    // firstName: Joi.string().min(2).max(32).required(),
-    // lastName: Joi.string().min(2).max(32).required(),
     username: Joi.string().min(4).max(32).required(),
     email: Joi.string()
       .email({
@@ -20,7 +18,9 @@ const schemas = {
     role: Joi.string().valid("freelancer", "client", "admin").required(),
   }),
   userACTIVATION: Joi.object().keys({
-    token: [Joi.string().required(), Joi.number().required()],
+    token: Joi.string()
+      .regex(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_.+/=]*$/)
+      .required(),
   }),
   userACTIVATIONEMAIL: Joi.object().keys({
     userId: Joi.string().length(24).hex().required(),
@@ -41,10 +41,14 @@ const schemas = {
     })
     .xor("email", "username"),
   refreshTOKEN: Joi.object().keys({
-    refreshToken: [Joi.string().required(), Joi.number().required()],
+    refreshToken: Joi.string()
+      .regex(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_.+/=]*$/)
+      .required(),
   }),
   userLOGOUT: Joi.object().keys({
-    refreshToken: [Joi.string().required(), Joi.number().required()],
+    refreshToken: Joi.string()
+      .regex(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_.+/=]*$/)
+      .required(),
   }),
   userDELETE: Joi.object().keys({
     password: Joi.string()
@@ -60,7 +64,6 @@ const schemas = {
     userId: Joi.string().length(24).hex().required(),
   }),
   passwordCHANGE: Joi.object().keys({
-    userId: Joi.string().length(24).hex().required(),
     oldPassword: Joi.string()
       .min(8)
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
@@ -81,19 +84,24 @@ const schemas = {
       .required(),
   }),
   passwordRESET: Joi.object().keys({
-    token: [Joi.string().required(), Joi.number().required()],
+    token: Joi.string()
+      .pattern(new RegExp("^[A-Za-z0-9-_]+.[A-Za-z0-9-_]+.[A-Za-z0-9-_.+/=]*$"))
+      .required(),
     newPassword: Joi.string()
       .min(8)
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
       .required(),
   }),
   userDetailsCHANGE: Joi.object().keys({
-    // firstName: Joi.string().min(2).max(32),
-    // lastName: Joi.string().min(2).max(32),
-    username: Joi.string().min(4).max(32).required(),
+    username: Joi.string().min(4).max(32),
+    email: Joi.string().email({
+      minDomainSegments: 2,
+      tlds: {
+        allow: ["com", "net"],
+      },
+    }),
   }),
   emailCHANGE: Joi.object().keys({
-    userId: Joi.string().length(24).hex().required(),
     email: Joi.string()
       .email({
         minDomainSegments: 2,
