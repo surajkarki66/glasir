@@ -13,6 +13,7 @@ import cookieParser from "cookie-parser";
 import { apiErrorHandler } from "./error/api-error-handler";
 import userRoutes from "./routes/user";
 import freelancerRoutes from "./routes/freelancer";
+import commonRoutes from "./routes/common";
 
 const app = express();
 
@@ -22,9 +23,9 @@ dotenv.config();
 // Body parser
 app.use(express.json());
 app.use(
-	express.urlencoded({
-		extended: false,
-	}),
+  express.urlencoded({
+    extended: false,
+  }),
 );
 
 // Cookie parser
@@ -47,31 +48,32 @@ app.use(cors());
 
 // Compression
 app.use(
-	compression({
-		level: 6,
-		threshold: 100 * 100, // 100 KB
-		filter: (req, res) => {
-			if (req.headers["x-no-compression"]) {
-				return false;
-			}
-			return compression.filter(req, res);
-		},
-	}),
+  compression({
+    level: 6,
+    threshold: 100 * 100, // 100 KB
+    filter: (req, res) => {
+      if (req.headers["x-no-compression"]) {
+        return false;
+      }
+      return compression.filter(req, res);
+    },
+  }),
 );
 
 if (process.env.NODE_ENV === "development") {
-	app.use(morgan("dev"));
+  app.use(morgan("dev"));
 }
 
 // Static routes
 app.use(
-	"/uploads",
-	express.static(path.join(__dirname + "/../public/uploads")),
+  "/uploads",
+  express.static(path.join(__dirname + "/../public/uploads")),
 );
 
 // Controller routes
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/freelancer", freelancerRoutes);
+app.use("/api/v1/common", commonRoutes);
 
 // Error middleware
 app.use(apiErrorHandler);

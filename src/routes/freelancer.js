@@ -70,12 +70,6 @@ router
   .post(FreelancerController.uploadDocument);
 
 router
-  .route("/me")
-  .get(authValidation.checkAuth)
-  .get(permissions.onlyFreelancerCanDoThisAction)
-  .get(FreelancerController.me);
-
-router
   .route("/:freelancerId")
   .get(authValidation.checkAuth)
   .get(dataValidation(Schemas.freelancerSchema.freelancerDETAILS, "params"))
@@ -97,6 +91,7 @@ router
   .post(authValidation.checkAuth)
   .post(dataValidation(Schemas.freelancerSchema.employmentCREATE, "body"))
   .post(
+    permissions.onlyActiveUserCanDoThisAction,
     permissions.onlyFreelancerCanDoThisAction,
     permissions.onlySameFreelancerCanDoThisAction,
   )
@@ -106,6 +101,7 @@ router
   .route("/update-employment/:freelancerId")
   .patch(authValidation.checkAuth)
   .patch(
+    permissions.onlyActiveUserCanDoThisAction,
     permissions.onlyFreelancerCanDoThisAction,
     permissions.onlySameFreelancerCanDoThisAction,
   )
@@ -123,6 +119,7 @@ router
   .post(dataValidation(Schemas.freelancerSchema.phoneNumberCONFIRM, "body"))
   .post(authValidation.checkAuth)
   .post(
+    permissions.onlyActiveUserCanDoThisAction,
     permissions.onlyFreelancerCanDoThisAction,
     permissions.onlySameFreelancerCanDoThisAction,
   )

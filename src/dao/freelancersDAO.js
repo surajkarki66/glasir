@@ -6,13 +6,15 @@ import { escapeRegex } from "../utils/utils";
 class FreelancersDAO {
   static freelancers;
   static DEFAULT_PROJECT = {
+    firstName: 1,
+    lastName: 1,
     expertise: 1,
     hourlyRate: 1,
     title: 1,
     englishLanguage: 1,
     isVerified: 1,
   };
-  static DEFAULT_SORT = { "user.fullName": 1 };
+  static DEFAULT_SORT = { firstName: 1, lastName: 1 };
 
   static async injectDB(conn) {
     if (FreelancersDAO.freelancers) {
@@ -77,14 +79,8 @@ class FreelancersDAO {
     }
   }
   static textSearchQuery(text) {
-    const query = {
-      $or: [
-        { "user.fullName": { $regex: new RegExp(escapeRegex(text), "gi") } },
-        { "user.username": { $regex: new RegExp(escapeRegex(text), "gi") } },
-      ],
-    };
-    // TODO: Sort By Job Success Rate
-    const sort = { _id: 1 };
+    const query = { $text: { $search: text } };
+    const sort = { score: { $meta: "textScore" } };
     return { query, sort };
   }
   static serviceSearchQuery(service) {
@@ -160,33 +156,14 @@ class FreelancersDAO {
     } = queryParams;
 
     const pipeline = [
-      { $match: { isVerified: true } },
-      {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "_id",
-          as: "user",
-        },
-      },
-      {
-        $addFields: {
-          user: { $arrayElemAt: ["$user", 0] },
-        },
-      },
+      { $match: query },
       {
         $project: {
           ...project,
-          "user.fullName": {
-            $concat: ["$user.firstName", " ", "$user.lastName"],
-          },
+          "location.country": 1,
           "location.province": 1,
-          "user.username": 1,
-          "user.avatar": 1,
-          "user.role": 1,
         },
       },
-      { $match: query },
       { $sort: sort },
     ];
 
@@ -243,7 +220,17 @@ class FreelancersDAO {
             as: "user",
           },
         },
-        { $addFields: { user: { $arrayElemAt: ["$user", 0] } } },
+        {
+          $addFields: {
+            user: { $arrayElemAt: ["$user", 0] },
+          },
+        },
+        {
+          $project: {
+            "user.password": 0,
+            "user.role": 0,
+          },
+        },
       ];
 
       const freelancer = await FreelancersDAO.freelancers
@@ -319,6 +306,7 @@ class FreelancersDAO {
           },
         },
         { $addFields: { user: { $arrayElemAt: ["$user", 0] } } },
+        { $project: { "user.password": 0 } },
       ];
       const profile = await FreelancersDAO.freelancers
         .aggregate(pipeline)
@@ -332,16 +320,6 @@ class FreelancersDAO {
       profileObj = { success: false, data: {}, statusCode: 404 };
       return profileObj;
     } catch (e) {
-      if (
-        e
-          .toString()
-          .startsWith(
-            "Error: Argument passed in must be a single String of 12 bytes or a string of 24 hex characters",
-          )
-      ) {
-        return null;
-      }
-
       logger.error(`Something went wrong: ${e}`);
       throw e;
     }

@@ -22,13 +22,14 @@ import {
   getFreelancers,
   searchFreelancer,
   getFreelancerDetails,
-  me,
   changeFreelancerDetails,
   addEmployment,
   updateEmployment,
   verifyPhoneNumber,
   confirmPhoneNumber,
 } from "./freelancer";
+
+import { me } from "./common";
 
 export const UserController = {
   getUsers,
@@ -54,10 +55,11 @@ export const FreelancerController = {
   getFreelancers,
   searchFreelancer,
   getFreelancerDetails,
-  me,
   changeFreelancerDetails,
   addEmployment,
   updateEmployment,
   verifyPhoneNumber,
   confirmPhoneNumber,
 };
+
+export const CommonController = { me };

@@ -239,7 +239,7 @@ export async function searchFreelancer(req, res, next) {
 
 export async function getFreelancerDetails(req, res, next) {
   try {
-    const freelancerId = req.params.freelancerId;
+    const { freelancerId } = req.params;
     const {
       success,
       data,
@@ -260,38 +260,6 @@ export async function getFreelancerDetails(req, res, next) {
     }
     next(ApiError.notfound("Freelancer doesnot exist."));
     return;
-  } catch (error) {
-    next(ApiError.internal(`Something went wrong: ${error.message}`));
-    return;
-  }
-}
-
-export async function me(req, res, next) {
-  try {
-    const { aud } = req.jwt;
-    const { success, data, statusCode } = await DAOs.freelancersDAO.me(aud);
-    if (success) {
-      const serverResponse = { status: "success", data: data };
-      return writeServerResponse(
-        res,
-        serverResponse,
-        statusCode,
-        "application/json",
-      );
-    }
-    const user = await DAOs.usersDAO.getUserById(aud);
-    if (user.success) {
-      const serverResponse = {
-        status: "success",
-        data: { ...user.data, password: null },
-      };
-      return writeServerResponse(
-        res,
-        serverResponse,
-        user.statusCode,
-        "application/json",
-      );
-    }
   } catch (error) {
     next(ApiError.internal(`Something went wrong: ${error.message}`));
     return;

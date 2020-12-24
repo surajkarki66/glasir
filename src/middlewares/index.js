@@ -3,6 +3,7 @@ import {
   onlyAdminCanDoThisAction,
   onlySameUserOrAdminCanDoThisAction,
   onlyActiveUserCanDoThisAction,
+  noAdminCanDoThisAction,
 } from "./auth-permission";
 
 import {
@@ -21,6 +22,7 @@ export const permissions = {
   onlyFreelancerCanDoThisAction,
   onlySameFreelancerCanDoThisAction,
   onlyActiveUserCanDoThisAction,
+  noAdminCanDoThisAction,
 };
 export const authValidation = { checkAuth };
 export const file = { fileUpload };

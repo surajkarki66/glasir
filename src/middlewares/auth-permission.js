@@ -48,11 +48,24 @@ export const onlyAdminCanDoThisAction = (req, res, next) => {
   }
 };
 
-export const onlyActiveUserCanDoThisAction = async (req, res, next) => {
+export const onlyActiveUserCanDoThisAction = (req, res, next) => {
   const { isActive } = req.jwt;
   if (isActive) {
     return next();
   }
-  next(ApiError.forbidden("User is required to verify their email."));
+  next(
+    ApiError.forbidden(
+      "Access denied: User is required to verify their email.",
+    ),
+  );
   return;
+};
+
+export const noAdminCanDoThisAction = (req, res, next) => {
+  const { role } = req.jwt;
+  if (role === "admin") {
+    next(ApiError.forbidden("Access denied: No admin can do this action"));
+    return;
+  }
+  return next();
 };
