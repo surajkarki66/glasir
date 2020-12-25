@@ -1,7 +1,6 @@
 import { ObjectId } from "bson";
 
 import logger from "../utils/logger";
-import { escapeRegex } from "../utils/utils";
 
 class FreelancersDAO {
   static freelancers;
@@ -85,11 +84,11 @@ class FreelancersDAO {
         path: ["firstName", "lastName", "title"],
         fuzzy: {
           maxEdits: 2,
+          prefixLength: 3,
         },
       },
     };
-    const sort = { score: { $meta: "textScore" } };
-    return { query, sort };
+    return { query };
   }
   static serviceSearchQuery(service) {
     const query = {
@@ -124,7 +123,7 @@ class FreelancersDAO {
 
     if (filters) {
       if ("text" in filters) {
-        const { query, sort } = this.textSearchQuery(filters["text"]);
+        const { query } = this.textSearchQuery(filters["text"]);
         queryParams = { searchText: { ...query }, sort };
       }
       if ("service" in filters) {
@@ -183,9 +182,9 @@ class FreelancersDAO {
             ...project,
             "location.country": 1,
             "location.province": 1,
+            score: { $meta: "searchScore" },
           },
         },
-        { $sort: sort },
       ];
     }
 
