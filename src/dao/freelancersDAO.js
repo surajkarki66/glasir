@@ -79,7 +79,15 @@ class FreelancersDAO {
     }
   }
   static textSearchQuery(text) {
-    const query = { $text: { $search: text } };
+    const query = {
+      text: {
+        query: text,
+        path: ["firstName", "lastName", "title"],
+        fuzzy: {
+          maxEdits: 2,
+        },
+      },
+    };
     const sort = { score: { $meta: "textScore" } };
     return { query, sort };
   }
@@ -117,7 +125,7 @@ class FreelancersDAO {
     if (filters) {
       if ("text" in filters) {
         const { query, sort } = this.textSearchQuery(filters["text"]);
-        queryParams = { query: { ...query }, sort };
+        queryParams = { searchText: { ...query }, sort };
       }
       if ("service" in filters) {
         const serviceQuery = this.serviceSearchQuery(filters["service"]);
@@ -151,11 +159,11 @@ class FreelancersDAO {
     }
     const {
       query = {},
+      searchText = null,
       project = FreelancersDAO.DEFAULT_PROJECT,
       sort = FreelancersDAO.DEFAULT_SORT,
     } = queryParams;
-
-    const pipeline = [
+    let pipeline = [
       { $match: query },
       {
         $project: {
@@ -166,6 +174,20 @@ class FreelancersDAO {
       },
       { $sort: sort },
     ];
+    if (searchText) {
+      pipeline = [
+        { $search: searchText },
+        { $match: query },
+        {
+          $project: {
+            ...project,
+            "location.country": 1,
+            "location.province": 1,
+          },
+        },
+        { $sort: sort },
+      ];
+    }
 
     let cursor;
     try {
