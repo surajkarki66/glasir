@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 const schemas = {
-  createProfile: Joi.object().keys({
+  createFreelancer: Joi.object().keys({
     firstName: Joi.string().min(2).max(32).required(),
     lastName: Joi.string().min(2).max(32).required(),
     title: Joi.string().min(10).max(70).required(),
