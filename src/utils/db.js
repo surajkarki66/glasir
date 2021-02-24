@@ -6,7 +6,6 @@ dotenv.config();
 
 export const getDB = async () => {
   const client = await MongoClient.connect(process.env.MONGO_URI, {
-    w: "majority",
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
