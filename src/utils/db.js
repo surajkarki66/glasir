@@ -1,14 +1,12 @@
-import dotenv from "dotenv";
 import MongoClient from "mongodb";
 
-// .env config
-dotenv.config();
+import config from "../config/config";
 
 export const getDB = async () => {
-  const client = await MongoClient.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  const client = await MongoClient.connect(
+    config.mongo.url,
+    config.mongo.options,
+  );
 
   return client;
 };

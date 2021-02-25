@@ -10,15 +10,13 @@ import morgan from "morgan";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 
+import config from "./config/config";
 import { apiErrorHandler } from "./error/api-error-handler";
 import userRoutes from "./routes/user";
 import freelancerRoutes from "./routes/freelancer";
 import commonRoutes from "./routes/common";
 
 const app = express();
-
-// Load environment variables
-dotenv.config();
 
 // Body parser
 app.use(express.json());
@@ -37,7 +35,7 @@ app.use(mongoSanitize());
 // Set security headers
 app.use(helmet());
 
-// Prevent xss atack
+// Prevent xss attack
 app.use(xss());
 
 // Prevent http param pollution
@@ -60,7 +58,7 @@ app.use(
   }),
 );
 
-if (process.env.NODE_ENV === "development") {
+if (config.nodeEnv === "development") {
   app.use(morgan("dev"));
 }
 

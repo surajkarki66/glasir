@@ -1,11 +1,8 @@
-import dotenv from "dotenv";
-
 import app from "./server";
 import DAOs from "./dao/index";
-import logger from "./utils/logger";
+import config from "./config/config";
+import logger from "./config/logger";
 import { getDB } from "./utils/db";
-
-dotenv.config();
 
 getDB()
   .then((client) => {
@@ -21,7 +18,7 @@ getDB()
     require("./utils/redis");
 
     // app server
-    const port = process.env.PORT || 8000;
+    const port = config.server.port;
     app.listen(port, () => {
       logger.info(`Listening on PORT ${port}.`);
     });

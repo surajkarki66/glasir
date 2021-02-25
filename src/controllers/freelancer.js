@@ -2,8 +2,9 @@ import { ObjectId } from "bson";
 import parsePhoneNumber from "libphonenumber-js";
 
 import DAOs from "../dao/index";
+import config from "../config/config";
 import ApiError from "../error/ApiError";
-import { mb } from "../helpers/messageBird";
+import mb from "../config/messageBird";
 import { writeServerResponse } from "../helpers/response";
 
 export async function makeProfile(req, res, next) {
@@ -15,8 +16,7 @@ export async function makeProfile(req, res, next) {
     const phoneNumber = parsePhoneNumber(phone.phoneNumber);
     if (phoneNumber && phoneNumber.isValid()) {
       const newHourlyRate =
-        profileInfo.hourlyRate -
-        process.env.SERVICE_FEE_RATE * profileInfo.hourlyRate;
+        profileInfo.hourlyRate - config.feeRate * profileInfo.hourlyRate;
       const info = {
         ...profileInfo,
         user: ObjectId(aud),

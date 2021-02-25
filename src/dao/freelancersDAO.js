@@ -1,6 +1,7 @@
 import { ObjectId } from "bson";
 
-import logger from "../utils/logger";
+import config from "../config/config";
+import logger from "../config/logger";
 
 class FreelancersDAO {
   static freelancers;
@@ -21,10 +22,10 @@ class FreelancersDAO {
     }
     try {
       FreelancersDAO.freelancers = await conn
-        .db(process.env.DB)
+        .db(config.database)
         .collection("freelancers");
       logger.info(
-        `Connected to freelancers collection of ${process.env.DB} database.`,
+        `Connected to freelancers collection of ${config.database} database.`,
         "FreelancersDAO.injectDB()",
       );
     } catch (e) {

@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 
+import config from "../config/config";
 import ApiError from "../error/ApiError";
 
 export const checkAuth = async (req, res, next) => {
@@ -11,7 +12,7 @@ export const checkAuth = async (req, res, next) => {
     } else {
       jwt.verify(
         authorization[1],
-        process.env.ACCESS_TOKEN_SECRET,
+        config.secretToken.accessToken,
         (error, res) => {
           if (error) {
             next(ApiError.forbidden(`Token is not verified: ${error}`));

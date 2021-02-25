@@ -4,9 +4,10 @@ import {
   verifyRefreshToken,
 } from "../helpers/jwt-helper";
 import DAOs from "../dao/index";
-import { mg } from "../helpers/mailgun";
+import mg from "../config/mailgun";
 import { client } from "../utils/redis";
 import ApiError from "../error/ApiError";
+import config from "../config/config";
 import { writeServerResponse } from "../helpers/response";
 import { comparePassword, hashPassword } from "../utils/utils";
 
@@ -98,7 +99,7 @@ export async function refreshToken(req, res, next) {
     const { refreshToken } = req.body;
     const result = await verifyRefreshToken(
       refreshToken,
-      process.env.REFRESH_TOKEN_SECRET,
+      config.secretToken.refreshToken,
     );
     const { aud, role } = result;
     const payload = { role };
@@ -165,16 +166,16 @@ export async function signup(req, res, next) {
         const payload = { role };
         const token = await signToken(_id, payload, "ACTIVATION", "5m");
         const mailOptions = {
-          from: `Glasir <${process.env.COMPANY}>`,
+          from: `Glasir <${config.company}>`,
           to: email,
           subject: "Account activation link",
           body: "Thank you for choosing Glasir !",
           html: `
            		<h1>Please use the following to activate your account</h1>
-           		<p>${process.env.CLIENT_URL}/user/activate/${token}</p>
+           		<p>${config.clientUrl}/user/activate/${token}</p>
            		<hr />
            		<p>This email may contain sensetive information</p>
-           		<p>${process.env.CLIENT_URL}</p>
+           		<p>${config.clientUrl}</p>
            		 `,
         };
         mg.messages().send(mailOptions, (error, body) => {
@@ -210,10 +211,7 @@ export async function signup(req, res, next) {
 export async function activation(req, res, next) {
   try {
     const { token } = req.body;
-    const result = await verifyToken(
-      token,
-      process.env.ACTIVATION_TOKEN_SECRET,
-    );
+    const result = await verifyToken(token, config.secretToken.activationToken);
     if (result.error) {
       next(ApiError.badRequest(result.error));
       return;
@@ -253,7 +251,7 @@ export async function logout(req, res, next) {
     const { refreshToken } = req.body;
     const { aud } = await verifyRefreshToken(
       refreshToken,
-      process.env.REFRESH_TOKEN_SECRET,
+      config.secretToken.refreshToken,
     );
     client.del(aud, (err, val) => {
       if (err) {
@@ -293,15 +291,15 @@ export async function forgotPassword(req, res, next) {
       const payload = { role };
       const token = await signToken(_id, payload, "FORGOT", "5m");
       const mailOptions = {
-        from: `Glasir <${process.env.COMPANY}>`,
+        from: `Glasir <${config.company}>`,
         to: email,
         subject: `Password Reset link`,
         html: `
                     <h1>Please use the following link to reset your password</h1>
-                    <p>${process.env.CLIENT_URL}/user/password-reset/${token}</p>
+                    <p>${config.clientUrl}/user/password-reset/${token}</p>
                     <hr />
                     <p>This email may contain sensetive information</p>
-                    <p>${process.env.CLIENT_URL}</p>
+                    <p>${config.clientUrl}</p>
                 `,
       };
       mg.messages().send(mailOptions, (error, body) => {
@@ -335,7 +333,7 @@ export async function forgotPassword(req, res, next) {
 export async function resetPassword(req, res, next) {
   try {
     const { newPassword, token } = req.body;
-    const result = await verifyToken(token, process.env.FORGOT_TOKEN_SECRET);
+    const result = await verifyToken(token, config.secretToken.forgotToken);
     if (result.error) {
       next(ApiError.badRequest(result.error));
       return;
@@ -476,16 +474,16 @@ export async function changeEmail(req, res, next) {
       const payload = { role };
       const token = await signToken(userId, payload, "ACTIVATION", "5m");
       const mailOptions = {
-        from: `Glasir <${process.env.COMPANY}>`,
+        from: `Glasir <${config.company}>`,
         to: email,
         subject: "Account activation link",
         body: "Thank you for choosing Glasir !",
         html: `
 						 <h1>Please use the following to activate your account</h1>
-						 <p>${process.env.CLIENT_URL}/user/activate/${token}</p>
+						 <p>${config.clientUrl}/user/activate/${token}</p>
 						 <hr />
 						 <p>This email may contain sensetive information</p>
-						 <p>${process.env.CLIENT_URL}</p>
+						 <p>${config.clientUrl}</p>
 							`,
       };
       mg.messages().send(mailOptions, (error, body) => {
@@ -528,16 +526,16 @@ export async function verifyEmail(req, res, next) {
         const payload = { role };
         const token = await signToken(_id, payload, "ACTIVATION", "5m");
         const mailOptions = {
-          from: `Glasir <${process.env.COMPANY}>`,
+          from: `Glasir <${config.company}>`,
           to: email,
           subject: "Account activation link",
           body: "Thank you for choosing Glasir !",
           html: `
            		<h1>Please use the following to activate your account</h1>
-           		<p>${process.env.CLIENT_URL}/user/activate/${token}</p>
+           		<p>${config.clientUrl}/user/activate/${token}</p>
            		<hr />
            		<p>This email may contain sensetive information</p>
-           		<p>${process.env.CLIENT_URL}</p>
+           		<p>${config.clientUrl}</p>
            		 `,
         };
         mg.messages().send(mailOptions, (error, body) => {

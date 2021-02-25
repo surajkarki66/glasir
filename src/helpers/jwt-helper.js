@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import createError from "http-errors";
 
+import config from "../config/config";
 import { client } from "../utils/redis";
 
 export const sign = (payload, secret, options, isRefresh) => {
@@ -37,7 +38,7 @@ export const signToken = (userId, payloadData, type, expiresIn) => {
   switch (type) {
     case "ACCESS":
       payload = payloadData;
-      secret = process.env.ACCESS_TOKEN_SECRET;
+      secret = config.secretToken.accessToken;
       options = {
         expiresIn: expiresIn,
         issuer: "pickurpage.com",
@@ -46,7 +47,7 @@ export const signToken = (userId, payloadData, type, expiresIn) => {
       return sign(payload, secret, options, false);
     case "REFRESH":
       payload = payloadData;
-      secret = process.env.REFRESH_TOKEN_SECRET;
+      secret = config.secretToken.refreshToken;
       options = {
         expiresIn: expiresIn,
         issuer: "pickurpage.com",
@@ -55,7 +56,7 @@ export const signToken = (userId, payloadData, type, expiresIn) => {
       return sign(payload, secret, options, true);
     case "ACTIVATION":
       payload = payloadData;
-      secret = process.env.ACTIVATION_TOKEN_SECRET;
+      secret = config.secretToken.activationToken;
       options = {
         expiresIn: expiresIn,
         issuer: "pickurpage.com",
@@ -65,7 +66,7 @@ export const signToken = (userId, payloadData, type, expiresIn) => {
 
     case "FORGOT":
       payload = payloadData;
-      secret = process.env.FORGOT_TOKEN_SECRET;
+      secret = config.secretToken.forgotToken;
       options = {
         expiresIn: expiresIn,
         issuer: "pickurpage.com",

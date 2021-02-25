@@ -1,4 +1,5 @@
-import logger from "../utils/logger";
+import config from "../config/config";
+import logger from "../config/logger";
 
 class ClientsDAO {
   static clients;
@@ -7,9 +8,9 @@ class ClientsDAO {
       return;
     }
     try {
-      ClientsDAO.clients = await conn.db(process.env.DB).collection("clients");
+      ClientsDAO.clients = await conn.db(config.database).collection("clients");
       logger.info(
-        `Connected to clients collection of ${process.env.DB} database.`,
+        `Connected to clients collection of ${config.database} database.`,
         "ClientsDAO.injectDB()",
       );
     } catch (e) {
