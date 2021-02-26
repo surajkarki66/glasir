@@ -1,7 +1,7 @@
 import { ObjectId } from "bson";
 
-import config from "../config/config";
-import logger from "../config/logger";
+import config from "../configs/config";
+import logger from "../configs/logger";
 
 class FreelancersDAO {
   static freelancers;

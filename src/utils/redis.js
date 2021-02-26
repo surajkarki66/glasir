@@ -1,6 +1,6 @@
 import redis from "redis";
 
-import logger from "../config/logger";
+import logger from "../configs/logger";
 
 const client = redis.createClient();
 

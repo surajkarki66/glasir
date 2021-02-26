@@ -3,11 +3,11 @@ import {
   verifyToken,
   verifyRefreshToken,
 } from "../helpers/jwt-helper";
-import DAOs from "../dao/index";
-import mg from "../config/mailgun";
+import DAOs from "../daos/index";
+import mg from "../configs/mailgun";
 import { client } from "../utils/redis";
-import ApiError from "../error/ApiError";
-import config from "../config/config";
+import ApiError from "../errors/ApiError";
+import config from "../configs/config";
 import { writeServerResponse } from "../helpers/response";
 import { comparePassword, hashPassword } from "../utils/utils";
 

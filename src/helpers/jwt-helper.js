@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import createError from "http-errors";
 
-import config from "../config/config";
+import config from "../configs/config";
 import { client } from "../utils/redis";
 
 export const sign = (payload, secret, options, isRefresh) => {

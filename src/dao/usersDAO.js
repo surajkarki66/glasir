@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 
-import logger from "../config/logger";
-import config from "../config/config";
+import logger from "../configs/logger";
+import config from "../configs/config";
 
 class UsersDAO {
   static #users;

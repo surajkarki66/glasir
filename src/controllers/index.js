@@ -13,7 +13,7 @@ import {
   verifyEmail,
   deleteUser,
   getUserDetails,
-} from "./user";
+} from "./user.controller";
 
 import {
   createFreelancer,
@@ -27,9 +27,9 @@ import {
   updateEmployment,
   verifyPhoneNumber,
   confirmPhoneNumber,
-} from "./freelancer";
+} from "./freelancer.controller";
 
-import { me } from "./common";
+import { me } from "./common.controller";
 
 export const UserController = {
   getUsers,

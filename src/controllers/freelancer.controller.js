@@ -1,10 +1,10 @@
 import { ObjectId } from "bson";
 import parsePhoneNumber from "libphonenumber-js";
 
-import DAOs from "../dao/index";
-import config from "../config/config";
-import ApiError from "../error/ApiError";
-import mb from "../config/messageBird";
+import DAOs from "../daos/index";
+import config from "../configs/config";
+import ApiError from "../errors/ApiError";
+import mb from "../configs/messageBird";
 import { writeServerResponse } from "../helpers/response";
 
 export async function createFreelancer(req, res, next) {
