@@ -19,7 +19,7 @@ router
     permissions.onlyFreelancerCanDoThisAction,
   )
   .post(dataValidation(Schemas.freelancerSchema.createFreelancer, "body"))
-  .post(FreelancerController.createFreelancer);
+  .post(FreelancerController.createFreelancerProfile);
 
 router
   .route("/get-freelancers")
