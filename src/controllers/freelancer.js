@@ -7,7 +7,7 @@ import ApiError from "../error/ApiError";
 import mb from "../config/messageBird";
 import { writeServerResponse } from "../helpers/response";
 
-export async function makeProfile(req, res, next) {
+export async function createFreelancer(req, res, next) {
   try {
     const profileInfo = req.body;
     const { aud } = req.jwt;
@@ -35,7 +35,7 @@ export async function makeProfile(req, res, next) {
         success,
         data,
         statusCode,
-      } = await DAOs.freelancersDAO.createProfile(info);
+      } = await DAOs.freelancersDAO.createFreelancer(info);
       if (success) {
         const serverResponse = {
           status: "success",

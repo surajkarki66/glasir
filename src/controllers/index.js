@@ -16,7 +16,7 @@ import {
 } from "./user";
 
 import {
-  makeProfile,
+  createFreelancer,
   uploadAvatar,
   uploadDocument,
   getFreelancers,
@@ -49,7 +49,7 @@ export const UserController = {
 };
 
 export const FreelancerController = {
-  makeProfile,
+  createFreelancer,
   uploadAvatar,
   uploadDocument,
   getFreelancers,

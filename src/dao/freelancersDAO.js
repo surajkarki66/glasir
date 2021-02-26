@@ -36,11 +36,11 @@ class FreelancersDAO {
       throw e;
     }
   }
-  static async createProfile(profileInfo) {
+  static async createFreelancer(freelancerInfo) {
     try {
       const info = {
-        user: ObjectId(profileInfo.user),
-        ...profileInfo,
+        user: ObjectId(freelancerInfo.user),
+        ...freelancerInfo,
       };
       const result = await FreelancersDAO.freelancers.insertOne(info);
       if (result && result.insertedCount === 1) {
