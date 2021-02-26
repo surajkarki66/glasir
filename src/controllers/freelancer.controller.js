@@ -1,7 +1,7 @@
 import { ObjectId } from "bson";
 import parsePhoneNumber from "libphonenumber-js";
 
-import DAOs from "../daos/index";
+import DAOs from "../dao/index";
 import config from "../configs/config";
 import ApiError from "../errors/ApiError";
 import mb from "../configs/messageBird";
@@ -190,10 +190,10 @@ export async function getFreelancers(req, res, next) {
 export async function searchFreelancer(req, res, next) {
   try {
     let filters = {};
-    const queryArry = Object.keys(req.query);
+    const queryArray = Object.keys(req.query);
     const { page, freelancersPerPage } = req.query;
 
-    queryArry.some((query) => {
+    queryArray.some((query) => {
       if (query === "page" || query === "freelancersPerPage") {
         return false;
       }
@@ -258,7 +258,7 @@ export async function getFreelancerDetails(req, res, next) {
         "application/json",
       );
     }
-    next(ApiError.notfound("Freelancer doesnot exist."));
+    next(ApiError.notfound("Freelancer doesn't exist."));
     return;
   } catch (error) {
     next(ApiError.internal(`Something went wrong: ${error.message}`));

@@ -19,3 +19,5 @@ router
   )
   .post(dataValidation(Schemas.clientSchema.createClient, "body"))
   .post(ClientController.createClientProfile);
+
+export default router;

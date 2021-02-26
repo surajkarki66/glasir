@@ -56,7 +56,6 @@ const MESSAGE_BIRD = {
 };
 
 const NODE_ENV = process.env.NODE_ENV;
-const COMPANY = process.env.COMPANY;
 const CLIENT_URL = process.env.CLIENT_URL;
 const DATABASE = process.env.DATABASE;
 const SERVICE_FEE_RATE = process.env.SERVICE_FEE_RATE;
@@ -68,7 +67,6 @@ const config = {
   mailGun: MAIL_GUN,
   messageBird: MESSAGE_BIRD,
   nodeEnv: NODE_ENV,
-  company: COMPANY,
   clientUrl: CLIENT_URL,
   database: DATABASE,
   feeRate: SERVICE_FEE_RATE,

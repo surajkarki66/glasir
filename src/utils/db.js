@@ -1,6 +1,6 @@
 import MongoClient from "mongodb";
 
-import config from "../config/config";
+import config from "../configs/config";
 
 export const getDB = async () => {
   const client = await MongoClient.connect(

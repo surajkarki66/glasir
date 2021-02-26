@@ -1,5 +1,5 @@
 import DAOs from "../dao/index";
-import ApiError from "../error/ApiError";
+import ApiError from "../errors/ApiError";
 
 export const onlyFreelancerCanDoThisAction = (req, res, next) => {
   const { role } = req.jwt;

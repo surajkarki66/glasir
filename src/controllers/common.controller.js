@@ -1,5 +1,5 @@
 import DAOs from "../dao/index";
-import ApiError from "../error/ApiError";
+import ApiError from "../errors/ApiError";
 import { writeServerResponse } from "../helpers/response";
 
 export async function me(req, res, next) {

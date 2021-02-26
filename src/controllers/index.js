@@ -31,7 +31,7 @@ import {
 
 import { me } from "./common.controller";
 
-import { createClientProfile } from "./client.controllers";
+import { createClientProfile } from "./client.controller";
 
 export const UserController = {
   getUsers,

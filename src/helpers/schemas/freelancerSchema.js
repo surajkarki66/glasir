@@ -27,9 +27,11 @@ const schemas = {
           .required(),
       })
       .required(),
-    phone: Joi.object().keys({
-      phoneNumber: Joi.string().required(),
-    }),
+    phone: Joi.object()
+      .keys({
+        phoneNumber: Joi.string().required(),
+      })
+      .required(),
     citizenship: Joi.string(),
     resume: Joi.string(),
     expertise: Joi.object()

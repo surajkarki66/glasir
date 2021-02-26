@@ -1,7 +1,7 @@
 import app from "./server";
 import DAOs from "./dao/index";
-import config from "./config/config";
-import logger from "./config/logger";
+import config from "./configs/config";
+import logger from "./configs/logger";
 import { getDB } from "./utils/db";
 
 getDB()

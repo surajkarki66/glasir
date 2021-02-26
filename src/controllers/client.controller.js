@@ -1,7 +1,7 @@
 import { ObjectId } from "bson";
 import parsePhoneNumber from "libphonenumber-js";
 
-import DAOs from "../daos/index";
+import DAOs from "../dao/index";
 import ApiError from "../errors/ApiError";
 import { writeServerResponse } from "../helpers/response";
 

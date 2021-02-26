@@ -3,7 +3,7 @@ import {
   verifyToken,
   verifyRefreshToken,
 } from "../helpers/jwt-helper";
-import DAOs from "../daos/index";
+import DAOs from "../dao/index";
 import mg from "../configs/mailgun";
 import { client } from "../utils/redis";
 import ApiError from "../errors/ApiError";
@@ -73,7 +73,7 @@ export async function login(req, res, next) {
     const serverResponse = {
       status: "success",
       data: {
-        message: "Login successfull.",
+        message: "Login successful.",
         accessToken: accessToken,
         refreshToken: refreshToken,
       },
@@ -166,7 +166,7 @@ export async function signup(req, res, next) {
         const payload = { role };
         const token = await signToken(_id, payload, "ACTIVATION", "5m");
         const mailOptions = {
-          from: `Glasir <${config.company}>`,
+          from: "noreply@gmail.com",
           to: email,
           subject: "Account activation link",
           body: "Thank you for choosing Glasir !",
@@ -174,7 +174,7 @@ export async function signup(req, res, next) {
            		<h1>Please use the following to activate your account</h1>
            		<p>${config.clientUrl}/user/activate/${token}</p>
            		<hr />
-           		<p>This email may contain sensetive information</p>
+           		<p>This email may contain sensitive information</p>
            		<p>${config.clientUrl}</p>
            		 `,
         };
@@ -291,14 +291,14 @@ export async function forgotPassword(req, res, next) {
       const payload = { role };
       const token = await signToken(_id, payload, "FORGOT", "5m");
       const mailOptions = {
-        from: `Glasir <${config.company}>`,
+        from: "noreply@gmail.com",
         to: email,
         subject: `Password Reset link`,
         html: `
                     <h1>Please use the following link to reset your password</h1>
                     <p>${config.clientUrl}/user/password-reset/${token}</p>
                     <hr />
-                    <p>This email may contain sensetive information</p>
+                    <p>This email may contain sensitive information</p>
                     <p>${config.clientUrl}</p>
                 `,
       };
@@ -404,7 +404,7 @@ export async function changePassword(req, res, next) {
         return;
       }
     } else {
-      next(ApiError.notfound("User doesnot exist."));
+      next(ApiError.notfound("User doesn't exist."));
       return;
     }
   } catch (error) {
@@ -474,7 +474,7 @@ export async function changeEmail(req, res, next) {
       const payload = { role };
       const token = await signToken(userId, payload, "ACTIVATION", "5m");
       const mailOptions = {
-        from: `Glasir <${config.company}>`,
+        from: "noreply@gmail.com",
         to: email,
         subject: "Account activation link",
         body: "Thank you for choosing Glasir !",
@@ -482,7 +482,7 @@ export async function changeEmail(req, res, next) {
 						 <h1>Please use the following to activate your account</h1>
 						 <p>${config.clientUrl}/user/activate/${token}</p>
 						 <hr />
-						 <p>This email may contain sensetive information</p>
+						 <p>This email may contain sensitive information</p>
 						 <p>${config.clientUrl}</p>
 							`,
       };
@@ -526,7 +526,7 @@ export async function verifyEmail(req, res, next) {
         const payload = { role };
         const token = await signToken(_id, payload, "ACTIVATION", "5m");
         const mailOptions = {
-          from: `Glasir <${config.company}>`,
+          from: "noreply@gmail.com",
           to: email,
           subject: "Account activation link",
           body: "Thank you for choosing Glasir !",
@@ -534,7 +534,7 @@ export async function verifyEmail(req, res, next) {
            		<h1>Please use the following to activate your account</h1>
            		<p>${config.clientUrl}/user/activate/${token}</p>
            		<hr />
-           		<p>This email may contain sensetive information</p>
+           		<p>This email may contain sensitive information</p>
            		<p>${config.clientUrl}</p>
            		 `,
         };
@@ -569,7 +569,7 @@ export async function verifyEmail(req, res, next) {
         );
       }
     } else {
-      next(ApiError.notfound("User doesnot exist."));
+      next(ApiError.notfound("User doesn't exist."));
       return;
     }
   } catch (err) {
@@ -595,7 +595,7 @@ export async function getUserDetails(req, res, next) {
         "application/json",
       );
     } else {
-      next(ApiError.notfound("User doesnot exist."));
+      next(ApiError.notfound("User doesn't exist."));
       return;
     }
   } catch (error) {
@@ -635,7 +635,7 @@ export async function deleteUser(req, res, next) {
       next(ApiError.notfound("User or Freelancer not found."));
       return;
     }
-    next(ApiError.notfound("User doesnot exist."));
+    next(ApiError.notfound("User doesn't exist."));
     return;
   } catch (e) {
     next(ApiError.internal(`Something went wrong: ${e.message}`));

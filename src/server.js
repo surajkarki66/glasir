@@ -2,19 +2,19 @@ import cors from "cors";
 import helmet from "helmet";
 import xss from "xss-clean";
 import hpp from "hpp";
-import mongoSanitize from "express-mongo-sanitize";
-import dotenv from "dotenv";
 import path from "path";
 import express from "express";
 import morgan from "morgan";
 import compression from "compression";
 import cookieParser from "cookie-parser";
+import mongoSanitize from "express-mongo-sanitize";
 
-import config from "./config/config";
-import { apiErrorHandler } from "./error/api-error-handler";
-import userRoutes from "./routes/user";
-import freelancerRoutes from "./routes/freelancer";
-import commonRoutes from "./routes/common";
+import config from "./configs/config";
+import { apiErrorHandler } from "./errors/api-error-handler";
+import userRoutes from "./routes/user.route";
+import freelancerRoutes from "./routes/freelancer.route";
+import commonRoutes from "./routes/common.route";
+import clientRoutes from "./routes/client.route";
 
 const app = express();
 
@@ -72,6 +72,7 @@ app.use(
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/freelancer", freelancerRoutes);
 app.use("/api/v1/common", commonRoutes);
+app.use("/api/v1/client", clientRoutes);
 
 // Error middleware
 app.use(apiErrorHandler);

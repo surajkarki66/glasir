@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
-import config from "../config/config";
-import ApiError from "../error/ApiError";
+import config from "../configs/config";
+import ApiError from "../errors/ApiError";
 
 export const checkAuth = async (req, res, next) => {
   if (req.headers["authorization"]) {

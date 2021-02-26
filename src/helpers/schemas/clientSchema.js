@@ -13,9 +13,11 @@ const schemas = {
       })
       .required(),
     avatar: Joi.string().required(),
-    phone: Joi.object().keys({
-      phoneNumber: Joi.string().required(),
-    }),
+    phone: Joi.object()
+      .keys({
+        phoneNumber: Joi.string().required(),
+      })
+      .required(),
     location: Joi.object()
       .keys({
         country: Joi.string().min(4).max(32).required(),

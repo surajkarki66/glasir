@@ -1,4 +1,4 @@
-import ApiError from "../error/ApiError";
+import ApiError from "../errors/ApiError";
 
 export const onlySameUserCanDoThisAction = (req, res, next) => {
   const userId = req.jwt.aud;

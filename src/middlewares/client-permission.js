@@ -1,4 +1,4 @@
-import ApiError from "../error/ApiError";
+import ApiError from "../errors/ApiError";
 
 export const onlyClientCanDoThisAction = (req, res, next) => {
   const { role } = req.jwt;

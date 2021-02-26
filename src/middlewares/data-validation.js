@@ -1,4 +1,4 @@
-import ApiError from "../error/ApiError";
+import ApiError from "../errors/ApiError";
 
 export const dataValidation = (schema, property) => {
   return async (req, res, next) => {
