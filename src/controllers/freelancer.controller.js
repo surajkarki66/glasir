@@ -7,18 +7,18 @@ import ApiError from "../errors/ApiError";
 import mb from "../configs/messageBird";
 import { writeServerResponse } from "../helpers/response";
 
-export async function createFreelancer(req, res, next) {
+export async function createFreelancerProfile(req, res, next) {
   try {
-    const profileInfo = req.body;
+    const freelancerInfo = req.body;
     const { aud } = req.jwt;
-    const { phone } = profileInfo;
+    const { phone } = freelancerInfo;
 
     const phoneNumber = parsePhoneNumber(phone.phoneNumber);
     if (phoneNumber && phoneNumber.isValid()) {
       const newHourlyRate =
-        profileInfo.hourlyRate - config.feeRate * profileInfo.hourlyRate;
+        freelancerInfo.hourlyRate - config.feeRate * freelancerInfo.hourlyRate;
       const info = {
-        ...profileInfo,
+        ...freelancerInfo,
         user: ObjectId(aud),
         hourlyRate: newHourlyRate,
         phone: { ...phone, isVerified: false },

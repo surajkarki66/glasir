@@ -56,6 +56,11 @@ class ClientsDAO {
       throw error;
     }
   }
+  static async getClientByPhone(phoneNumber) {
+    return await ClientsDAO.clients.findOne({
+      "phone.phoneNumber": phoneNumber,
+    });
+  }
 }
 
 export default ClientsDAO;

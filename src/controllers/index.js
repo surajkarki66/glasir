@@ -16,7 +16,7 @@ import {
 } from "./user.controller";
 
 import {
-  createFreelancer,
+  createFreelancerProfile,
   uploadAvatar,
   uploadDocument,
   getFreelancers,
@@ -30,6 +30,8 @@ import {
 } from "./freelancer.controller";
 
 import { me } from "./common.controller";
+
+import { createClientProfile } from "./client.controllers";
 
 export const UserController = {
   getUsers,
@@ -49,7 +51,7 @@ export const UserController = {
 };
 
 export const FreelancerController = {
-  createFreelancer,
+  createFreelancerProfile,
   uploadAvatar,
   uploadDocument,
   getFreelancers,
@@ -63,3 +65,5 @@ export const FreelancerController = {
 };
 
 export const CommonController = { me };
+
+export const ClientController = { createClientProfile };
