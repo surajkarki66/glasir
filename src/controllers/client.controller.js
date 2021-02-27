@@ -55,3 +55,39 @@ export async function createClientProfile(req, res, next) {
     return;
   }
 }
+
+export async function getClients(req, res, next) {
+  try {
+    const { page, clientsPerPage } = req.query;
+    const {
+      success,
+      data,
+      statusCode,
+      totalNumClients,
+    } = await DAOs.clientsDAO.getClients({
+      page,
+      clientsPerPage,
+    });
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: data,
+        page: Number(page),
+        filters: {},
+        entries_per_page: Number(clientsPerPage),
+        totalResults: totalNumClients,
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    }
+    next(ApiError.notFound("Not found"));
+    return;
+  } catch (e) {
+    next(ApiError.internal(`Something went wrong: ${e.message}`));
+    return;
+  }
+}
