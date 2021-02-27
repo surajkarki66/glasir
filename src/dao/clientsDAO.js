@@ -58,6 +58,44 @@ class ClientsDAO {
       throw error;
     }
   }
+  static async getClients({ page = 0, clientsPerPage = 10, filter = {} } = {}) {
+    const sort = ClientsDAO.DEFAULT_SORT;
+    const projection = {};
+    let cursor;
+    try {
+      cursor = await ClientsDAO.clients
+        .find(filter)
+        .project(projection)
+        .sort(sort);
+    } catch (e) {
+      logger.error(`Unable to issue find command, ${e.message}`);
+      return {
+        success: false,
+        data: [],
+        totalNumClients: 0,
+        statusCode: 404,
+      };
+    }
+    const displayCursor = cursor
+      .skip(parseInt(page) * parseInt(clientsPerPage))
+      .limit(parseInt(clientsPerPage));
+    try {
+      const documents = await displayCursor.toArray();
+      const totalNumClients =
+        parseInt(page) === 0 ? await ClientsDAO.clients.countDocuments({}) : 0;
+      return {
+        success: true,
+        data: documents,
+        totalNumClients,
+        statusCode: documents.length > 0 ? 200 : 404,
+      };
+    } catch (e) {
+      logger.error(
+        `Unable to convert cursor to array or problem counting documents, ${e.message}`,
+      );
+      throw e;
+    }
+  }
   static async getClientByPhone(phoneNumber) {
     return await ClientsDAO.clients.findOne({
       "phone.phoneNumber": phoneNumber,

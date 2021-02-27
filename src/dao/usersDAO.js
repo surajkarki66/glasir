@@ -150,7 +150,7 @@ class UsersDAO {
         return {
           success: false,
           data: {
-            error: "No user exist with this userid.",
+            error: "No user exist with this userId.",
           },
           statusCode: 404,
         };
@@ -173,7 +173,7 @@ class UsersDAO {
         return {
           success: false,
           data: {
-            error: "No user exist with this userid.",
+            error: "No user exist with this userId.",
           },
           statusCode: 404,
         };
