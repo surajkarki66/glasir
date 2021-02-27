@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 const schemas = {
-  createClient: Joi.object().keys({
+  clientCREATE: Joi.object().keys({
     firstName: Joi.string().min(2).max(32).required(),
     lastName: Joi.string().min(2).max(32).required(),
     company: Joi.object()
@@ -26,6 +26,10 @@ const schemas = {
         zip: Joi.number().integer(),
       })
       .required(),
+  }),
+  clientLIST: Joi.object().keys({
+    page: Joi.number().min(0).required(),
+    clientsPerPage: Joi.number().min(1).required(),
   }),
 };
 

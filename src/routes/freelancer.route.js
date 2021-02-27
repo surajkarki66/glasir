@@ -18,7 +18,7 @@ router
     permissions.onlyActiveUserCanDoThisAction,
     permissions.onlyFreelancerCanDoThisAction,
   )
-  .post(dataValidation(Schemas.freelancerSchema.createFreelancer, "body"))
+  .post(dataValidation(Schemas.freelancerSchema.freelancerCREATE, "body"))
   .post(FreelancerController.createFreelancerProfile);
 
 router

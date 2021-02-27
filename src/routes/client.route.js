@@ -17,7 +17,14 @@ router
     permissions.onlyActiveUserCanDoThisAction,
     permissions.onlyClientCanDoThisAction,
   )
-  .post(dataValidation(Schemas.clientSchema.createClient, "body"))
+  .post(dataValidation(Schemas.clientSchema.clientCREATE, "body"))
   .post(ClientController.createClientProfile);
+
+router
+  .route("/get-clients")
+  .get(authValidation.checkAuth)
+  .get(permissions.onlyAdminCanDoThisAction)
+  .get(dataValidation(Schemas.clientSchema.clientLIST, "query"))
+  .get(ClientController.getClients);
 
 export default router;

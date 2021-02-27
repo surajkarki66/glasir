@@ -31,7 +31,7 @@ import {
 
 import { me } from "./common.controller";
 
-import { createClientProfile } from "./client.controller";
+import { createClientProfile, getClients } from "./client.controller";
 
 export const UserController = {
   getUsers,
@@ -66,4 +66,4 @@ export const FreelancerController = {
 
 export const CommonController = { me };
 
-export const ClientController = { createClientProfile };
+export const ClientController = { createClientProfile, getClients };
