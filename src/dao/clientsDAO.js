@@ -150,6 +150,39 @@ class ClientsDAO {
       throw e;
     }
   }
+  static async me(userId) {
+    try {
+      const pipeline = [
+        {
+          $match: {
+            user: ObjectId(userId),
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        { $addFields: { user: { $arrayElemAt: ["$user", 0] } } },
+        { $project: { "user.password": 0 } },
+      ];
+      const profile = await ClientsDAO.clients.aggregate(pipeline).next();
+      let profileObj;
+
+      if (profile) {
+        profileObj = { success: true, data: profile, statusCode: 200 };
+        return profileObj;
+      }
+      profileObj = { success: false, data: {}, statusCode: 404 };
+      return profileObj;
+    } catch (e) {
+      logger.error(`Something went wrong: ${e}`);
+      throw e;
+    }
+  }
 }
 
 export default ClientsDAO;
