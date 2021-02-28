@@ -91,3 +91,29 @@ export async function getClients(req, res, next) {
     return;
   }
 }
+export async function getClientDetails(req, res, next) {
+  try {
+    const { clientId } = req.params;
+    const { success, data, statusCode } = await DAOs.clientsDAO.getClientById(
+      clientId,
+    );
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: { ...data, password: null },
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    } else {
+      next(ApiError.notfound("Client doesn't exist."));
+      return;
+    }
+  } catch (error) {
+    next(ApiError.internal("Something went wrong: ", error.messages));
+    return;
+  }
+}

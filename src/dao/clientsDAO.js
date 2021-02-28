@@ -101,6 +101,55 @@ class ClientsDAO {
       "phone.phoneNumber": phoneNumber,
     });
   }
+  static async getClientById(id) {
+    try {
+      const pipeline = [
+        { $match: { _id: ObjectId(id) } },
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        {
+          $addFields: {
+            user: { $arrayElemAt: ["$user", 0] },
+          },
+        },
+        {
+          $project: {
+            "user.password": 0,
+            "user.role": 0,
+          },
+        },
+      ];
+
+      const client = await ClientsDAO.clients.aggregate(pipeline).next();
+      if (client) {
+        return {
+          success: true,
+          data: client,
+          statusCode: 200,
+        };
+      } else {
+        const message = "No document matching id: " + id + " could be found!";
+        logger.error(message, "getClientById()");
+        return {
+          success: false,
+          data: {},
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Unable to convert cursor to array or problem counting documents, ${e.message}`,
+        "getClientById()",
+      );
+      throw e;
+    }
+  }
 }
 
 export default ClientsDAO;

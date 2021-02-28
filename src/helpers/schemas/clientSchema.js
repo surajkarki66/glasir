@@ -31,6 +31,9 @@ const schemas = {
     page: Joi.number().min(0).required(),
     clientsPerPage: Joi.number().min(1).required(),
   }),
+  clientDETAILS: Joi.object().keys({
+    clientId: Joi.string().length(24).hex().required(),
+  }),
 };
 
 export default schemas;

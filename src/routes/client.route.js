@@ -27,4 +27,10 @@ router
   .get(dataValidation(Schemas.clientSchema.clientLIST, "query"))
   .get(ClientController.getClients);
 
+router
+  .route("/:clientId")
+  .get(authValidation.checkAuth)
+  .get(dataValidation(Schemas.clientSchema.clientDETAILS, "params"))
+  .get(ClientController.getClientDetails);
+
 export default router;
