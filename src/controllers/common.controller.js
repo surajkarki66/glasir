@@ -6,7 +6,9 @@ export async function me(req, res, next) {
   try {
     const { aud, role } = req.jwt;
     const { success, data, statusCode } =
-      role === "freelancer" ? await DAOs.freelancersDAO.me(aud) : null;
+      role === "freelancer"
+        ? await DAOs.freelancersDAO.me(aud)
+        : await DAOs.clientsDAO.me(aud);
     if (success) {
       const serverResponse = {
         status: "success",
