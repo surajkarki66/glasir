@@ -46,7 +46,7 @@ router
       .fileUpload("../../../public/uploads/", ["image/jpeg", "image/jpg"])
       .single("avatar"),
   )
-  .post(FreelancerController.uploadAvatar);
+  .post(FreelancerController.uploadFreelancerAvatar);
 
 router
   .route("/upload-doc/:freelancerId")

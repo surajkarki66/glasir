@@ -62,7 +62,7 @@ export async function createFreelancerProfile(req, res, next) {
     return;
   }
 }
-export async function uploadAvatar(req, res, next) {
+export async function uploadFreelancerAvatar(req, res, next) {
   try {
     const file = req.file;
     if (!file) {

@@ -17,7 +17,7 @@ import {
 
 import {
   createFreelancerProfile,
-  uploadAvatar,
+  uploadFreelancerAvatar,
   uploadDocument,
   getFreelancers,
   searchFreelancer,
@@ -58,7 +58,7 @@ export const UserController = {
 
 export const FreelancerController = {
   createFreelancerProfile,
-  uploadAvatar,
+  uploadFreelancerAvatar,
   uploadDocument,
   getFreelancers,
   searchFreelancer,
