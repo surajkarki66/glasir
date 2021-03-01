@@ -6,6 +6,7 @@ import {
   dataValidation,
   authValidation,
   permissions,
+  file,
 } from "../middlewares/index";
 
 const router = new Router();
@@ -43,5 +44,20 @@ router
   )
   .patch(dataValidation(Schemas.clientSchema.clientUPDATE, "body"))
   .patch(ClientController.changeClientDetails);
+
+router
+  .route("/upload-avatar/:clientId")
+  .post(authValidation.checkAuth)
+  .post(dataValidation(Schemas.clientSchema.avatarUPLOAD, "params"))
+  .post(
+    permissions.onlyClientCanDoThisAction,
+    permissions.onlySameClientCanDoThisAction,
+  )
+  .post(
+    file
+      .fileUpload("../../../public/uploads/", ["image/jpeg", "image/jpg"])
+      .single("avatar"),
+  )
+  .post(ClientController.uploadClientAvatar);
 
 export default router;

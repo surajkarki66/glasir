@@ -36,6 +36,7 @@ import {
   getClients,
   getClientDetails,
   changeClientDetails,
+  uploadClientAvatar,
 } from "./client.controller";
 
 export const UserController = {
@@ -76,4 +77,5 @@ export const ClientController = {
   getClients,
   getClientDetails,
   changeClientDetails,
+  uploadClientAvatar,
 };

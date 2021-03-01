@@ -53,6 +53,9 @@ const schemas = {
       zip: Joi.number().integer(),
     }),
   }),
+  avatarUPLOAD: Joi.object().keys({
+    clientId: Joi.string().length(24).hex().required(),
+  }),
 };
 
 export default schemas;
