@@ -117,3 +117,45 @@ export async function getClientDetails(req, res, next) {
     return;
   }
 }
+
+export async function changeClientDetails(req, res, next) {
+  try {
+    const { clientId } = req.params;
+    const { phone } = req.body;
+    let clientDetails = {
+      ...req.body,
+      isVerified: false,
+      updatedAt: new Date(),
+    };
+    if (phone) {
+      clientDetails = {
+        ...req.body,
+        isVerified: false,
+        phone: { ...phone, isVerified: false },
+        updatedAt: new Date(),
+      };
+    }
+    const { success, data, statusCode } = await DAOs.clientsDAO.updateClient(
+      clientId,
+      clientDetails,
+    );
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: { message: "Updated successfully." },
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    } else {
+      next(ApiError.notfound(data.error));
+      return;
+    }
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}

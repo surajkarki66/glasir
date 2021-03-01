@@ -34,6 +34,25 @@ const schemas = {
   clientDETAILS: Joi.object().keys({
     clientId: Joi.string().length(24).hex().required(),
   }),
+  clientUPDATE: Joi.object().keys({
+    firstName: Joi.string().min(2).max(32),
+    lastName: Joi.string().min(2).max(32),
+    company: Joi.object().keys({
+      name: Joi.string().min(2).max(32),
+      website: Joi.string().min(10).max(32),
+      tagline: Joi.string().min(2).max(32),
+      description: Joi.string().min(5).max(200),
+    }),
+    phone: Joi.object().keys({
+      phoneNumber: Joi.string().required(),
+    }),
+    location: Joi.object().keys({
+      country: Joi.string().min(4).max(32),
+      street: Joi.string().min(5).max(70),
+      city: Joi.string().min(5).max(70),
+      zip: Joi.number().integer(),
+    }),
+  }),
 };
 
 export default schemas;

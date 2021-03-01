@@ -4,13 +4,16 @@ import config from "../configs/config";
 import logger from "../configs/logger";
 
 class ClientsDAO {
-  static clients;
+  static #clients;
+  static #DEFAULT_SORT = [["firstName", -1]];
   static async injectDB(conn) {
-    if (ClientsDAO.clients) {
+    if (ClientsDAO.#clients) {
       return;
     }
     try {
-      ClientsDAO.clients = await conn.db(config.database).collection("clients");
+      ClientsDAO.#clients = await conn
+        .db(config.database)
+        .collection("clients");
       logger.info(
         `Connected to clients collection of ${config.database} database.`,
         "ClientsDAO.injectDB()",
@@ -29,7 +32,7 @@ class ClientsDAO {
         user: ObjectId(clientInfo.user),
         ...clientInfo,
       };
-      const result = await ClientsDAO.clients.insertOne(info);
+      const result = await ClientsDAO.#clients.insertOne(info);
       if (result && result.insertedCount === 1) {
         const data = result.ops[0];
         return {
@@ -59,11 +62,11 @@ class ClientsDAO {
     }
   }
   static async getClients({ page = 0, clientsPerPage = 10, filter = {} } = {}) {
-    const sort = ClientsDAO.DEFAULT_SORT;
+    const sort = ClientsDAO.#DEFAULT_SORT;
     const projection = {};
     let cursor;
     try {
-      cursor = await ClientsDAO.clients
+      cursor = await ClientsDAO.#clients
         .find(filter)
         .project(projection)
         .sort(sort);
@@ -82,7 +85,7 @@ class ClientsDAO {
     try {
       const documents = await displayCursor.toArray();
       const totalNumClients =
-        parseInt(page) === 0 ? await ClientsDAO.clients.countDocuments({}) : 0;
+        parseInt(page) === 0 ? await ClientsDAO.#clients.countDocuments({}) : 0;
       return {
         success: true,
         data: documents,
@@ -97,7 +100,7 @@ class ClientsDAO {
     }
   }
   static async getClientByPhone(phoneNumber) {
-    return await ClientsDAO.clients.findOne({
+    return await ClientsDAO.#clients.findOne({
       "phone.phoneNumber": phoneNumber,
     });
   }
@@ -126,7 +129,7 @@ class ClientsDAO {
         },
       ];
 
-      const client = await ClientsDAO.clients.aggregate(pipeline).next();
+      const client = await ClientsDAO.#clients.aggregate(pipeline).next();
       if (client) {
         return {
           success: true,
@@ -169,7 +172,7 @@ class ClientsDAO {
         { $addFields: { user: { $arrayElemAt: ["$user", 0] } } },
         { $project: { "user.password": 0 } },
       ];
-      const profile = await ClientsDAO.clients.aggregate(pipeline).next();
+      const profile = await ClientsDAO.#clients.aggregate(pipeline).next();
       let profileObj;
 
       if (profile) {
@@ -180,6 +183,44 @@ class ClientsDAO {
       return profileObj;
     } catch (e) {
       logger.error(`Something went wrong: ${e}`);
+      throw e;
+    }
+  }
+  static async updateClient(clientId, updateObject) {
+    try {
+      const result = await ClientsDAO.#clients.updateOne(
+        {
+          _id: ObjectId(clientId),
+        },
+        {
+          $set: updateObject,
+        },
+      );
+      if (
+        (result.modifiedCount === 1 && result.matchedCount === 1) ||
+        result.matchedCount === 1
+      ) {
+        return {
+          success: true,
+          data: {
+            message: "Updated successfully.",
+          },
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No client exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while updating client, ${e}`,
+        "updateClient()",
+      );
       throw e;
     }
   }
