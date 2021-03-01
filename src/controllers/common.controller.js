@@ -23,7 +23,7 @@ export async function me(req, res, next) {
       );
     }
     const serverResponse = {
-      status: "false",
+      status: "failed",
       isAuthenticated: true,
       role: role,
       data: data,

@@ -229,6 +229,34 @@ class ClientsDAO {
       throw e;
     }
   }
+  static async deleteClientByUserId(userId) {
+    try {
+      const result = await ClientsDAO.#clients.deleteOne({
+        user: ObjectId(userId),
+      });
+      if (result.deletedCount === 1) {
+        return {
+          success: true,
+          data: { message: "Deleted successfully." },
+          statusCode: 200,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No client exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while deleting user, ${e}`,
+        "deleteClient()",
+      );
+      throw e;
+    }
+  }
 }
 
 export default ClientsDAO;

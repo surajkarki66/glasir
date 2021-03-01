@@ -84,7 +84,7 @@ router
 router
   .route("/delete/:userId")
   .delete(authValidation.checkAuth)
-  .delete(permissions.onlySameUserOrAdminCanDoThisAction)
+  .delete(permissions.onlySameUserCanDoThisAction)
   .delete(dataValidation(Schemas.userSchema.userDELETE, "body"))
   .delete(UserController.deleteUser);
 

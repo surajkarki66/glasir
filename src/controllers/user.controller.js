@@ -607,6 +607,7 @@ export async function deleteUser(req, res, next) {
   try {
     const { password } = req.body;
     const { userId } = req.params;
+    const { role } = req.jwt;
     const { success, data } = await DAOs.usersDAO.getUserById(userId);
     if (success) {
       const actualPassword = data.password;
@@ -616,10 +617,11 @@ export async function deleteUser(req, res, next) {
         return;
       }
       const deleteUser = DAOs.usersDAO.deleteUser(userId);
-      const deleteFreelancer = DAOs.freelancersDAO.deleteFreelancerByUserId(
-        userId,
-      );
-      const result = await Promise.all([deleteUser, deleteFreelancer]);
+      const deleteFreelancerOrClient =
+        role === "freelancer"
+          ? DAOs.freelancersDAO.deleteFreelancerByUserId(userId)
+          : DAOs.clientsDAO.deleteClientByUserId(userId);
+      const result = await Promise.all([deleteUser, deleteFreelancerOrClient]);
       if (result) {
         const serverResponse = {
           status: "success",
@@ -632,7 +634,7 @@ export async function deleteUser(req, res, next) {
           "application/json",
         );
       }
-      next(ApiError.notfound("User or Freelancer not found."));
+      next(ApiError.notfound("User or Freelancer or Client not found."));
       return;
     }
     next(ApiError.notfound("User doesn't exist."));
