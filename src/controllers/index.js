@@ -25,8 +25,8 @@ import {
   changeFreelancerDetails,
   addEmployment,
   updateEmployment,
-  verifyPhoneNumber,
-  confirmPhoneNumber,
+  verifyFreelancerPhoneNumber,
+  confirmFreelancerPhoneNumber,
 } from "./freelancer.controller";
 
 import { me } from "./common.controller";
@@ -37,6 +37,8 @@ import {
   getClientDetails,
   changeClientDetails,
   uploadClientAvatar,
+  verifyClientPhoneNumber,
+  confirmClientPhoneNumber,
 } from "./client.controller";
 
 export const UserController = {
@@ -66,8 +68,8 @@ export const FreelancerController = {
   changeFreelancerDetails,
   addEmployment,
   updateEmployment,
-  verifyPhoneNumber,
-  confirmPhoneNumber,
+  verifyFreelancerPhoneNumber,
+  confirmFreelancerPhoneNumber,
 };
 
 export const CommonController = { me };
@@ -78,4 +80,6 @@ export const ClientController = {
   getClientDetails,
   changeClientDetails,
   uploadClientAvatar,
+  verifyClientPhoneNumber,
+  confirmClientPhoneNumber,
 };

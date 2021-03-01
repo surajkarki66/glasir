@@ -370,7 +370,7 @@ export async function updateEmployment(req, res, next) {
   }
 }
 
-export async function verifyPhoneNumber(req, res, next) {
+export async function verifyFreelancerPhoneNumber(req, res, next) {
   try {
     const { phoneNumber } = req.body;
     const params = {
@@ -400,7 +400,7 @@ export async function verifyPhoneNumber(req, res, next) {
   }
 }
 
-export async function confirmPhoneNumber(req, res, next) {
+export async function confirmFreelancerPhoneNumber(req, res, next) {
   try {
     const { id, token, freelancerId } = req.body;
     mb.verify.verify(id, token, function (err, response) {

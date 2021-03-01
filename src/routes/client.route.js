@@ -60,4 +60,22 @@ router
   )
   .post(ClientController.uploadClientAvatar);
 
+router
+  .route("/verify-phone-number")
+  .post(authValidation.checkAuth)
+  .post(permissions.onlyClientCanDoThisAction)
+  .post(dataValidation(Schemas.clientSchema.phoneNumberVERIFY, "body"))
+  .post(ClientController.verifyClientPhoneNumber);
+
+router
+  .route("/confirm-phone-number")
+  .post(dataValidation(Schemas.clientSchema.phoneNumberCONFIRM, "body"))
+  .post(authValidation.checkAuth)
+  .post(
+    permissions.onlyActiveUserCanDoThisAction,
+    permissions.onlyClientCanDoThisAction,
+    permissions.onlySameClientCanDoThisAction,
+  )
+  .post(ClientController.confirmClientPhoneNumber);
+
 export default router;

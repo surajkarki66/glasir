@@ -2,6 +2,7 @@ import { ObjectId } from "bson";
 import parsePhoneNumber from "libphonenumber-js";
 
 import DAOs from "../dao/index";
+import mb from "../configs/messageBird";
 import ApiError from "../errors/ApiError";
 import { writeServerResponse } from "../helpers/response";
 
@@ -190,6 +191,78 @@ export async function uploadClientAvatar(req, res, next) {
     }
   } catch (error) {
     next(ApiError.internal(`Something went wrong. ${error.message}`));
+    return;
+  }
+}
+
+export async function verifyClientPhoneNumber(req, res, next) {
+  try {
+    const { phoneNumber } = req.body;
+    const params = {
+      originator: "Glasir",
+      type: "sms",
+    };
+    mb.verify.create(phoneNumber, params, function (err, response) {
+      if (err) {
+        const { statusCode } = err;
+        if (statusCode === 422) {
+          next(ApiError.unprocessable("Invalid phone number."));
+          return;
+        }
+        next(ApiError.internal(`Something went wrong: ${err.message}`));
+        return;
+      }
+
+      const serverResponse = {
+        status: "success",
+        data: { message: "Verification code sent.", id: response.id },
+      };
+      return writeServerResponse(res, serverResponse, 200, "application/json");
+    });
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+
+export async function confirmClientPhoneNumber(req, res, next) {
+  try {
+    const { id, token, clientId } = req.body;
+    mb.verify.verify(id, token, function (err, response) {
+      if (err) {
+        const { statusCode } = err;
+        if (statusCode === 422) {
+          next(ApiError.unprocessable("The verification code is expired."));
+          return;
+        }
+        if (statusCode === 404) {
+          next(ApiError.notFound("The verification id is not found."));
+          return;
+        }
+        next(ApiError.internal(`Something went wrong`));
+        return;
+      }
+      const updateObject = { "phone.isVerified": true, updatedAt: new Date() };
+      DAOs.clientsDAO.updateClient(clientId, updateObject).then((response) => {
+        const { success, statusCode, data } = response;
+        if (success) {
+          const serverResponse = {
+            status: "success",
+            data: { message: "Phone number is verified." },
+          };
+          return writeServerResponse(
+            res,
+            serverResponse,
+            statusCode,
+            "application/json",
+          );
+        }
+        next(ApiError.notfound(data.error));
+        return;
+      });
+    });
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
     return;
   }
 }

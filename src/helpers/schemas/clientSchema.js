@@ -56,6 +56,14 @@ const schemas = {
   avatarUPLOAD: Joi.object().keys({
     clientId: Joi.string().length(24).hex().required(),
   }),
+  phoneNumberVERIFY: Joi.object().keys({
+    phoneNumber: Joi.string().required(),
+  }),
+  phoneNumberCONFIRM: Joi.object().keys({
+    token: Joi.string().required(),
+    id: Joi.string().required(),
+    clientId: Joi.string().length(24).hex().required(),
+  }),
 };
 
 export default schemas;

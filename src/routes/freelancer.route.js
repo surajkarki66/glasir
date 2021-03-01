@@ -111,8 +111,9 @@ router
 router
   .route("/verify-phone-number")
   .post(authValidation.checkAuth)
+  .post(permissions.onlyClientCanDoThisAction)
   .post(dataValidation(Schemas.freelancerSchema.phoneNumberVERIFY, "body"))
-  .post(FreelancerController.verifyPhoneNumber);
+  .post(FreelancerController.verifyFreelancerPhoneNumber);
 
 router
   .route("/confirm-phone-number")
@@ -123,6 +124,6 @@ router
     permissions.onlyFreelancerCanDoThisAction,
     permissions.onlySameFreelancerCanDoThisAction,
   )
-  .post(FreelancerController.confirmPhoneNumber);
+  .post(FreelancerController.confirmFreelancerPhoneNumber);
 
 export default router;
