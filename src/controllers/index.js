@@ -35,6 +35,7 @@ import {
   createClientProfile,
   getClients,
   getClientDetails,
+  changeClientDetails,
 } from "./client.controller";
 
 export const UserController = {
@@ -74,4 +75,5 @@ export const ClientController = {
   createClientProfile,
   getClients,
   getClientDetails,
+  changeClientDetails,
 };

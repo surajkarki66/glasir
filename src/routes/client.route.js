@@ -33,4 +33,15 @@ router
   .get(dataValidation(Schemas.clientSchema.clientDETAILS, "params"))
   .get(ClientController.getClientDetails);
 
+router
+  .route("/update-profile/:clientId")
+  .patch(authValidation.checkAuth)
+  .patch(
+    permissions.onlyActiveUserCanDoThisAction,
+    permissions.onlyClientCanDoThisAction,
+    permissions.onlySameClientCanDoThisAction,
+  )
+  .patch(dataValidation(Schemas.clientSchema.clientUPDATE, "body"))
+  .patch(ClientController.changeClientDetails);
+
 export default router;

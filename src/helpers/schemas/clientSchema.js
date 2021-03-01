@@ -38,7 +38,7 @@ const schemas = {
     firstName: Joi.string().min(2).max(32),
     lastName: Joi.string().min(2).max(32),
     company: Joi.object().keys({
-      name: Joi.string().min(2).max(32),
+      name: Joi.string().min(2).max(32).required(),
       website: Joi.string().min(10).max(32),
       tagline: Joi.string().min(2).max(32),
       description: Joi.string().min(5).max(200),
@@ -47,7 +47,7 @@ const schemas = {
       phoneNumber: Joi.string().required(),
     }),
     location: Joi.object().keys({
-      country: Joi.string().min(4).max(32),
+      country: Joi.string().min(4).max(32).required(),
       street: Joi.string().min(5).max(70),
       city: Joi.string().min(5).max(70),
       zip: Joi.number().integer(),

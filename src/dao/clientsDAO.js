@@ -104,6 +104,11 @@ class ClientsDAO {
       "phone.phoneNumber": phoneNumber,
     });
   }
+  static async getClientByUserId(userId) {
+    return await ClientsDAO.#clients.findOne({
+      user: ObjectId(userId),
+    });
+  }
   static async getClientById(id) {
     try {
       const pipeline = [

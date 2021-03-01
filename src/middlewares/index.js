@@ -11,7 +11,10 @@ import {
   onlySameFreelancerCanDoThisAction,
 } from "./freelancer-permission";
 
-import { onlyClientCanDoThisAction } from "./client-permission";
+import {
+  onlyClientCanDoThisAction,
+  onlySameClientCanDoThisAction,
+} from "./client-permission";
 
 import { checkAuth } from "./auth-validation";
 import { dataValidation } from "./data-validation";
@@ -26,6 +29,7 @@ export const permissions = {
   onlyActiveUserCanDoThisAction,
   noAdminCanDoThisAction,
   onlyClientCanDoThisAction,
+  onlySameClientCanDoThisAction,
 };
 export const authValidation = { checkAuth };
 export const file = { fileUpload };
