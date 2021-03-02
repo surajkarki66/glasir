@@ -1,6 +1,6 @@
 import ApiError from "../errors/ApiError";
 
-export const onlySameUserCanDoThisAction = (req, res, next) => {
+const onlySameUserCanDoThisAction = (req, res, next) => {
   const userId = req.jwt.aud;
   if (req.params && req.params.userId === userId) {
     return next();
@@ -15,7 +15,7 @@ export const onlySameUserCanDoThisAction = (req, res, next) => {
     return;
   }
 };
-export const onlySameUserOrAdminCanDoThisAction = (req, res, next) => {
+const onlySameUserOrAdminCanDoThisAction = (req, res, next) => {
   const role = req.jwt.role;
   const userId = req.jwt.aud;
   if (req.params && req.params.userId === userId) {
@@ -38,7 +38,7 @@ export const onlySameUserOrAdminCanDoThisAction = (req, res, next) => {
   }
 };
 
-export const onlyAdminCanDoThisAction = (req, res, next) => {
+const onlyAdminCanDoThisAction = (req, res, next) => {
   const role = req.jwt.role;
   if (role === "admin") {
     return next();
@@ -48,7 +48,7 @@ export const onlyAdminCanDoThisAction = (req, res, next) => {
   }
 };
 
-export const onlyActiveUserCanDoThisAction = (req, res, next) => {
+const onlyActiveUserCanDoThisAction = (req, res, next) => {
   const { isActive } = req.jwt;
   if (isActive) {
     return next();
@@ -61,11 +61,19 @@ export const onlyActiveUserCanDoThisAction = (req, res, next) => {
   return;
 };
 
-export const noAdminCanDoThisAction = (req, res, next) => {
+const noAdminCanDoThisAction = (req, res, next) => {
   const { role } = req.jwt;
   if (role === "admin") {
     next(ApiError.forbidden("Access denied: No admin can do this action"));
     return;
   }
   return next();
+};
+
+export default {
+  onlySameUserCanDoThisAction,
+  onlyAdminCanDoThisAction,
+  onlySameUserOrAdminCanDoThisAction,
+  onlyActiveUserCanDoThisAction,
+  noAdminCanDoThisAction,
 };

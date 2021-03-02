@@ -1,20 +1,19 @@
 import { Router } from "express";
 
-import { CommonController } from "../controllers/index";
-import {
-  authValidation,
-  permissions,
-  dataValidation,
-} from "../middlewares/index";
-import { Schemas } from "../helpers/schemas/index";
+import Schemas from "../helpers/schemas/index";
+import CommonController from "../controllers/common.controller";
+import validations, { permissions } from "../middlewares/index";
 
 const router = new Router();
 
+const { checkAuth, dataValidation } = validations;
+const { authPermissions } = permissions;
+
 router
   .route("/me")
-  .get(authValidation.checkAuth)
+  .get(checkAuth)
   .get(dataValidation(Schemas.commonSchema.commonME, "body"))
-  .get(permissions.onlySameUserCanDoThisAction)
+  .get(authPermissions.onlySameUserCanDoThisAction)
   .get(CommonController.me);
 
 export default router;

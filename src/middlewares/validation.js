@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import config from "../configs/config";
 import ApiError from "../errors/ApiError";
 
-export const checkAuth = async (req, res, next) => {
+const checkAuth = async (req, res, next) => {
   if (req.headers["authorization"]) {
     const authorization = req.headers["authorization"].split(" ");
     if (authorization[0] !== "Bearer") {
@@ -28,3 +28,20 @@ export const checkAuth = async (req, res, next) => {
     return;
   }
 };
+
+const dataValidation = (schema, property) => {
+  return async (req, res, next) => {
+    try {
+      const value = await schema.validateAsync(req[property]);
+      req[property] = value;
+      next();
+    } catch (err) {
+      const { details } = err;
+      const message = details.map((i) => i.message).join(",");
+      next(ApiError.badRequest(message));
+      return;
+    }
+  };
+};
+
+export default { dataValidation, checkAuth };

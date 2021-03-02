@@ -1,7 +1,7 @@
 import DAOs from "../dao/index";
 import ApiError from "../errors/ApiError";
 
-export const onlyFreelancerCanDoThisAction = (req, res, next) => {
+const onlyFreelancerCanDoThisAction = (req, res, next) => {
   const { role } = req.jwt;
   if (role === "freelancer") {
     return next();
@@ -10,7 +10,7 @@ export const onlyFreelancerCanDoThisAction = (req, res, next) => {
   return;
 };
 
-export const onlySameFreelancerCanDoThisAction = async (req, res, next) => {
+const onlySameFreelancerCanDoThisAction = async (req, res, next) => {
   const { aud } = req.jwt;
   const freelancerId = req.params.freelancerId || req.body.freelancerId;
   const result = await DAOs.freelancersDAO.getFreelancerByUserId(aud);
@@ -23,4 +23,9 @@ export const onlySameFreelancerCanDoThisAction = async (req, res, next) => {
     ),
   );
   return;
+};
+
+export default {
+  onlyFreelancerCanDoThisAction,
+  onlySameFreelancerCanDoThisAction,
 };

@@ -1,36 +1,17 @@
-import {
-  onlySameUserCanDoThisAction,
-  onlyAdminCanDoThisAction,
-  onlySameUserOrAdminCanDoThisAction,
-  onlyActiveUserCanDoThisAction,
-  noAdminCanDoThisAction,
-} from "./auth-permission";
+import fileUpload from "./upload";
 
-import {
-  onlyFreelancerCanDoThisAction,
-  onlySameFreelancerCanDoThisAction,
-} from "./freelancer-permission";
+import authPermissions from "./auth-permission";
+import freelancerPermissions from "./freelancer-permission";
+import clientPermissions from "./client-permission";
 
-import {
-  onlyClientCanDoThisAction,
-  onlySameClientCanDoThisAction,
-} from "./client-permission";
-
-import { checkAuth } from "./auth-validation";
-import { dataValidation } from "./data-validation";
-import { fileUpload } from "./upload";
+import validations from "./validation";
 
 export const permissions = {
-  onlySameUserCanDoThisAction,
-  onlyAdminCanDoThisAction,
-  onlySameUserOrAdminCanDoThisAction,
-  onlyFreelancerCanDoThisAction,
-  onlySameFreelancerCanDoThisAction,
-  onlyActiveUserCanDoThisAction,
-  noAdminCanDoThisAction,
-  onlyClientCanDoThisAction,
-  onlySameClientCanDoThisAction,
+  authPermissions,
+  freelancerPermissions,
+  clientPermissions,
 };
-export const authValidation = { checkAuth };
+
+export default validations;
+
 export const file = { fileUpload };
-export { dataValidation };

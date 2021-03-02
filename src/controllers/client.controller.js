@@ -6,7 +6,7 @@ import mb from "../configs/messageBird";
 import ApiError from "../errors/ApiError";
 import { writeServerResponse } from "../helpers/response";
 
-export async function createClientProfile(req, res, next) {
+async function createClientProfile(req, res, next) {
   try {
     const clientInfo = req.body;
     const { aud } = req.jwt;
@@ -57,7 +57,7 @@ export async function createClientProfile(req, res, next) {
   }
 }
 
-export async function getClients(req, res, next) {
+async function getClients(req, res, next) {
   try {
     const { page, clientsPerPage } = req.query;
     const {
@@ -92,7 +92,7 @@ export async function getClients(req, res, next) {
     return;
   }
 }
-export async function getClientDetails(req, res, next) {
+async function getClientDetails(req, res, next) {
   try {
     const { clientId } = req.params;
     const { success, data, statusCode } = await DAOs.clientsDAO.getClientById(
@@ -119,7 +119,7 @@ export async function getClientDetails(req, res, next) {
   }
 }
 
-export async function changeClientDetails(req, res, next) {
+async function changeClientDetails(req, res, next) {
   try {
     const { clientId } = req.params;
     const { phone } = req.body;
@@ -161,7 +161,7 @@ export async function changeClientDetails(req, res, next) {
   }
 }
 
-export async function uploadClientAvatar(req, res, next) {
+async function uploadClientAvatar(req, res, next) {
   try {
     const file = req.file;
     if (!file) {
@@ -195,7 +195,7 @@ export async function uploadClientAvatar(req, res, next) {
   }
 }
 
-export async function verifyClientPhoneNumber(req, res, next) {
+async function verifyClientPhoneNumber(req, res, next) {
   try {
     const { phoneNumber } = req.body;
     const params = {
@@ -225,7 +225,7 @@ export async function verifyClientPhoneNumber(req, res, next) {
   }
 }
 
-export async function confirmClientPhoneNumber(req, res, next) {
+async function confirmClientPhoneNumber(req, res, next) {
   try {
     const { id, token, clientId } = req.body;
     mb.verify.verify(id, token, function (err, response) {
@@ -266,3 +266,12 @@ export async function confirmClientPhoneNumber(req, res, next) {
     return;
   }
 }
+export default {
+  createClientProfile,
+  getClients,
+  getClientDetails,
+  changeClientDetails,
+  uploadClientAvatar,
+  verifyClientPhoneNumber,
+  confirmClientPhoneNumber,
+};

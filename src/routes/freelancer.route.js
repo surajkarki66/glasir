@@ -1,45 +1,43 @@
 import { Router } from "express";
 
-import { FreelancerController } from "../controllers/index";
-import { Schemas } from "../helpers/schemas/index";
-import {
-  dataValidation,
-  authValidation,
-  permissions,
-  file,
-} from "../middlewares/index";
+import FreelancerController from "../controllers/freelancer.controller";
+import Schemas from "../helpers/schemas/index";
+import validations, { permissions, file } from "../middlewares/index";
 
 const router = new Router();
 
+const { checkAuth, dataValidation } = validations;
+const { authPermissions, freelancerPermissions } = permissions;
+
 router
   .route("/create-profile")
-  .post(authValidation.checkAuth)
+  .post(checkAuth)
   .post(
-    permissions.onlyActiveUserCanDoThisAction,
-    permissions.onlyFreelancerCanDoThisAction,
+    authPermissions.onlyActiveUserCanDoThisAction,
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
   )
   .post(dataValidation(Schemas.freelancerSchema.freelancerCREATE, "body"))
   .post(FreelancerController.createFreelancerProfile);
 
 router
   .route("/get-freelancers")
-  .get(authValidation.checkAuth)
+  .get(checkAuth)
   .get(dataValidation(Schemas.freelancerSchema.freelancerLIST, "query"))
   .get(FreelancerController.getFreelancers);
 
 router
   .route("/search")
-  .get(authValidation.checkAuth)
+  .get(checkAuth)
   .get(dataValidation(Schemas.freelancerSchema.freelancerSEARCH, "query"))
   .get(FreelancerController.searchFreelancer);
 
 router
   .route("/upload-avatar/:freelancerId")
-  .post(authValidation.checkAuth)
+  .post(checkAuth)
   .post(dataValidation(Schemas.freelancerSchema.avatarUPLOAD, "params"))
   .post(
-    permissions.onlyFreelancerCanDoThisAction,
-    permissions.onlySameFreelancerCanDoThisAction,
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    freelancerPermissions.onlySameFreelancerCanDoThisAction,
   )
   .post(
     file
@@ -50,11 +48,11 @@ router
 
 router
   .route("/upload-doc/:freelancerId")
-  .post(authValidation.checkAuth)
+  .post(checkAuth)
   .post(dataValidation(Schemas.freelancerSchema.documentUPLOAD, "params"))
   .post(
-    permissions.onlyFreelancerCanDoThisAction,
-    permissions.onlySameFreelancerCanDoThisAction,
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    freelancerPermissions.onlySameFreelancerCanDoThisAction,
   )
   .post(
     file
@@ -71,58 +69,58 @@ router
 
 router
   .route("/:freelancerId")
-  .get(authValidation.checkAuth)
+  .get(checkAuth)
   .get(dataValidation(Schemas.freelancerSchema.freelancerDETAILS, "params"))
   .get(FreelancerController.getFreelancerDetails);
 
 router
   .route("/update-profile/:freelancerId")
-  .patch(authValidation.checkAuth)
+  .patch(checkAuth)
   .patch(
-    permissions.onlyActiveUserCanDoThisAction,
-    permissions.onlyFreelancerCanDoThisAction,
-    permissions.onlySameFreelancerCanDoThisAction,
+    authPermissions.onlyActiveUserCanDoThisAction,
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    freelancerPermissions.onlySameFreelancerCanDoThisAction,
   )
   .patch(dataValidation(Schemas.freelancerSchema.freelancerUPDATE, "body"))
   .patch(FreelancerController.changeFreelancerDetails);
 
 router
   .route("/add-employment")
-  .post(authValidation.checkAuth)
+  .post(checkAuth)
   .post(dataValidation(Schemas.freelancerSchema.employmentCREATE, "body"))
   .post(
-    permissions.onlyActiveUserCanDoThisAction,
-    permissions.onlyFreelancerCanDoThisAction,
-    permissions.onlySameFreelancerCanDoThisAction,
+    authPermissions.onlyActiveUserCanDoThisAction,
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    freelancerPermissions.onlySameFreelancerCanDoThisAction,
   )
   .post(FreelancerController.addEmployment);
 
 router
   .route("/update-employment/:freelancerId")
-  .patch(authValidation.checkAuth)
+  .patch(checkAuth)
   .patch(
-    permissions.onlyActiveUserCanDoThisAction,
-    permissions.onlyFreelancerCanDoThisAction,
-    permissions.onlySameFreelancerCanDoThisAction,
+    authPermissions.onlyActiveUserCanDoThisAction,
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    freelancerPermissions.onlySameFreelancerCanDoThisAction,
   )
   .patch(dataValidation(Schemas.freelancerSchema.employmentUPDATE, "body"))
   .patch(FreelancerController.updateEmployment);
 
 router
   .route("/verify-phone-number")
-  .post(authValidation.checkAuth)
-  .post(permissions.onlyClientCanDoThisAction)
+  .post(checkAuth)
+  .post(freelancerPermissions.onlyFreelancerCanDoThisAction)
   .post(dataValidation(Schemas.freelancerSchema.phoneNumberVERIFY, "body"))
   .post(FreelancerController.verifyFreelancerPhoneNumber);
 
 router
   .route("/confirm-phone-number")
   .post(dataValidation(Schemas.freelancerSchema.phoneNumberCONFIRM, "body"))
-  .post(authValidation.checkAuth)
+  .post(checkAuth)
   .post(
-    permissions.onlyActiveUserCanDoThisAction,
-    permissions.onlyFreelancerCanDoThisAction,
-    permissions.onlySameFreelancerCanDoThisAction,
+    authPermissions.onlyActiveUserCanDoThisAction,
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    freelancerPermissions.onlySameFreelancerCanDoThisAction,
   )
   .post(FreelancerController.confirmFreelancerPhoneNumber);
 

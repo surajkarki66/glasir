@@ -2,7 +2,7 @@ import DAOs from "../dao/index";
 import ApiError from "../errors/ApiError";
 import { writeServerResponse } from "../helpers/response";
 
-export async function me(req, res, next) {
+async function me(req, res, next) {
   try {
     const { aud, role } = req.jwt;
     const { success, data, statusCode } =
@@ -34,3 +34,5 @@ export async function me(req, res, next) {
     return;
   }
 }
+
+export default { me };

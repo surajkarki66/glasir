@@ -11,7 +11,7 @@ import config from "../configs/config";
 import { writeServerResponse } from "../helpers/response";
 import { comparePassword, hashPassword } from "../utils/utils";
 
-export async function getUsers(req, res, next) {
+async function getUsers(req, res, next) {
   try {
     const { page, usersPerPage } = req.query;
     const {
@@ -42,7 +42,7 @@ export async function getUsers(req, res, next) {
   }
 }
 
-export async function login(req, res, next) {
+async function login(req, res, next) {
   try {
     let userData;
     const { username, email, password } = req.body;
@@ -94,7 +94,7 @@ export async function login(req, res, next) {
   }
 }
 
-export async function refreshToken(req, res, next) {
+async function refreshToken(req, res, next) {
   try {
     const { refreshToken } = req.body;
     const result = await verifyRefreshToken(
@@ -136,7 +136,7 @@ export async function refreshToken(req, res, next) {
   }
 }
 
-export async function signup(req, res, next) {
+async function signup(req, res, next) {
   try {
     const userFromBody = req.body;
     const { email, username } = userFromBody;
@@ -208,7 +208,7 @@ export async function signup(req, res, next) {
   }
 }
 
-export async function activation(req, res, next) {
+async function activation(req, res, next) {
   try {
     const { token } = req.body;
     const result = await verifyToken(token, config.secretToken.activationToken);
@@ -246,7 +246,7 @@ export async function activation(req, res, next) {
   }
 }
 
-export async function logout(req, res, next) {
+async function logout(req, res, next) {
   try {
     const { refreshToken } = req.body;
     const { aud } = await verifyRefreshToken(
@@ -282,7 +282,7 @@ export async function logout(req, res, next) {
   }
 }
 
-export async function forgotPassword(req, res, next) {
+async function forgotPassword(req, res, next) {
   try {
     const { email } = req.body;
     const result = await DAOs.usersDAO.getUserByEmail(email);
@@ -330,7 +330,7 @@ export async function forgotPassword(req, res, next) {
   }
 }
 
-export async function resetPassword(req, res, next) {
+async function resetPassword(req, res, next) {
   try {
     const { newPassword, token } = req.body;
     const result = await verifyToken(token, config.secretToken.forgotToken);
@@ -368,7 +368,7 @@ export async function resetPassword(req, res, next) {
   }
 }
 
-export async function changePassword(req, res, next) {
+async function changePassword(req, res, next) {
   try {
     const { userId } = req.params;
     const { oldPassword, newPassword } = req.body;
@@ -413,7 +413,7 @@ export async function changePassword(req, res, next) {
   }
 }
 
-export async function changeUserDetails(req, res, next) {
+async function changeUserDetails(req, res, next) {
   try {
     const userDetails = req.body;
     const { userId } = req.params;
@@ -450,7 +450,7 @@ export async function changeUserDetails(req, res, next) {
     return;
   }
 }
-export async function changeEmail(req, res, next) {
+async function changeEmail(req, res, next) {
   try {
     const { userId } = req.params;
     const { email } = req.body;
@@ -514,7 +514,7 @@ export async function changeEmail(req, res, next) {
   }
 }
 
-export async function verifyEmail(req, res, next) {
+async function verifyEmail(req, res, next) {
   try {
     const { userId } = req.body;
     const { success, data, statusCode } = await DAOs.usersDAO.getUserById(
@@ -577,7 +577,7 @@ export async function verifyEmail(req, res, next) {
     return;
   }
 }
-export async function getUserDetails(req, res, next) {
+async function getUserDetails(req, res, next) {
   try {
     const { userId } = req.params;
     const { success, data, statusCode } = await DAOs.usersDAO.getUserById(
@@ -603,7 +603,7 @@ export async function getUserDetails(req, res, next) {
     return;
   }
 }
-export async function deleteUser(req, res, next) {
+async function deleteUser(req, res, next) {
   try {
     const { password } = req.body;
     const { userId } = req.params;
@@ -644,3 +644,20 @@ export async function deleteUser(req, res, next) {
     return;
   }
 }
+
+export default {
+  getUsers,
+  login,
+  refreshToken,
+  signup,
+  activation,
+  logout,
+  forgotPassword,
+  resetPassword,
+  changePassword,
+  changeUserDetails,
+  changeEmail,
+  verifyEmail,
+  deleteUser,
+  getUserDetails,
+};

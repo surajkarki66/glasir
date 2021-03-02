@@ -1,7 +1,7 @@
 import DAOs from "../dao/index";
 import ApiError from "../errors/ApiError";
 
-export const onlyClientCanDoThisAction = (req, res, next) => {
+const onlyClientCanDoThisAction = (req, res, next) => {
   const { role } = req.jwt;
   if (role === "client") {
     return next();
@@ -10,7 +10,7 @@ export const onlyClientCanDoThisAction = (req, res, next) => {
   return;
 };
 
-export const onlySameClientCanDoThisAction = async (req, res, next) => {
+const onlySameClientCanDoThisAction = async (req, res, next) => {
   const { aud } = req.jwt;
   const clientId = req.params.clientId || req.body.clientId;
   const result = await DAOs.clientsDAO.getClientByUserId(aud);
@@ -22,3 +22,5 @@ export const onlySameClientCanDoThisAction = async (req, res, next) => {
   );
   return;
 };
+
+export default { onlyClientCanDoThisAction, onlySameClientCanDoThisAction };

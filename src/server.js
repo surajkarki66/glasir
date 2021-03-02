@@ -10,7 +10,7 @@ import cookieParser from "cookie-parser";
 import mongoSanitize from "express-mongo-sanitize";
 
 import config from "./configs/config";
-import { apiErrorHandler } from "./errors/api-error-handler";
+import apiErrorHandler from "./errors/api-error-handler";
 import userRoutes from "./routes/user.route";
 import freelancerRoutes from "./routes/freelancer.route";
 import commonRoutes from "./routes/common.route";

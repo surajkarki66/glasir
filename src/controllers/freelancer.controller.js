@@ -7,7 +7,7 @@ import ApiError from "../errors/ApiError";
 import mb from "../configs/messageBird";
 import { writeServerResponse } from "../helpers/response";
 
-export async function createFreelancerProfile(req, res, next) {
+async function createFreelancerProfile(req, res, next) {
   try {
     const freelancerInfo = req.body;
     const { aud } = req.jwt;
@@ -62,7 +62,7 @@ export async function createFreelancerProfile(req, res, next) {
     return;
   }
 }
-export async function uploadFreelancerAvatar(req, res, next) {
+async function uploadFreelancerAvatar(req, res, next) {
   try {
     const file = req.file;
     if (!file) {
@@ -96,7 +96,7 @@ export async function uploadFreelancerAvatar(req, res, next) {
     return;
   }
 }
-export async function uploadDocument(req, res, next) {
+async function uploadDocument(req, res, next) {
   try {
     if (!req.files) {
       next(ApiError.badRequest("No file selected."));
@@ -151,7 +151,7 @@ export async function uploadDocument(req, res, next) {
     return;
   }
 }
-export async function getFreelancers(req, res, next) {
+async function getFreelancers(req, res, next) {
   try {
     const { page, freelancersPerPage } = req.query;
     const {
@@ -187,7 +187,7 @@ export async function getFreelancers(req, res, next) {
   }
 }
 
-export async function searchFreelancer(req, res, next) {
+async function searchFreelancer(req, res, next) {
   try {
     let filters = {};
     const queryArray = Object.keys(req.query);
@@ -237,7 +237,7 @@ export async function searchFreelancer(req, res, next) {
   }
 }
 
-export async function getFreelancerDetails(req, res, next) {
+async function getFreelancerDetails(req, res, next) {
   try {
     const { freelancerId } = req.params;
     const {
@@ -266,7 +266,7 @@ export async function getFreelancerDetails(req, res, next) {
   }
 }
 
-export async function changeFreelancerDetails(req, res, next) {
+async function changeFreelancerDetails(req, res, next) {
   try {
     const { freelancerId } = req.params;
     const { phone } = req.body;
@@ -312,7 +312,7 @@ export async function changeFreelancerDetails(req, res, next) {
   }
 }
 
-export async function addEmployment(req, res, next) {
+async function addEmployment(req, res, next) {
   try {
     const { freelancerId } = req.body;
     const employment = req.body;
@@ -340,7 +340,7 @@ export async function addEmployment(req, res, next) {
   }
 }
 
-export async function updateEmployment(req, res, next) {
+async function updateEmployment(req, res, next) {
   try {
     const { freelancerId } = req.params;
     const { companyName, newEmployment } = req.body;
@@ -370,7 +370,7 @@ export async function updateEmployment(req, res, next) {
   }
 }
 
-export async function verifyFreelancerPhoneNumber(req, res, next) {
+async function verifyFreelancerPhoneNumber(req, res, next) {
   try {
     const { phoneNumber } = req.body;
     const params = {
@@ -400,7 +400,7 @@ export async function verifyFreelancerPhoneNumber(req, res, next) {
   }
 }
 
-export async function confirmFreelancerPhoneNumber(req, res, next) {
+async function confirmFreelancerPhoneNumber(req, res, next) {
   try {
     const { id, token, freelancerId } = req.body;
     mb.verify.verify(id, token, function (err, response) {
@@ -443,3 +443,17 @@ export async function confirmFreelancerPhoneNumber(req, res, next) {
     return;
   }
 }
+
+export default {
+  createFreelancerProfile,
+  uploadFreelancerAvatar,
+  uploadDocument,
+  getFreelancers,
+  searchFreelancer,
+  getFreelancerDetails,
+  changeFreelancerDetails,
+  addEmployment,
+  updateEmployment,
+  verifyFreelancerPhoneNumber,
+  confirmFreelancerPhoneNumber,
+};

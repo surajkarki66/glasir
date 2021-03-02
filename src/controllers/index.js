@@ -1,45 +1,10 @@
-import {
-  getUsers,
-  login,
-  refreshToken,
-  signup,
-  activation,
-  logout,
-  forgotPassword,
-  resetPassword,
-  changePassword,
-  changeUserDetails,
-  changeEmail,
-  verifyEmail,
-  deleteUser,
-  getUserDetails,
-} from "./user.controller";
+import {} from "./user.controller";
 
-import {
-  createFreelancerProfile,
-  uploadFreelancerAvatar,
-  uploadDocument,
-  getFreelancers,
-  searchFreelancer,
-  getFreelancerDetails,
-  changeFreelancerDetails,
-  addEmployment,
-  updateEmployment,
-  verifyFreelancerPhoneNumber,
-  confirmFreelancerPhoneNumber,
-} from "./freelancer.controller";
+import {} from "./freelancer.controller";
 
 import { me } from "./common.controller";
 
-import {
-  createClientProfile,
-  getClients,
-  getClientDetails,
-  changeClientDetails,
-  uploadClientAvatar,
-  verifyClientPhoneNumber,
-  confirmClientPhoneNumber,
-} from "./client.controller";
+import {} from "./client.controller";
 
 export const UserController = {
   getUsers,

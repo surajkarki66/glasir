@@ -1,19 +1,18 @@
 import { Router } from "express";
 
-import { Schemas } from "../helpers/schemas/index";
-import { UserController } from "../controllers/index";
-import {
-  permissions,
-  authValidation,
-  dataValidation,
-} from "../middlewares/index";
+import Schemas from "../helpers/schemas/index";
+import UserController from "../controllers/user.controller";
+import validations, { permissions } from "../middlewares/index";
 
 const router = new Router();
 
+const { checkAuth, dataValidation } = validations;
+const { authPermissions } = permissions;
+
 router
   .route("/get-users")
-  .get(authValidation.checkAuth)
-  .get(permissions.onlyAdminCanDoThisAction)
+  .get(checkAuth)
+  .get(authPermissions.onlyAdminCanDoThisAction)
   .get(dataValidation(Schemas.userSchema.userLIST, "query"))
   .get(UserController.getUsers);
 
@@ -39,7 +38,7 @@ router
 
 router
   .route("/logout")
-  .post(authValidation.checkAuth)
+  .post(checkAuth)
   .post(dataValidation(Schemas.userSchema.userLOGOUT, "body"))
   .post(UserController.logout);
 
@@ -55,43 +54,43 @@ router
 
 router
   .route("/change-password/:userId")
-  .patch(authValidation.checkAuth)
-  .patch(permissions.onlySameUserCanDoThisAction)
+  .patch(checkAuth)
+  .patch(authPermissions.onlySameUserCanDoThisAction)
   .patch(dataValidation(Schemas.userSchema.passwordCHANGE, "body"))
   .patch(UserController.changePassword);
 
 router
   .route("/change-user-details/:userId")
-  .patch(authValidation.checkAuth)
-  .patch(permissions.onlySameUserCanDoThisAction)
+  .patch(checkAuth)
+  .patch(authPermissions.onlySameUserCanDoThisAction)
   .patch(dataValidation(Schemas.userSchema.userDetailsCHANGE, "body"))
   .patch(UserController.changeUserDetails);
 
 router
   .route("/change-email/:userId")
-  .patch(authValidation.checkAuth)
-  .patch(permissions.onlySameUserCanDoThisAction)
+  .patch(checkAuth)
+  .patch(authPermissions.onlySameUserCanDoThisAction)
   .patch(dataValidation(Schemas.userSchema.emailCHANGE, "body"))
   .patch(UserController.changeEmail);
 
 router
   .route("/verify-email")
-  .post(authValidation.checkAuth)
+  .post(checkAuth)
   .post(dataValidation(Schemas.userSchema.userACTIVATIONEMAIL, "body"))
-  .post(permissions.onlySameUserCanDoThisAction)
+  .post(authPermissions.onlySameUserCanDoThisAction)
   .post(UserController.verifyEmail);
 
 router
   .route("/delete/:userId")
-  .delete(authValidation.checkAuth)
-  .delete(permissions.onlySameUserCanDoThisAction)
+  .delete(checkAuth)
+  .delete(authPermissions.onlySameUserCanDoThisAction)
   .delete(dataValidation(Schemas.userSchema.userDELETE, "body"))
   .delete(UserController.deleteUser);
 
 router
   .route("/details/:userId")
-  .get(authValidation.checkAuth)
-  .get(permissions.onlySameUserOrAdminCanDoThisAction)
+  .get(checkAuth)
+  .get(authPermissions.onlySameUserOrAdminCanDoThisAction)
   .get(dataValidation(Schemas.userSchema.userDETAILS, "params"))
   .get(UserController.getUserDetails);
 
