@@ -3,7 +3,7 @@ import multer from "multer";
 
 import ApiError from "../errors/ApiError";
 
-export default function fileUpload(destination, fileType) {
+const fileUpload = (destination, fileType) => {
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, path.join(__dirname + destination));
@@ -37,4 +37,6 @@ export default function fileUpload(destination, fileType) {
   });
 
   return upload;
-}
+};
+
+export default fileUpload;

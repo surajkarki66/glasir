@@ -4,7 +4,7 @@ import createError from "http-errors";
 import config from "../configs/config";
 import { client } from "../utils/redis";
 
-export const sign = (payload, secret, options, isRefresh) => {
+const sign = (payload, secret, options, isRefresh) => {
   return new Promise((resolve, reject) => {
     jwt.sign(payload, secret, options, (err, token) => {
       if (err) {
@@ -31,7 +31,7 @@ export const sign = (payload, secret, options, isRefresh) => {
     });
   });
 };
-export const signToken = (userId, payloadData, type, expiresIn) => {
+const signToken = (userId, payloadData, type, expiresIn) => {
   let secret;
   let options;
   let payload = {};
@@ -78,7 +78,7 @@ export const signToken = (userId, payloadData, type, expiresIn) => {
     // pass
   }
 };
-export const verifyToken = async (token, secretKey) => {
+const verifyToken = async (token, secretKey) => {
   return jwt.verify(token, secretKey, (error, response) => {
     if (error) {
       if (String(error).startsWith("TokenExpiredError")) {
@@ -92,7 +92,7 @@ export const verifyToken = async (token, secretKey) => {
   });
 };
 
-export const verifyRefreshToken = (refreshToken, secretKey) => {
+const verifyRefreshToken = (refreshToken, secretKey) => {
   return new Promise((resolve, reject) => {
     jwt.verify(refreshToken, secretKey, (err, payload) => {
       if (err) {
@@ -113,9 +113,11 @@ export const verifyRefreshToken = (refreshToken, secretKey) => {
         }
         if (refreshToken === result) return resolve(payload);
         reject(
-          createError.Forbidden("Refresh token is doesnot belongs to you."),
+          createError.Forbidden("Refresh token is doesn't belongs to you."),
         );
       });
     });
   });
 };
+
+export { sign, signToken, verifyToken, verifyRefreshToken };

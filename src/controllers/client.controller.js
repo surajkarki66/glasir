@@ -2,7 +2,7 @@ import { ObjectId } from "bson";
 import parsePhoneNumber from "libphonenumber-js";
 
 import DAOs from "../dao/index";
-import mb from "../configs/messageBird";
+import messageBird from "../configs/messageBird";
 import ApiError from "../errors/ApiError";
 import { writeServerResponse } from "../helpers/response";
 
@@ -202,7 +202,7 @@ async function verifyClientPhoneNumber(req, res, next) {
       originator: "Glasir",
       type: "sms",
     };
-    mb.verify.create(phoneNumber, params, function (err, response) {
+    messageBird.verify.create(phoneNumber, params, function (err, response) {
       if (err) {
         const { statusCode } = err;
         if (statusCode === 422) {
@@ -228,7 +228,7 @@ async function verifyClientPhoneNumber(req, res, next) {
 async function confirmClientPhoneNumber(req, res, next) {
   try {
     const { id, token, clientId } = req.body;
-    mb.verify.verify(id, token, function (err, response) {
+    messageBird.verify.verify(id, token, function (err, response) {
       if (err) {
         const { statusCode } = err;
         if (statusCode === 422) {

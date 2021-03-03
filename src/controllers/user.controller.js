@@ -4,7 +4,7 @@ import {
   verifyRefreshToken,
 } from "../helpers/jwt-helper";
 import DAOs from "../dao/index";
-import mg from "../configs/mailgun";
+import mailGun from "../configs/mailgun";
 import { client } from "../utils/redis";
 import ApiError from "../errors/ApiError";
 import config from "../configs/config";
@@ -178,7 +178,7 @@ async function signup(req, res, next) {
            		<p>${config.clientUrl}</p>
            		 `,
         };
-        mg.messages().send(mailOptions, (error, body) => {
+        mailGun.messages().send(mailOptions, (error, body) => {
           if (error) {
             next(ApiError.internal(`Something went wrong: ${error.message}`));
             return;
@@ -302,7 +302,7 @@ async function forgotPassword(req, res, next) {
                     <p>${config.clientUrl}</p>
                 `,
       };
-      mg.messages().send(mailOptions, (error, body) => {
+      mailGun.messages().send(mailOptions, (error, body) => {
         if (error) {
           next(ApiError.internal(`Something went wrong: ${error.message}`));
           return;
@@ -486,7 +486,7 @@ async function changeEmail(req, res, next) {
 						 <p>${config.clientUrl}</p>
 							`,
       };
-      mg.messages().send(mailOptions, (error, body) => {
+      mailGun.messages().send(mailOptions, (error, body) => {
         if (error) {
           next(ApiError.internal(`Something went wrong: ${error.message}`));
           return;
@@ -538,7 +538,7 @@ async function verifyEmail(req, res, next) {
            		<p>${config.clientUrl}</p>
            		 `,
         };
-        mg.messages().send(mailOptions, (error, body) => {
+        mailGun.messages().send(mailOptions, (error, body) => {
           if (error) {
             next(ApiError.internal(`Something went wrong: ${error.message}`));
             return;

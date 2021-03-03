@@ -2,7 +2,9 @@ import mailgun from "mailgun-js";
 
 import config from "./config";
 
-export default mailgun({
+const mailGun = mailgun({
   apiKey: config.mailGun.apiKey,
   domain: config.mailGun.domain,
 });
+
+export default mailGun;

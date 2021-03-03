@@ -1,7 +1,7 @@
 import ApiError from "./ApiError";
 import { writeServerResponse } from "../helpers/response";
 
-export default function apiErrorHandler(err, req, res, next) {
+const apiErrorHandler = (err, req, res, next) => {
   if (err instanceof ApiError) {
     return writeServerResponse(
       res,
@@ -16,4 +16,6 @@ export default function apiErrorHandler(err, req, res, next) {
     500,
     "application/json",
   );
-}
+};
+
+export default apiErrorHandler;

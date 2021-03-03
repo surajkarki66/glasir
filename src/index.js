@@ -2,14 +2,15 @@ import app from "./server";
 import DAOs from "./dao/index";
 import config from "./configs/config";
 import logger from "./configs/logger";
-import { getDB } from "./utils/db";
+import db from "./utils/db";
 
-getDB()
+db()
   .then((client) => {
     // Injecting connection
     DAOs.usersDAO.injectDB(client);
     DAOs.freelancersDAO.injectDB(client);
     DAOs.clientsDAO.injectDB(client);
+    DAOs.jobsDAO.injectDB(client);
 
     // logging
     logger.info("Database connected successfully.");

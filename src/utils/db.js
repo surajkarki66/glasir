@@ -2,7 +2,7 @@ import MongoClient from "mongodb";
 
 import config from "../configs/config";
 
-export const getDB = async () => {
+const db = async () => {
   const client = await MongoClient.connect(
     config.mongo.url,
     config.mongo.options,
@@ -10,3 +10,5 @@ export const getDB = async () => {
 
   return client;
 };
+
+export default db;

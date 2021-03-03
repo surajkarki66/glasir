@@ -4,7 +4,7 @@ import parsePhoneNumber from "libphonenumber-js";
 import DAOs from "../dao/index";
 import config from "../configs/config";
 import ApiError from "../errors/ApiError";
-import mb from "../configs/messageBird";
+import messageBird from "../configs/messageBird";
 import { writeServerResponse } from "../helpers/response";
 
 async function createFreelancerProfile(req, res, next) {
@@ -377,7 +377,7 @@ async function verifyFreelancerPhoneNumber(req, res, next) {
       originator: "Glasir",
       type: "sms",
     };
-    mb.verify.create(phoneNumber, params, function (err, response) {
+    messageBird.verify.create(phoneNumber, params, function (err, response) {
       if (err) {
         const { statusCode } = err;
         if (statusCode === 422) {
@@ -403,7 +403,7 @@ async function verifyFreelancerPhoneNumber(req, res, next) {
 async function confirmFreelancerPhoneNumber(req, res, next) {
   try {
     const { id, token, freelancerId } = req.body;
-    mb.verify.verify(id, token, function (err, response) {
+    messageBird.verify.verify(id, token, function (err, response) {
       if (err) {
         const { statusCode } = err;
         if (statusCode === 422) {
