@@ -43,12 +43,12 @@ const SECRET_TOKEN = {
   forgotToken: FORGOT_TOKEN_SECRET,
 };
 
-const MAIL_GUN_API_KEY = process.env.MAIL_GUN_API_KEY;
-const MAIL_GUN_DOMAIN = process.env.MAIL_GUN_DOMAIN;
+const EMAIL = process.env.EMAIL;
+const EMAIL_PASS = process.env.EMAIL_PASS;
 
-const MAIL_GUN = {
-  apiKey: MAIL_GUN_API_KEY,
-  domain: MAIL_GUN_DOMAIN,
+const NODEMAIL = {
+  email: EMAIL,
+  pass: EMAIL_PASS,
 };
 
 const MESSAGE_BIRD = {
@@ -64,7 +64,7 @@ const config = {
   mongo: MONGO,
   server: SERVER,
   secretToken: SECRET_TOKEN,
-  mailGun: MAIL_GUN,
+  nodeMailer: NODEMAIL,
   messageBird: MESSAGE_BIRD,
   nodeEnv: NODE_ENV,
   clientUrl: CLIENT_URL,
