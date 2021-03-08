@@ -166,7 +166,7 @@ async function signup(req, res, next) {
         const payload = { role };
         const token = await signToken(_id, payload, "ACTIVATION", "5m");
         const mailOptions = {
-          from: "noreply@gmail.com",
+          from: config.nodeMailer.email,
           to: email,
           subject: "Account activation link",
           body: "Thank you for choosing Glasir !",
@@ -291,7 +291,7 @@ async function forgotPassword(req, res, next) {
       const payload = { role };
       const token = await signToken(_id, payload, "FORGOT", "5m");
       const mailOptions = {
-        from: "noreply@gmail.com",
+        from: config.nodeMailer.email,
         to: email,
         subject: `Password Reset link`,
         html: `
@@ -474,7 +474,7 @@ async function changeEmail(req, res, next) {
       const payload = { role };
       const token = await signToken(userId, payload, "ACTIVATION", "5m");
       const mailOptions = {
-        from: "noreply@gmail.com",
+        from: config.nodeMailer.email,
         to: email,
         subject: "Account activation link",
         body: "Thank you for choosing Glasir !",
@@ -526,7 +526,7 @@ async function verifyEmail(req, res, next) {
         const payload = { role };
         const token = await signToken(_id, payload, "ACTIVATION", "5m");
         const mailOptions = {
-          from: "noreply@gmail.com",
+          from: config.nodeMailer.email,
           to: email,
           subject: "Account activation link",
           body: "Thank you for choosing Glasir !",
