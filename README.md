@@ -1,5 +1,6 @@
 # Glasir
-This is our first academic project. This is a freelancing web application.
+This is our first academic project. Actually, `Glasir` is freelancing website targeted for Nepalese people.
+This repo contain all the endpoints of REST APIs required for `Glasir` website frontend.
 
 ## To start the node development server.
 First create .env file with name `.env`. Then copy the following credentials
