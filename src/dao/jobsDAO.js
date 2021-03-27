@@ -21,6 +21,34 @@ class JobsDAO {
       throw e;
     }
   }
+  static async createJob(jobInfo) {
+    try {
+      const info = {
+        client: ObjectId(jobInfo.client),
+        ...jobInfo,
+      };
+      const result = await JobsDAO.#jobs.insertOne(info);
+      if (result && result.insertedCount === 1) {
+        const data = result.ops[0];
+        return {
+          success: true,
+          data: data,
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "Job is not created",
+          },
+          statusCode: 500,
+        };
+      }
+    } catch (error) {
+      logger.error(`Error occurred while adding new job, ${error.message}.`);
+      throw error;
+    }
+  }
 }
 
 export default JobsDAO;
