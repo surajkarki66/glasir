@@ -1,5 +1,3 @@
-import { ObjectId } from "mongodb";
-
 import config from "../configs/config";
 import logger from "../configs/logger";
 

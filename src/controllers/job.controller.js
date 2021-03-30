@@ -42,4 +42,13 @@ async function createJob(req, res, next) {
   }
 }
 
+async function getJobs(req, res, next) {
+  try {
+    const { page, jobsPerPage } = req.query;
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+
 export default { createJob };
