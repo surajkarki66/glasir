@@ -16,28 +16,35 @@ const schemas = {
       )
       .required(),
     projectType: Joi.string().valid("onetime", "ongoing").required(),
-    expertise: Joi.object().keys({
-      skills: Joi.array()
-        .items(Joi.string().min(2).max(200))
-        .min(1)
-        .max(9)
-        .required(),
-      expertiseLevel: Joi.string()
-        .valid("Beginner", "Intermediate", "Expert")
-        .required(),
-    }),
+    expertise: Joi.object()
+      .keys({
+        skills: Joi.array()
+          .items(Joi.string().min(2).max(200))
+          .min(1)
+          .max(9)
+          .required(),
+        expertiseLevel: Joi.string()
+          .valid("Beginner", "Intermediate", "Expert")
+          .required(),
+      })
+      .required(),
     pay: Joi.object()
       .keys({
         type: Joi.string().valid("fixed", "hourly").required(),
-        price: Joi.number().when("type", {
-          is: "hourly",
-          then: Joi.object()
-            .keys({
-              minRate: Joi.number().required(),
-              maxRate: Joi.number().required,
-            })
-            .required(),
-        }),
+        price: Joi.object()
+          .keys({
+            total: Joi.number().required(),
+          })
+          .when("type", {
+            is: "hourly",
+            then: Joi.object()
+              .keys({
+                minRate: Joi.number().required(),
+                maxRate: Joi.number().required,
+              })
+              .required(),
+          })
+          .required(),
       })
       .required(),
   }),

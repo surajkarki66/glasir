@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 import config from "../configs/config";
 import logger from "../configs/logger";
 
@@ -23,11 +25,7 @@ class JobsDAO {
   }
   static async createJob(jobInfo) {
     try {
-      const info = {
-        client: ObjectId(jobInfo.client),
-        ...jobInfo,
-      };
-      const result = await JobsDAO.#jobs.insertOne(info);
+      const result = await JobsDAO.#jobs.insertOne(jobInfo);
       if (result && result.insertedCount === 1) {
         const data = result.ops[0];
         return {
