@@ -1,4 +1,4 @@
-import { ObjectId } from "bson";
+import { ObjectId } from "mongodb";
 
 import config from "../configs/config";
 import logger from "../configs/logger";
@@ -28,11 +28,7 @@ class ClientsDAO {
   }
   static async createClient(clientInfo) {
     try {
-      const info = {
-        user: ObjectId(clientInfo.user),
-        ...clientInfo,
-      };
-      const result = await ClientsDAO.#clients.insertOne(info);
+      const result = await ClientsDAO.#clients.insertOne(clientInfo);
       if (result && result.insertedCount === 1) {
         const data = result.ops[0];
         return {

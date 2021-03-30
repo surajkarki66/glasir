@@ -1,4 +1,4 @@
-import { ObjectId } from "bson";
+import { ObjectId } from "mongodb";
 
 import config from "../configs/config";
 import logger from "../configs/logger";
@@ -38,11 +38,7 @@ class FreelancersDAO {
   }
   static async createFreelancer(freelancerInfo) {
     try {
-      const info = {
-        user: ObjectId(freelancerInfo.user),
-        ...freelancerInfo,
-      };
-      const result = await FreelancersDAO.freelancers.insertOne(info);
+      const result = await FreelancersDAO.freelancers.insertOne(freelancerInfo);
       if (result && result.insertedCount === 1) {
         const data = result.ops[0];
         return {
