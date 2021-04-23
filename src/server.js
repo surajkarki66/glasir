@@ -43,7 +43,12 @@ app.use(xss());
 app.use(hpp());
 
 // Cors
-app.use(cors());
+app.use(
+  cors({
+    origin: config.clientUrl,
+    credentials: true,
+  }),
+);
 
 // Compression
 app.use(

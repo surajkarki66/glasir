@@ -3,29 +3,14 @@ import createError from "http-errors";
 
 import config from "../configs/config";
 
-const sign = (payload, secret, options, isRefresh) => {
+const sign = (payload, secret, options) => {
   return new Promise((resolve, reject) => {
     jwt.sign(payload, secret, options, (err, token) => {
       if (err) {
         reject(createError.InternalServerError());
         return;
       }
-      if (isRefresh) {
-        const userId = options.audience;
-        client.set(
-          userId,
-          token,
-          "EX",
-          7 * 24 * 60 * 60, // 7 days
-          (err, reply) => {
-            if (err) {
-              reject(createError.InternalServerError());
-              return;
-            }
-            resolve(token);
-          },
-        );
-      }
+
       resolve(token);
     });
   });

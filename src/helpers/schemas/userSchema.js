@@ -45,11 +45,6 @@ const schemas = {
       .regex(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_.+/=]*$/)
       .required(),
   }),
-  userLOGOUT: Joi.object().keys({
-    refreshToken: Joi.string()
-      .regex(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_.+/=]*$/)
-      .required(),
-  }),
   userDELETE: Joi.object().keys({
     password: Joi.string()
       .min(8)
