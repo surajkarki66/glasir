@@ -14,7 +14,6 @@ MONGO_PASSWORD=<mongodb database password>
 MONGO_HOST=<mongodb cluster host name>
 
 ACCESS_TOKEN_SECRET=laskdjflsdjf
-REFRESH_TOKEN_SECRET=jlskadfjll
 ACTIVATION_TOKEN_SECRET=jflsdkjufasdhfl
 FORGOT_TOKEN_SECRET=flkjorgetlk
 
