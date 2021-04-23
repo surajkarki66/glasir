@@ -15,9 +15,6 @@ db()
     // logging
     logger.info("Database connected successfully.");
 
-    // redis
-    require("./utils/redis");
-
     // app server
     const port = config.server.port;
     app.listen(port, () => {

@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 import createError from "http-errors";
 
 import config from "../configs/config";
-import { client } from "../utils/redis";
 
 const sign = (payload, secret, options, isRefresh) => {
   return new Promise((resolve, reject) => {
@@ -45,15 +44,7 @@ const signToken = (userId, payloadData, type, expiresIn) => {
         audience: userId.toString(),
       };
       return sign(payload, secret, options, false);
-    case "REFRESH":
-      payload = payloadData;
-      secret = config.secretToken.refreshToken;
-      options = {
-        expiresIn: expiresIn,
-        issuer: "pickurpage.com",
-        audience: userId.toString(),
-      };
-      return sign(payload, secret, options, true);
+
     case "ACTIVATION":
       payload = payloadData;
       secret = config.secretToken.activationToken;
@@ -92,32 +83,4 @@ const verifyToken = async (token, secretKey) => {
   });
 };
 
-const verifyRefreshToken = (refreshToken, secretKey) => {
-  return new Promise((resolve, reject) => {
-    jwt.verify(refreshToken, secretKey, (err, payload) => {
-      if (err) {
-        if (String(err).startsWith("TokenExpiredError")) {
-          return reject(
-            createError.Unauthorized("Expired link. Signup again."),
-          );
-        }
-        if (String(err).startsWith("JsonWebTokenError")) {
-          return reject(createError.BadRequest("Invalid token."));
-        }
-      }
-      const userId = payload.aud;
-      client.get(userId.toString(), (err, result) => {
-        if (err) {
-          reject(createError.InternalServerError("Invalid refresh token."));
-          return;
-        }
-        if (refreshToken === result) return resolve(payload);
-        reject(
-          createError.Forbidden("Refresh token is doesn't belongs to you."),
-        );
-      });
-    });
-  });
-};
-
-export { sign, signToken, verifyToken, verifyRefreshToken };
+export { sign, signToken, verifyToken };

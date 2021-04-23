@@ -32,13 +32,11 @@ const SERVER = {
 };
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 const ACTIVATION_TOKEN_SECRET = process.env.ACTIVATION_TOKEN_SECRET;
 const FORGOT_TOKEN_SECRET = process.env.FORGOT_TOKEN_SECRET;
 
 const SECRET_TOKEN = {
   accessToken: ACCESS_TOKEN_SECRET,
-  refreshToken: REFRESH_TOKEN_SECRET,
   activationToken: ACTIVATION_TOKEN_SECRET,
   forgotToken: FORGOT_TOKEN_SECRET,
 };
@@ -59,6 +57,7 @@ const NODE_ENV = process.env.NODE_ENV;
 const CLIENT_URL = process.env.CLIENT_URL;
 const DATABASE = process.env.DATABASE;
 const SERVICE_FEE_RATE = process.env.SERVICE_FEE_RATE;
+const JWT_EXPIRES = process.env.JWT_EXPIRES_NUM;
 
 const config = {
   mongo: MONGO,
@@ -70,6 +69,7 @@ const config = {
   clientUrl: CLIENT_URL,
   database: DATABASE,
   feeRate: SERVICE_FEE_RATE,
+  jwtExpires: JWT_EXPIRES,
 };
 
 export default config;

@@ -1,11 +1,6 @@
-import {
-  signToken,
-  verifyToken,
-  verifyRefreshToken,
-} from "../helpers/jwt-helper";
+import { signToken, verifyToken } from "../helpers/jwt-helper";
 import DAOs from "../dao/index";
 import transporter from "../configs/nodemailer";
-import { client } from "../utils/redis";
 import ApiError from "../errors/ApiError";
 import config from "../configs/config";
 import { writeServerResponse } from "../helpers/response";
@@ -67,71 +62,25 @@ async function login(req, res, next) {
       return;
     }
     const payload = { role, isActive };
-    const accessToken = await signToken(_id, payload, "ACCESS", "1h");
-    const refreshToken = await signToken(_id, payload, "REFRESH", "7d");
+    const token = await signToken(_id, payload, "ACCESS", config.jwtExpires);
 
     const serverResponse = {
       status: "success",
       data: {
         message: "Login successful.",
-        accessToken: accessToken,
-        refreshToken: refreshToken,
+        token: token,
       },
     };
-    res.cookie("AccessToken", accessToken, {
-      httpOnly: true,
-      maxAge: 3600000,
-    });
-    res.cookie("RefreshToken", refreshToken, {
-      httpOnly: true,
-      maxAge: 604800000,
-    });
+    const options = {
+      maxAge: config.jwtExpires,
+      secure: config.env === "production" ? true : false,
+      httpOnly: config.env === "production" ? true : false,
+    };
+    res.cookie("token", token, options);
 
     return writeServerResponse(res, serverResponse, 200, "application/json");
   } catch (e) {
     next(ApiError.internal(`Something went wrong: ${e.message}`));
-    return;
-  }
-}
-
-async function refreshToken(req, res, next) {
-  try {
-    const { refreshToken } = req.body;
-    const result = await verifyRefreshToken(
-      refreshToken,
-      config.secretToken.refreshToken,
-    );
-    const { aud, role } = result;
-    const payload = { role };
-    const accessToken = await signToken(aud, payload, "ACCESS", "1h");
-    const refToken = await signToken(aud, payload, "REFRESH", "7d");
-    const serverResponse = {
-      status: "success",
-      data: { accessToken: accessToken, refreshToken: refToken },
-    };
-    res.cookie("AccessToken", accessToken, {
-      httpOnly: true,
-      maxAge: 3600000,
-    });
-    res.cookie("RefreshToken", refreshToken, {
-      httpOnly: true,
-      maxAge: 604800000,
-    });
-    return writeServerResponse(res, serverResponse, 200, "application/json");
-  } catch (error) {
-    if (String(error).startsWith("UnauthorizedError")) {
-      next(ApiError.unauthorized("Expired link. Signup again."));
-      return;
-    }
-    if (String(error).startsWith("BadRequestError")) {
-      next(ApiError.badRequest("Invalid token."));
-      return;
-    }
-    if (String(error).startsWith("ForbiddenError")) {
-      next(ApiError.forbidden("Invalid token."));
-      return;
-    }
-    next(ApiError.internal("Something went wrong."));
     return;
   }
 }
@@ -246,39 +195,25 @@ async function activation(req, res, next) {
   }
 }
 
-async function logout(req, res, next) {
+function logout(req, res, next) {
+  const options = {
+    maxAge: 0,
+    secure: config.env === "production" ? true : false,
+    httpOnly: config.env === "production" ? true : false,
+  };
+  res.cookie("token", "", options).send();
+}
+
+async function loggedIn(req, res, next) {
   try {
-    const { refreshToken } = req.body;
-    const { aud } = await verifyRefreshToken(
-      refreshToken,
-      config.secretToken.refreshToken,
-    );
-    client.del(aud, (err, val) => {
-      if (err) {
-        next(ApiError.internal("Something went wrong."));
-        return;
-      }
-      const serverResponse = {
-        status: "success",
-        data: { message: "Logout successfully." },
-      };
-      return writeServerResponse(res, serverResponse, 200, "application/json");
-    });
-  } catch (error) {
-    if (String(error).startsWith("UnauthorizedError")) {
-      next(ApiError.unauthorized("Expired link. Signup again."));
-      return;
-    }
-    if (String(error).startsWith("BadRequestError")) {
-      next(ApiError.badRequest("Invalid token."));
-      return;
-    }
-    if (String(error).startsWith("ForbiddenError")) {
-      next(ApiError.forbidden("Invalid token."));
-      return;
-    }
-    next(ApiError.internal("Something went wrong."));
-    return;
+    const token = req.cookies.token;
+    if (!token) return res.send("");
+
+    await verifyToken(token, config.secretToken.accessToken);
+
+    res.send(token);
+  } catch (err) {
+    res.send("");
   }
 }
 
@@ -648,10 +583,10 @@ async function deleteUser(req, res, next) {
 export default {
   getUsers,
   login,
-  refreshToken,
   signup,
   activation,
   logout,
+  loggedIn,
   forgotPassword,
   resetPassword,
   changePassword,

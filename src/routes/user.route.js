@@ -22,11 +22,6 @@ router
   .post(UserController.login);
 
 router
-  .route("/refresh-token")
-  .post(dataValidation(Schemas.userSchema.refreshTOKEN, "body"))
-  .post(UserController.refreshToken);
-
-router
   .route("/signup")
   .post(dataValidation(Schemas.userSchema.userSIGNUP, "body"))
   .post(UserController.signup);
@@ -36,11 +31,9 @@ router
   .patch(dataValidation(Schemas.userSchema.userACTIVATION, "body"))
   .patch(UserController.activation);
 
-router
-  .route("/logout")
-  .post(checkAuth)
-  .post(dataValidation(Schemas.userSchema.userLOGOUT, "body"))
-  .post(UserController.logout);
+router.route("/loggedIn").get(UserController.loggedIn);
+
+router.route("/logout").get(UserController.logout);
 
 router
   .route("/forgot-password")
