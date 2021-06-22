@@ -47,11 +47,6 @@ const schemas = {
             "Writing",
           )
           .required(),
-        serviceType: Joi.array()
-          .items(Joi.string().min(2).max(200))
-          .min(1)
-          .max(4)
-          .required(),
         skills: Joi.array()
           .items(Joi.string().min(2).max(200))
           .min(1)
@@ -191,11 +186,6 @@ const schemas = {
           "Web,Mobile And Software Dev",
           "Writing",
         )
-        .required(),
-      serviceType: Joi.array()
-        .items(Joi.string().min(2).max(200))
-        .min(1)
-        .max(4)
         .required(),
       skills: Joi.array()
         .items(Joi.string().min(2).max(200))
