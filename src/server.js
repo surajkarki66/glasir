@@ -43,14 +43,6 @@ app.use(xss());
 // Prevent http param pollution
 app.use(hpp());
 
-
-// CSRF token
-const csrfProtection = csrf({
-  cookie: true
-});
-
-app.use(csrfProtection);
-
 // Cors
 app.use(
   cors({
@@ -89,6 +81,15 @@ app.use("/api/v1/freelancer", freelancerRoutes);
 app.use("/api/v1/common", commonRoutes);
 app.use("/api/v1/client", clientRoutes);
 app.use("/api/v1/job", jobRoutes);
+
+
+
+// CSRF token
+const csrfProtection = csrf({
+  cookie: true
+});
+
+app.use(csrfProtection);
 
 // Route for getting csrf token
 app.get('/csrf-token', (req, res) => {

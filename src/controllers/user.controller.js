@@ -44,21 +44,21 @@ async function login(req, res, next) {
     if (username) {
       userData = await DAOs.usersDAO.getUserByUsername(username);
       if (!userData) {
-        next(ApiError.badRequest("Make sure your username is correct."));
+        next(ApiError.badRequest("Oops! Username is incorrect."));
         return;
       }
     }
     if (email) {
       userData = await DAOs.usersDAO.getUserByEmail(email);
       if (!userData) {
-        next(ApiError.badRequest("Make sure your email is correct."));
+        next(ApiError.badRequest("Oops! Email is incorrect."));
         return;
       }
     }
     const actualPassword = userData.password;
     const { _id, role, isActive } = userData;
     if (!(await comparePassword(password, actualPassword))) {
-      next(ApiError.badRequest("Make sure your password is correct."));
+      next(ApiError.badRequest("Oops! Password is incorrect."));
       return;
     }
     const payload = { role, isActive };
@@ -75,6 +75,7 @@ async function login(req, res, next) {
       maxAge: config.jwtExpires,
       secure: config.env === "production" ? true : false,
       httpOnly: config.env === "production" ? true : false,
+      sameSite: config.env === "production" ? true : false,
     };
     res.cookie("token", token, options);
 
@@ -312,7 +313,7 @@ async function changePassword(req, res, next) {
       const password = data.password;
 
       if (!(await comparePassword(oldPassword, password))) {
-        next(ApiError.unauthorized("Make sure your password is correct."));
+        next(ApiError.unauthorized("Oops! Password is incorrect."));
         return;
       }
       const updatedObject = {
@@ -548,7 +549,7 @@ async function deleteUser(req, res, next) {
       const actualPassword = data.password;
 
       if (!(await comparePassword(password, actualPassword))) {
-        next(ApiError.unauthorized("Make sure your password is correct."));
+        next(ApiError.unauthorized("Oops! Password is incorrect."));
         return;
       }
       const deleteUser = DAOs.usersDAO.deleteUser(userId);
