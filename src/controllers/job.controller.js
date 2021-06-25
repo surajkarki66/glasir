@@ -15,7 +15,9 @@ async function createJob(req, res, next) {
     const { _id } = client;
     const jobInfo = {
       ...req.body,
-      clientId: ObjectId(_id),
+      client: ObjectId(_id),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     const { success, data, statusCode } = await DAOs.jobsDAO.createJob(jobInfo);
     if (success) {
