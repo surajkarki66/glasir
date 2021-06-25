@@ -41,7 +41,10 @@ router
   )
   .post(
     file
-      .fileUpload("../../../public/uploads/", ["image/jpeg", "image/jpg"])
+      .fileUpload("../../../public/uploads/avatars/freelancers", [
+        "image/jpeg",
+        "image/jpg",
+      ])
       .single("avatar"),
   )
   .post(FreelancerController.uploadFreelancerAvatar);
@@ -56,7 +59,7 @@ router
   )
   .post(
     file
-      .fileUpload("../../../public/uploads/", [
+      .fileUpload("../../../public/uploads/documents/", [
         "application/pdf",
         "application/docx",
       ])

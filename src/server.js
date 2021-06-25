@@ -71,7 +71,7 @@ if (config.nodeEnv === "development") {
 // Static routes
 app.use(
   "/uploads",
-  express.static(path.join(__dirname + "/../public/uploads")),
+  express.static(path.join(__dirname + "/../public/uploads/")),
 );
 
 // Controller routes

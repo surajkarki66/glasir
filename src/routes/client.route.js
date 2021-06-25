@@ -53,7 +53,10 @@ router
   )
   .post(
     file
-      .fileUpload("../../../public/uploads/", ["image/jpeg", "image/jpg"])
+      .fileUpload("../../../public/uploads/avatars/clients/", [
+        "image/jpeg",
+        "image/jpg",
+      ])
       .single("avatar"),
   )
   .post(ClientController.uploadClientAvatar);
