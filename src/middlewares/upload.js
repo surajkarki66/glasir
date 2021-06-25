@@ -9,8 +9,13 @@ const fileUpload = (destination, fileType) => {
       cb(null, path.join(__dirname + destination));
     },
     filename: function (req, file, cb) {
+      const { aud } = req.jwt;
       const fileName =
-        new Date().toISOString().slice(0, 10) + "_" + file.originalname;
+        aud +
+        "_" +
+        new Date().toISOString().slice(0, 10) +
+        "_" +
+        file.originalname;
       cb(null, fileName);
     },
   });
