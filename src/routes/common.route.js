@@ -11,9 +11,9 @@ const { authPermissions } = permissions;
 
 router
   .route("/me")
-  .get(checkAuth)
-  .get(dataValidation(Schemas.commonSchema.commonME, "body"))
-  .get(authPermissions.onlySameUserCanDoThisAction)
-  .get(CommonController.me);
+  .post(checkAuth)
+  .post(dataValidation(Schemas.commonSchema.commonME, "body"))
+  .post(authPermissions.onlySameUserCanDoThisAction)
+  .post(CommonController.me);
 
 export default router;

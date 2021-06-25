@@ -31,8 +31,6 @@ router
   .patch(dataValidation(Schemas.userSchema.userACTIVATION, "body"))
   .patch(UserController.activation);
 
-router.route("/loggedIn").get(UserController.loggedIn);
-
 router.route("/logout").get(UserController.logout);
 
 router

@@ -9,15 +9,11 @@ import { comparePassword, hashPassword } from "../utils/utils";
 async function getUsers(req, res, next) {
   try {
     const { page, usersPerPage } = req.query;
-    const {
-      success,
-      data,
-      statusCode,
-      totalNumUsers,
-    } = await DAOs.usersDAO.getUsers({
-      page,
-      usersPerPage,
-    });
+    const { success, data, statusCode, totalNumUsers } =
+      await DAOs.usersDAO.getUsers({
+        page,
+        usersPerPage,
+      });
     if (success) {
       const users = {
         status: "success",
@@ -203,19 +199,6 @@ function logout(req, res, next) {
     httpOnly: config.env === "production" ? true : false,
   };
   res.cookie("token", "", options).send();
-}
-
-async function loggedIn(req, res, next) {
-  try {
-    const token = req.cookies.token;
-    if (!token) return res.send("");
-
-    await verifyToken(token, config.secretToken.accessToken);
-
-    res.send(token);
-  } catch (err) {
-    res.send("");
-  }
 }
 
 async function forgotPassword(req, res, next) {
@@ -587,7 +570,6 @@ export default {
   signup,
   activation,
   logout,
-  loggedIn,
   forgotPassword,
   resetPassword,
   changePassword,

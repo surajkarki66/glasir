@@ -12,7 +12,9 @@ async function me(req, res, next) {
     if (success) {
       const serverResponse = {
         status: "success",
+        hasProfile: true,
         isAuthenticated: true,
+        role: role,
         data: data,
       };
       return writeServerResponse(
@@ -23,7 +25,8 @@ async function me(req, res, next) {
       );
     }
     const serverResponse = {
-      status: "failed",
+      status: "success",
+      hasProfile: false,
       isAuthenticated: true,
       role: role,
       data: data,

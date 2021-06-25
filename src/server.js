@@ -1,5 +1,4 @@
 import cors from "cors";
-import csrf from "csurf";
 import helmet from "helmet";
 import xss from "xss-clean";
 import hpp from "hpp";
@@ -81,20 +80,6 @@ app.use("/api/v1/freelancer", freelancerRoutes);
 app.use("/api/v1/common", commonRoutes);
 app.use("/api/v1/client", clientRoutes);
 app.use("/api/v1/job", jobRoutes);
-
-
-
-// CSRF token
-const csrfProtection = csrf({
-  cookie: true
-});
-
-app.use(csrfProtection);
-
-// Route for getting csrf token
-app.get('/csrf-token', (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
-});
 
 // Error middleware
 app.use(apiErrorHandler);
