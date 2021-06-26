@@ -4,6 +4,9 @@ const schemas = {
   jobCREATE: Joi.object().keys({
     title: Joi.string().min(5).max(255).required(),
     description: Joi.string().min(50).max(5000).required(),
+    jobStatus: Joi.string().default("opened").valid("opened", "closed"),
+    moneySpent: Joi.number().default(0),
+    isPaymentVerified: Joi.boolean().default(false),
     category: Joi.string()
       .valid(
         "Administration",
@@ -40,13 +43,19 @@ const schemas = {
             then: Joi.object()
               .keys({
                 minRate: Joi.number().required(),
-                maxRate: Joi.number().required,
+                maxRate: Joi.number().required(),
               })
               .required(),
           })
           .required(),
       })
       .required(),
+    proposals: Joi.array()
+      .items(Joi.string().length(24).hex())
+      .max(50)
+      .default([]),
+    createdAt: Joi.date().default(new Date()),
+    updatedAt: Joi.date().default(new Date()),
   }),
 };
 
