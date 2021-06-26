@@ -45,10 +45,33 @@ async function createJob(req, res, next) {
 async function getJobs(req, res, next) {
   try {
     const { page, jobsPerPage } = req.query;
+    const { success, data, totalNumJobs, statusCode } =
+      await DAOs.jobsDAO.getJobs({
+        page,
+        jobsPerPage,
+      });
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        jobs: data,
+        page: parseInt(page),
+        filters: {},
+        entriesPerPage: parseInt(jobsPerPage),
+        totalResults: totalNumJobs,
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    }
+    next(ApiError.notfound("Jobs are not found."));
+    return;
   } catch (error) {
     next(ApiError.internal(`Something went wrong: ${error.message}`));
     return;
   }
 }
 
-export default { createJob };
+export default { createJob, getJobs };

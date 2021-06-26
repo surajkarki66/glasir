@@ -4,7 +4,7 @@ import logger from "../configs/logger";
 class JobsDAO {
   static #jobs;
   static #DEFAULT_PROJECT = {};
-  static #DEFAULT_SORT = { createdAt: -1 };
+  static #DEFAULT_SORT = [["createdAt", 1]];
   static async injectDB(conn) {
     if (JobsDAO.#jobs) {
       return;

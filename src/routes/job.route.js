@@ -18,5 +18,10 @@ router
   )
   .post(dataValidation(Schemas.jobSchema.jobCREATE, "body"))
   .post(JobController.createJob);
+router
+  .route("/get-jobs")
+  .get(checkAuth)
+  .get(dataValidation(Schemas.jobSchema.jobLIST, "query"))
+  .get(JobController.getJobs);
 
 export default router;
