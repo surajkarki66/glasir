@@ -57,6 +57,10 @@ const schemas = {
     createdAt: Joi.date().default(new Date()),
     updatedAt: Joi.date().default(new Date()),
   }),
+  jobLIST: Joi.object().keys({
+    page: Joi.number().min(0).required(),
+    jobsPerPage: Joi.number().min(1).required(),
+  }),
 };
 
 export default schemas;
