@@ -61,6 +61,28 @@ const schemas = {
     page: Joi.number().min(0).required(),
     jobsPerPage: Joi.number().min(1).required(),
   }),
+  jobSEARCH: Joi.object().keys({
+    text: Joi.string().allow("").required(),
+    category: Joi.string()
+      .valid(
+        "Administration",
+        "Design And Creative",
+        "Engineering And Architecture",
+        "IT And Networking",
+        "Marketing",
+        "Web,Mobile And Software Dev",
+        "Writing",
+        "",
+      )
+      .required(),
+    expertiseLevel: Joi.string()
+      .valid("Beginner", "Intermediate", "Expert", "")
+      .required(),
+    projectType: Joi.string().valid("onetime", "ongoing", "").required(),
+    payType: Joi.string().valid("fixed", "hourly", "").required(),
+    page: Joi.number().min(0).required(),
+    jobsPerPage: Joi.number().min(1).required(),
+  }),
 };
 
 export default schemas;

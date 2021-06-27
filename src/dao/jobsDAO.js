@@ -3,8 +3,20 @@ import logger from "../configs/logger";
 
 class JobsDAO {
   static #jobs;
-  static #DEFAULT_PROJECT = {};
-  static #DEFAULT_SORT = [["createdAt", 1]];
+  static #DEFAULT_PROJECT = {
+    title: 1,
+    description: 1,
+    jobStatus: 1,
+    moneySpent: 1,
+    isPaymentVerified: 1,
+    category: 1,
+    expertise: 1,
+    pay: 1,
+    proposals: 1,
+    createdAt: 1,
+    updatedAt: 1,
+  };
+  static #DEFAULT_SORT = { createdAt: -1, updatedAt: -1 };
   static async injectDB(conn) {
     if (JobsDAO.#jobs) {
       return;
@@ -47,22 +59,111 @@ class JobsDAO {
       throw error;
     }
   }
+  static textSearchQuery(text) {
+    const query = {
+      text: {
+        query: text,
+        path: ["title", "description"],
+        score: { boost: { value: 5 } },
+      },
+      highlight: {
+        path: ["title", "description"],
+      },
+    };
+    const project = {
+      ...JobsDAO.#DEFAULT_PROJECT,
+      score: { $meta: "searchScore" },
+      highlight: { $meta: "searchHighlights" },
+    };
+    return { query, project };
+  }
+  static categorySearchQuery(category) {
+    const query = {
+      category: category,
+    };
+    return query;
+  }
+  static expertiseLevelSearchQuery(expertiseLevel) {
+    const query = {
+      "expertise.expertiseLevel": expertiseLevel,
+    };
+    return query;
+  }
+  static projectTypeSearchQuery(projectType) {
+    const query = {
+      projectType: projectType,
+    };
+    return query;
+  }
+  static payTypeSearchQuery(payType) {
+    const query = {
+      "pay.type": payType,
+    };
+    return query;
+  }
   static async getJobs({ filters = null, page = 0, jobsPerPage = 20 } = {}) {
     let queryParams = {};
 
     if (filters) {
-      /** @TODO
-       * Add here filter objects
-       */
+      if ("text" in filters) {
+        const { query, project } = this.textSearchQuery(filters["text"]);
+        queryParams = { searchText: { ...query }, project };
+      }
+      if ("category" in filters) {
+        const categoryQuery = this.categorySearchQuery(filters["category"]);
+        queryParams.query = { ...queryParams.query, ...categoryQuery };
+      }
+      if ("expertiseLevel" in filters) {
+        const expertiseLevelQuery = this.expertiseLevelSearchQuery(
+          filters["expertiseLevel"],
+        );
+        queryParams.query = {
+          ...queryParams.query,
+          ...expertiseLevelQuery,
+        };
+      }
+      if ("projectType" in filters) {
+        const projectTypeQuery = this.projectTypeSearchQuery(
+          filters["projectType"],
+        );
+        queryParams.query = {
+          ...queryParams.query,
+          ...projectTypeQuery,
+        };
+      }
+      if ("payType" in filters) {
+        const payType = this.payTypeSearchQuery(filters["payType"]);
+        queryParams.query = {
+          ...queryParams.query,
+          ...payType,
+        };
+      }
     }
     const {
       query = {},
+      searchText = null,
       project = JobsDAO.#DEFAULT_PROJECT,
       sort = JobsDAO.#DEFAULT_SORT,
     } = queryParams;
+    let pipeline = [
+      { $match: query },
+      {
+        $project: project,
+      },
+      { $sort: sort },
+    ];
+    if (searchText) {
+      pipeline = [
+        { $search: searchText },
+        { $match: query },
+        {
+          $project: project,
+        },
+      ];
+    }
     let cursor;
     try {
-      cursor = await JobsDAO.#jobs.find(query).project(project).sort(sort);
+      cursor = await JobsDAO.#jobs.aggregate(pipeline);
     } catch (e) {
       console.error(`Unable to issue find command, ${e}`);
       return {
@@ -78,8 +179,7 @@ class JobsDAO {
 
     try {
       const documents = await displayCursor.toArray();
-      const totalNumJobs =
-        parseInt(page) === 0 ? await JobsDAO.#jobs.countDocuments({}) : 0;
+      const totalNumJobs = documents.length;
       return {
         success: true,
         data: documents,
