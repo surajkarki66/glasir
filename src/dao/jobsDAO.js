@@ -7,6 +7,7 @@ class JobsDAO {
     title: 1,
     description: 1,
     jobStatus: 1,
+    projectLengthInHours: 1,
     moneySpent: 1,
     isPaymentVerified: 1,
     category: 1,

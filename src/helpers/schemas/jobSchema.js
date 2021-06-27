@@ -7,6 +7,7 @@ const schemas = {
     jobStatus: Joi.string().default("opened").valid("opened", "closed"),
     moneySpent: Joi.number().default(0),
     isPaymentVerified: Joi.boolean().default(false),
+    projectLengthInHours: Joi.number().greater(0).required(),
     category: Joi.string()
       .valid(
         "Administration",
@@ -35,9 +36,6 @@ const schemas = {
       .keys({
         type: Joi.string().valid("fixed", "hourly").required(),
         price: Joi.object()
-          .keys({
-            total: Joi.number().required(),
-          })
           .when("type", {
             is: "hourly",
             then: Joi.object()
@@ -46,6 +44,9 @@ const schemas = {
                 maxRate: Joi.number().required(),
               })
               .required(),
+            otherwise: Joi.object().keys({
+              total: Joi.number().required(),
+            }),
           })
           .required(),
       })
