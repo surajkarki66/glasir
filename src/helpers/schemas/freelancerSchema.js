@@ -8,6 +8,7 @@ const schemas = {
     avatar: Joi.string().required(),
     overview: Joi.string().min(10).max(5000).required(),
     hourlyRate: Joi.number().greater(0).required(),
+    noOfJobsWorkedIn: Joi.number().default(0),
     location: Joi.object()
       .keys({
         country: Joi.string().valid("Nepal").required(),
@@ -18,11 +19,11 @@ const schemas = {
           .valid(
             "Province No.1",
             "Province No.2",
-            "Bagmati Province",
-            "Gandaki Province",
-            "Lumbini Province",
-            "Karnali Province",
-            "Sudurpashchim Province",
+            "Bagmati",
+            "Gandaki",
+            "Lumbini",
+            "Karnali",
+            "Sudurpashchim",
           )
           .required(),
       })
@@ -129,11 +130,11 @@ const schemas = {
       .valid(
         "Province No.1",
         "Province No.2",
-        "Bagmati Province",
-        "Gandaki Province",
-        "Lumbini Province",
-        "Karnali Province",
-        "Sudurpashchim Province",
+        "Bagmati",
+        "Gandaki",
+        "Lumbini",
+        "Karnali",
+        "Sudurpashchim",
         "",
       )
       .required(),
@@ -166,11 +167,11 @@ const schemas = {
         .valid(
           "Province No.1",
           "Province No.2",
-          "Bagmati Province",
-          "Gandaki Province",
-          "Lumbini Province",
-          "Karnali Province",
-          "Sudurpashchim Province",
+          "Bagmati",
+          "Gandaki",
+          "Lumbini",
+          "Karnali",
+          "Sudurpashchim",
         )
         .required(),
     }),
