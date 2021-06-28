@@ -6,10 +6,12 @@ import messageBird from "../configs/messageBird";
 import ApiError from "../errors/ApiError";
 import { writeServerResponse } from "../helpers/response";
 
-async function rateClient(req, res, next) {
+async function rateEmployer(req, res, next) {
   try {
     /**
-     *  TODO: rating client by freelancer.
+     *  TODO 1: rating employer by freelancer.
+     * if freelancer rate an employer a/c to one job then when next job is given by same employer
+     * then we we have to update employer rating
      */
   } catch (error) {
     next(ApiError.internal(`Something went wrong: ${error.message}`));

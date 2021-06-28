@@ -49,9 +49,9 @@ const schemas = {
           .required(),
       })
       .required(),
-    proposals: Joi.array()
+    proposals: Joi.array().items(Joi.string().length(24).hex()).default([]),
+    employersHired: Joi.array()
       .items(Joi.string().length(24).hex())
-      .max(50)
       .default([]),
     createdAt: Joi.date().default(new Date()),
     updatedAt: Joi.date().default(new Date()),

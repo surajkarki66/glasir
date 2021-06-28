@@ -351,39 +351,15 @@ class FreelancersDAO {
       throw e;
     }
   }
-  static async incrementJobs(freelancerId, incrementingValue) {
+  static async addJobId(freelancerId, jobId) {
     try {
-      const result = await FreelancersDAO.freelancers.updateOne(
-        {
-          _id: ObjectId(freelancerId),
-        },
-        {
-          $inc: { noOfJobsWorkedIn: incrementingValue },
-        },
-      );
-      if (
-        (result.modifiedCount === 1 && result.matchedCount === 1) ||
-        result.matchedCount === 1
-      ) {
-        return {
-          success: true,
-          data: {
-            message: "Updated successfully.",
-          },
-          statusCode: 201,
-        };
-      } else {
-        return {
-          success: false,
-          data: {
-            error: "No freelancer exist with this id.",
-          },
-          statusCode: 404,
-        };
-      }
+      /**
+       * TODO: Push jobId to freelancer's profile
+       * This is for freelancer to show how many jobs they already worked in past.
+       */
     } catch (e) {
       logger.error(
-        `Error occurred while updating employer, ${e}`,
+        `Error occurred while adding job id, ${e}`,
         "updateFreelancer()",
       );
       throw e;

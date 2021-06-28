@@ -18,6 +18,17 @@ async function myJobs(req, res, next) {
   }
 }
 
+async function rateFreelancer(req, res, next) {
+  try {
+    /**
+     *  TODO: rating freelancer by employer.
+     */
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+
 async function createFreelancerProfile(req, res, next) {
   try {
     const freelancerInfo = req.body;
@@ -303,25 +314,12 @@ async function changeFreelancerDetails(req, res, next) {
 async function incrementNoOfJobsWorkedIn(req, res, next) {
   try {
     const { freelancerId } = req.params;
-    const { incrementingValue } = req.body;
-
-    const { success, data, statusCode } =
-      await DAOs.freelancersDAO.incrementJobs(freelancerId, incrementingValue);
-    if (success) {
-      const serverResponse = {
-        status: "success",
-        data: { message: "Incremented successfully." },
-      };
-      return writeServerResponse(
-        res,
-        serverResponse,
-        statusCode,
-        "application/json",
-      );
-    } else {
-      next(ApiError.notfound(data.error));
-      return;
-    }
+    const { jobId } = req.body;
+    /**
+     *  TODO 2: rating freelancer by employer.
+     * if employer rate the freelancer a/c to  how he/she job performs .
+     *
+     */
   } catch (error) {
     next(ApiError.internal(`Something went wrong: ${error.message}`));
     return;

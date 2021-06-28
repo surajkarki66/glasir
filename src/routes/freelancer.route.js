@@ -88,17 +88,6 @@ router
   .patch(FreelancerController.changeFreelancerDetails);
 
 router
-  .route("/incrementNoOfJobsWorkedIn/:freelancerId")
-  .patch(checkAuth)
-  .patch(
-    authPermissions.onlyActiveUserCanDoThisAction,
-    freelancerPermissions.onlyFreelancerCanDoThisAction,
-    freelancerPermissions.onlySameFreelancerCanDoThisAction,
-  )
-  .patch(dataValidation(Schemas.freelancerSchema.incrementJobsWorkedIn, "body"))
-  .patch(FreelancerController.incrementNoOfJobsWorkedIn);
-
-router
   .route("/add-employment")
   .post(checkAuth)
   .post(dataValidation(Schemas.freelancerSchema.employmentCREATE, "body"))
