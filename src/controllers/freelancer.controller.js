@@ -31,11 +31,8 @@ async function createFreelancerProfile(req, res, next) {
         next(ApiError.conflict("Phone number is already used."));
         return;
       }
-      const {
-        success,
-        data,
-        statusCode,
-      } = await DAOs.freelancersDAO.createFreelancer(info);
+      const { success, data, statusCode } =
+        await DAOs.freelancersDAO.createFreelancer(info);
       if (success) {
         const serverResponse = {
           status: "success",
@@ -71,11 +68,8 @@ async function uploadFreelancerAvatar(req, res, next) {
     }
     const { freelancerId } = req.params;
     const updateObject = { avatar: file.filename, updatedAt: new Date() };
-    const {
-      success,
-      data,
-      statusCode,
-    } = await DAOs.freelancersDAO.updateFreelancer(freelancerId, updateObject);
+    const { success, data, statusCode } =
+      await DAOs.freelancersDAO.updateFreelancer(freelancerId, updateObject);
     if (success) {
       const serverResponse = {
         status: "success",
@@ -126,11 +120,8 @@ async function uploadDocument(req, res, next) {
       };
     }
 
-    const {
-      success,
-      data,
-      statusCode,
-    } = await DAOs.freelancersDAO.updateFreelancer(freelancerId, updateObject);
+    const { success, data, statusCode } =
+      await DAOs.freelancersDAO.updateFreelancer(freelancerId, updateObject);
     if (success) {
       const serverResponse = {
         status: "success",
@@ -154,15 +145,11 @@ async function uploadDocument(req, res, next) {
 async function getFreelancers(req, res, next) {
   try {
     const { page, freelancersPerPage } = req.query;
-    const {
-      success,
-      data,
-      totalNumFreelancers,
-      statusCode,
-    } = await DAOs.freelancersDAO.getFreelancers({
-      page,
-      freelancersPerPage,
-    });
+    const { success, data, totalNumFreelancers, statusCode } =
+      await DAOs.freelancersDAO.getFreelancers({
+        page,
+        freelancersPerPage,
+      });
     if (success) {
       const serverResponse = {
         status: "success",
@@ -202,16 +189,12 @@ async function searchFreelancer(req, res, next) {
       }
     });
 
-    const {
-      success,
-      data,
-      totalNumFreelancers,
-      statusCode,
-    } = await DAOs.freelancersDAO.getFreelancers({
-      filters,
-      page,
-      freelancersPerPage,
-    });
+    const { success, data, totalNumFreelancers, statusCode } =
+      await DAOs.freelancersDAO.getFreelancers({
+        filters,
+        page,
+        freelancersPerPage,
+      });
 
     if (success) {
       const serverResponse = {
@@ -240,11 +223,8 @@ async function searchFreelancer(req, res, next) {
 async function getFreelancerDetails(req, res, next) {
   try {
     const { freelancerId } = req.params;
-    const {
-      success,
-      data,
-      statusCode,
-    } = await DAOs.freelancersDAO.getFreelancerById(freelancerId);
+    const { success, data, statusCode } =
+      await DAOs.freelancersDAO.getFreelancerById(freelancerId);
 
     if (success) {
       const serverResponse = {
@@ -283,18 +263,43 @@ async function changeFreelancerDetails(req, res, next) {
         updatedAt: new Date(),
       };
     }
-    const {
-      success,
-      data,
-      statusCode,
-    } = await DAOs.freelancersDAO.updateFreelancer(
-      freelancerId,
-      freelancerDetails,
-    );
+    const { success, data, statusCode } =
+      await DAOs.freelancersDAO.updateFreelancer(
+        freelancerId,
+        freelancerDetails,
+      );
     if (success) {
       const serverResponse = {
         status: "success",
         data: { message: "Updated successfully." },
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    } else {
+      next(ApiError.notfound(data.error));
+      return;
+    }
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+
+async function incrementNoOfJobsWorkedIn(req, res, next) {
+  try {
+    const { freelancerId } = req.params;
+    const { incrementingValue } = req.body;
+
+    const { success, data, statusCode } =
+      await DAOs.freelancersDAO.incrementJobs(freelancerId, incrementingValue);
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: { message: "Incremented successfully." },
       };
       return writeServerResponse(
         res,
@@ -318,11 +323,8 @@ async function addEmployment(req, res, next) {
     const employment = req.body;
     delete employment.freelancerId;
 
-    const {
-      success,
-      data,
-      statusCode,
-    } = await DAOs.freelancersDAO.addEmployment(freelancerId, employment);
+    const { success, data, statusCode } =
+      await DAOs.freelancersDAO.addEmployment(freelancerId, employment);
     if (success) {
       const serverResponse = { status: "success", data: data };
       return writeServerResponse(
@@ -344,15 +346,12 @@ async function updateEmployment(req, res, next) {
   try {
     const { freelancerId } = req.params;
     const { companyName, newEmployment } = req.body;
-    const {
-      success,
-      data,
-      statusCode,
-    } = await DAOs.freelancersDAO.updateEmployment(
-      freelancerId,
-      companyName,
-      newEmployment,
-    );
+    const { success, data, statusCode } =
+      await DAOs.freelancersDAO.updateEmployment(
+        freelancerId,
+        companyName,
+        newEmployment,
+      );
     if (success) {
       const serverResponse = { status: "success", data: data };
       return writeServerResponse(
@@ -456,4 +455,5 @@ export default {
   updateEmployment,
   verifyFreelancerPhoneNumber,
   confirmFreelancerPhoneNumber,
+  incrementNoOfJobsWorkedIn,
 };

@@ -345,7 +345,45 @@ class FreelancersDAO {
       }
     } catch (e) {
       logger.error(
-        `Error occurred while updating user, ${e}`,
+        `Error occurred while updating employer, ${e}`,
+        "updateFreelancer()",
+      );
+      throw e;
+    }
+  }
+  static async incrementJobs(freelancerId, incrementingValue) {
+    try {
+      const result = await FreelancersDAO.freelancers.updateOne(
+        {
+          _id: ObjectId(freelancerId),
+        },
+        {
+          $inc: { noOfJobsWorkedIn: incrementingValue },
+        },
+      );
+      if (
+        (result.modifiedCount === 1 && result.matchedCount === 1) ||
+        result.matchedCount === 1
+      ) {
+        return {
+          success: true,
+          data: {
+            message: "Updated successfully.",
+          },
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No freelancer exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while updating employer, ${e}`,
         "updateFreelancer()",
       );
       throw e;

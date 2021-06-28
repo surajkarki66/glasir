@@ -265,5 +265,8 @@ const schemas = {
     id: Joi.string().required(),
     freelancerId: Joi.string().length(24).hex().required(),
   }),
+  incrementJobsWorkedIn: Joi.object().keys({
+    incrementingValue: Joi.number().required(),
+  }),
 };
 export default schemas;
