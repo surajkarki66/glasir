@@ -7,9 +7,9 @@ const schemas = {
     company: Joi.object()
       .keys({
         name: Joi.string().min(2).max(32).required(),
-        website: Joi.string().min(10).max(32),
-        tagline: Joi.string().min(2).max(32),
-        description: Joi.string().min(5).max(200),
+        website: Joi.string().min(10).max(32).default(null),
+        tagline: Joi.string().min(2).max(32).default(null),
+        description: Joi.string().min(5).max(200).required(),
       })
       .required(),
     avatar: Joi.string().required(),
@@ -21,9 +21,9 @@ const schemas = {
     location: Joi.object()
       .keys({
         country: Joi.string().min(4).max(32).required(),
-        street: Joi.string().min(5).max(70),
-        city: Joi.string().min(5).max(70),
-        zip: Joi.number().integer(),
+        street: Joi.string().min(5).max(70).required(),
+        city: Joi.string().min(5).max(70).required(),
+        zip: Joi.number().integer().default(null),
       })
       .required(),
     totalMoneySpent: Joi.number().default(0),
@@ -49,18 +49,18 @@ const schemas = {
     lastName: Joi.string().min(2).max(32),
     company: Joi.object().keys({
       name: Joi.string().min(2).max(32).required(),
-      website: Joi.string().min(10).max(32),
-      tagline: Joi.string().min(2).max(32),
-      description: Joi.string().min(5).max(200),
+      website: Joi.string().min(10).max(32).required(),
+      tagline: Joi.string().min(2).max(32).required(),
+      description: Joi.string().min(5).max(200).required(),
     }),
     phone: Joi.object().keys({
       phoneNumber: Joi.string().required(),
     }),
     location: Joi.object().keys({
       country: Joi.string().min(4).max(32).required(),
-      street: Joi.string().min(5).max(70),
-      city: Joi.string().min(5).max(70),
-      zip: Joi.number().integer(),
+      street: Joi.string().min(5).max(70).required(),
+      city: Joi.string().min(5).max(70).required(),
+      zip: Joi.number().integer().required(),
     }),
     payment: Joi.object().keys({
       method: Joi.string().valid("paypal", "creditCard", null).required(),

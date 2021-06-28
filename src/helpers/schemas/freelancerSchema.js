@@ -32,8 +32,8 @@ const schemas = {
         phoneNumber: Joi.string().required(),
       })
       .required(),
-    citizenship: Joi.string(),
-    resume: Joi.string(),
+    citizenship: Joi.string().default(null),
+    resume: Joi.string().default(null),
     expertise: Joi.object()
       .keys({
         service: Joi.string()
@@ -60,12 +60,14 @@ const schemas = {
 
     education: Joi.object().keys({
       school: Joi.string().min(5).max(200).required(),
-      areaOfStudy: Joi.string().min(2).max(70),
-      degree: Joi.string().min(5).max(100),
-      datesAttended: Joi.object().keys({
-        from: Joi.date().iso().required(),
-        to: Joi.date().iso().greater(Joi.ref("from")).required(),
-      }),
+      areaOfStudy: Joi.string().min(2).max(70).required(),
+      degree: Joi.string().min(5).max(100).required(),
+      datesAttended: Joi.object()
+        .keys({
+          from: Joi.date().iso().required(),
+          to: Joi.date().iso().greater(Joi.ref("from")).required(),
+        })
+        .required(),
       description: Joi.string().min(5).max(200),
     }),
 
