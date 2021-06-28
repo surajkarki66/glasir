@@ -6,6 +6,17 @@ import messageBird from "../configs/messageBird";
 import ApiError from "../errors/ApiError";
 import { writeServerResponse } from "../helpers/response";
 
+async function rateClient(req, res, next) {
+  try {
+    /**
+     *  TODO: rating client by freelancer.
+     */
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+
 async function createEmployerProfile(req, res, next) {
   try {
     const employerInfo = req.body;
