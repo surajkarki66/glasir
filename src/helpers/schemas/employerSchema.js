@@ -26,6 +26,16 @@ const schemas = {
         zip: Joi.number().integer(),
       })
       .required(),
+    totalMoneySpent: Joi.number().default(0),
+    payment: Joi.object()
+      .keys({
+        method: Joi.string().valid("paypal", "creditCard", null).required(),
+        isVerified: Joi.boolean().default(false),
+      })
+      .default({
+        method: null,
+        isVerified: false,
+      }),
   }),
   employerLIST: Joi.object().keys({
     page: Joi.number().min(0).required(),
@@ -51,6 +61,10 @@ const schemas = {
       street: Joi.string().min(5).max(70),
       city: Joi.string().min(5).max(70),
       zip: Joi.number().integer(),
+    }),
+    payment: Joi.object().keys({
+      method: Joi.string().valid("paypal", "creditCard", null).required(),
+      isVerified: Joi.boolean().default(false),
     }),
   }),
   avatarUPLOAD: Joi.object().keys({

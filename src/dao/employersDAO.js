@@ -80,7 +80,7 @@ class EmployersDAO {
     }
     const displayCursor = cursor
       .skip(parseInt(page) * parseInt(employersPerPage))
-      .limit(parseInt(EmployersPerPage));
+      .limit(parseInt(employersPerPage));
     try {
       const documents = await displayCursor.toArray();
       const totalNumEmployers =

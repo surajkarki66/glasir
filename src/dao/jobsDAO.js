@@ -6,6 +6,9 @@ class JobsDAO {
   static #DEFAULT_PROJECT = {
     title: 1,
     description: 1,
+    "employer.location.country": 1,
+    "employer.totalMoneySpent": 1,
+    "employer.payment.isVerified": 1,
     jobStatus: 1,
     projectLengthInHours: 1,
     moneySpent: 1,
@@ -149,6 +152,19 @@ class JobsDAO {
     let pipeline = [
       { $match: query },
       {
+        $lookup: {
+          from: "employers",
+          localField: "employer",
+          foreignField: "_id",
+          as: "employer",
+        },
+      },
+      {
+        $addFields: {
+          employer: { $arrayElemAt: ["$employer", 0] },
+        },
+      },
+      {
         $project: project,
       },
       { $sort: sort },
@@ -157,6 +173,19 @@ class JobsDAO {
       pipeline = [
         { $search: searchText },
         { $match: query },
+        {
+          $lookup: {
+            from: "employers",
+            localField: "employer",
+            foreignField: "_id",
+            as: "employer",
+          },
+        },
+        {
+          $addFields: {
+            employer: { $arrayElemAt: ["$employer", 0] },
+          },
+        },
         {
           $project: project,
         },
