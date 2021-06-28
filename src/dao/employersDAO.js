@@ -202,6 +202,7 @@ class EmployersDAO {
           $set: updateObject,
         },
       );
+      console.log(result);
       if (
         (result.modifiedCount === 1 && result.matchedCount === 1) ||
         result.matchedCount === 1

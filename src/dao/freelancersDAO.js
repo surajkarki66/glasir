@@ -13,6 +13,8 @@ class FreelancersDAO {
     title: 1,
     englishLanguage: 1,
     isVerified: 1,
+    avatar: 1,
+    jobsWorkedIn: 1,
   };
   static DEFAULT_SORT = { firstName: 1, lastName: 1 };
 

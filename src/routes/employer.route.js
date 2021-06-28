@@ -53,7 +53,7 @@ router
   )
   .post(
     file
-      .fileUpload("../../../public/uploads/avatars/employers/", [
+      .fileUpload("../../../public/uploads/avatars/employers", [
         "image/jpeg",
         "image/jpg",
       ])

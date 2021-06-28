@@ -198,7 +198,7 @@ function logout(req, res, next) {
     secure: config.env === "production" ? true : false,
     httpOnly: config.env === "production" ? true : false,
   };
-  res.cookie("token", "", options).send();
+  res.cookie("logout", "", options).send();
 }
 
 async function forgotPassword(req, res, next) {

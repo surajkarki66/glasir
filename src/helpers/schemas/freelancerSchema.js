@@ -8,7 +8,7 @@ const schemas = {
     avatar: Joi.string().required(),
     overview: Joi.string().min(10).max(5000).required(),
     hourlyRate: Joi.number().greater(0).required(),
-    noOfJobsWorkedIn: Joi.number().default(0),
+    jobsWorkedIn: Joi.array().items(Joi.string()).default([]),
     location: Joi.object()
       .keys({
         country: Joi.string().valid("Nepal").required(),
@@ -59,18 +59,20 @@ const schemas = {
       })
       .required(),
 
-    education: Joi.object().keys({
-      school: Joi.string().min(5).max(200).required(),
-      areaOfStudy: Joi.string().min(2).max(70).required(),
-      degree: Joi.string().min(5).max(100).required(),
-      datesAttended: Joi.object()
-        .keys({
-          from: Joi.date().iso().required(),
-          to: Joi.date().iso().greater(Joi.ref("from")).required(),
-        })
-        .required(),
-      description: Joi.string().min(5).max(200),
-    }),
+    education: Joi.object()
+      .keys({
+        school: Joi.string().min(5).max(200).required(),
+        areaOfStudy: Joi.string().min(2).max(70).required(),
+        degree: Joi.string().min(5).max(100).required(),
+        datesAttended: Joi.object()
+          .keys({
+            from: Joi.date().iso().required(),
+            to: Joi.date().iso().greater(Joi.ref("from")).required(),
+          })
+          .required(),
+        description: Joi.string().min(5).max(200),
+      })
+      .default({}),
 
     employments: Joi.array()
       .items(
@@ -92,7 +94,8 @@ const schemas = {
           description: Joi.string().min(5).max(255),
         }),
       )
-      .max(10),
+      .max(10)
+      .default([]),
 
     englishLanguage: Joi.object()
       .keys({
@@ -100,7 +103,6 @@ const schemas = {
           .valid("Basic", "Conversational", "Fluent", "Native Or Bilingual")
           .required(),
       })
-
       .required(),
   }),
 
