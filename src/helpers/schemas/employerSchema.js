@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 const schemas = {
-  clientCREATE: Joi.object().keys({
+  employerCREATE: Joi.object().keys({
     firstName: Joi.string().min(2).max(32).required(),
     lastName: Joi.string().min(2).max(32).required(),
     company: Joi.object()
@@ -27,14 +27,14 @@ const schemas = {
       })
       .required(),
   }),
-  clientLIST: Joi.object().keys({
+  employerLIST: Joi.object().keys({
     page: Joi.number().min(0).required(),
-    clientsPerPage: Joi.number().min(1).required(),
+    employersPerPage: Joi.number().min(1).required(),
   }),
-  clientDETAILS: Joi.object().keys({
-    clientId: Joi.string().length(24).hex().required(),
+  employerDETAILS: Joi.object().keys({
+    employerId: Joi.string().length(24).hex().required(),
   }),
-  clientUPDATE: Joi.object().keys({
+  employerUPDATE: Joi.object().keys({
     firstName: Joi.string().min(2).max(32),
     lastName: Joi.string().min(2).max(32),
     company: Joi.object().keys({
@@ -54,7 +54,7 @@ const schemas = {
     }),
   }),
   avatarUPLOAD: Joi.object().keys({
-    clientId: Joi.string().length(24).hex().required(),
+    employerId: Joi.string().length(24).hex().required(),
   }),
   phoneNumberVERIFY: Joi.object().keys({
     phoneNumber: Joi.string().required(),
@@ -62,7 +62,7 @@ const schemas = {
   phoneNumberCONFIRM: Joi.object().keys({
     token: Joi.string().required(),
     id: Joi.string().required(),
-    clientId: Joi.string().length(24).hex().required(),
+    employerId: Joi.string().length(24).hex().required(),
   }),
 };
 

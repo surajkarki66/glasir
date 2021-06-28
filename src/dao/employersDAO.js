@@ -3,32 +3,32 @@ import { ObjectId } from "mongodb";
 import config from "../configs/config";
 import logger from "../configs/logger";
 
-class ClientsDAO {
-  static #clients;
+class EmployersDAO {
+  static #employers;
   static #DEFAULT_SORT = [["firstName", -1]];
   static async injectDB(conn) {
-    if (ClientsDAO.#clients) {
+    if (EmployersDAO.#employers) {
       return;
     }
     try {
-      ClientsDAO.#clients = await conn
+      EmployersDAO.#employers = await conn
         .db(config.database)
-        .collection("clients");
+        .collection("employers");
       logger.info(
-        `Connected to clients collection of ${config.database} database.`,
-        "ClientsDAO.injectDB()",
+        `Connected to employers collection of ${config.database} database.`,
+        "EmployersDAO.injectDB()",
       );
     } catch (e) {
       logger.error(
         `Error while injecting DB: ${e.message}`,
-        "ClientsDAO.injectDB()",
+        "EmployersDAO.injectDB()",
       );
       throw e;
     }
   }
-  static async createClient(clientInfo) {
+  static async createEmployer(employerInfo) {
     try {
-      const result = await ClientsDAO.#clients.insertOne(clientInfo);
+      const result = await EmployersDAO.#employers.insertOne(employerInfo);
       if (result && result.insertedCount === 1) {
         const data = result.ops[0];
         return {
@@ -45,8 +45,7 @@ class ClientsDAO {
         return {
           success: false,
           data: {
-            error:
-              "A freelancer with the given user id or phone already exists.",
+            error: "A employer with the given user id or phone already exists.",
           },
           statusCode: 409,
         };
@@ -57,12 +56,16 @@ class ClientsDAO {
       throw error;
     }
   }
-  static async getClients({ page = 0, clientsPerPage = 10, filter = {} } = {}) {
-    const sort = ClientsDAO.#DEFAULT_SORT;
+  static async getEmployers({
+    page = 0,
+    employersPerPage = 10,
+    filter = {},
+  } = {}) {
+    const sort = EmployersDAO.#DEFAULT_SORT;
     const projection = {};
     let cursor;
     try {
-      cursor = await ClientsDAO.#clients
+      cursor = await EmployersDAO.#employers
         .find(filter)
         .project(projection)
         .sort(sort);
@@ -71,21 +74,23 @@ class ClientsDAO {
       return {
         success: false,
         data: [],
-        totalNumClients: 0,
+        totalNumEmployers: 0,
         statusCode: 404,
       };
     }
     const displayCursor = cursor
-      .skip(parseInt(page) * parseInt(clientsPerPage))
-      .limit(parseInt(clientsPerPage));
+      .skip(parseInt(page) * parseInt(employersPerPage))
+      .limit(parseInt(EmployersPerPage));
     try {
       const documents = await displayCursor.toArray();
-      const totalNumClients =
-        parseInt(page) === 0 ? await ClientsDAO.#clients.countDocuments({}) : 0;
+      const totalNumEmployers =
+        parseInt(page) === 0
+          ? await EmployersDAO.#employers.countDocuments({})
+          : 0;
       return {
         success: true,
         data: documents,
-        totalNumClients,
+        totalNumEmployers,
         statusCode: documents.length > 0 ? 200 : 404,
       };
     } catch (e) {
@@ -95,17 +100,17 @@ class ClientsDAO {
       throw e;
     }
   }
-  static async getClientByPhone(phoneNumber) {
-    return await ClientsDAO.#clients.findOne({
+  static async getEmployerByPhone(phoneNumber) {
+    return await EmployersDAO.#employers.findOne({
       "phone.phoneNumber": phoneNumber,
     });
   }
-  static async getClientByUserId(userId) {
-    return await ClientsDAO.#clients.findOne({
+  static async getEmployerByUserId(userId) {
+    return await EmployersDAO.#employers.findOne({
       user: ObjectId(userId),
     });
   }
-  static async getClientById(id) {
+  static async getEmployerById(id) {
     try {
       const pipeline = [
         { $match: { _id: ObjectId(id) } },
@@ -130,16 +135,16 @@ class ClientsDAO {
         },
       ];
 
-      const client = await ClientsDAO.#clients.aggregate(pipeline).next();
-      if (client) {
+      const employer = await EmployersDAO.#employers.aggregate(pipeline).next();
+      if (employer) {
         return {
           success: true,
-          data: client,
+          data: employer,
           statusCode: 200,
         };
       } else {
         const message = "No document matching id: " + id + " could be found!";
-        logger.error(message, "getClientById()");
+        logger.error(message, "getEmployerById()");
         return {
           success: false,
           data: {},
@@ -149,7 +154,7 @@ class ClientsDAO {
     } catch (e) {
       logger.error(
         `Unable to convert cursor to array or problem counting documents, ${e.message}`,
-        "getClientById()",
+        "getEmployerById()",
       );
       throw e;
     }
@@ -173,7 +178,7 @@ class ClientsDAO {
         { $addFields: { user: { $arrayElemAt: ["$user", 0] } } },
         { $project: { "user.password": 0 } },
       ];
-      const profile = await ClientsDAO.#clients.aggregate(pipeline).next();
+      const profile = await EmployersDAO.#employers.aggregate(pipeline).next();
       let profileObj;
 
       if (profile) {
@@ -187,11 +192,11 @@ class ClientsDAO {
       throw e;
     }
   }
-  static async updateClient(clientId, updateObject) {
+  static async updateEmployer(EmployerId, updateObject) {
     try {
-      const result = await ClientsDAO.#clients.updateOne(
+      const result = await EmployersDAO.#employers.updateOne(
         {
-          _id: ObjectId(clientId),
+          _id: ObjectId(EmployerId),
         },
         {
           $set: updateObject,
@@ -212,22 +217,22 @@ class ClientsDAO {
         return {
           success: false,
           data: {
-            error: "No client exist with this id.",
+            error: "No employer exist with this id.",
           },
           statusCode: 404,
         };
       }
     } catch (e) {
       logger.error(
-        `Error occurred while updating client, ${e}`,
-        "updateClient()",
+        `Error occurred while updating employer, ${e}`,
+        "updateEmployer()",
       );
       throw e;
     }
   }
-  static async deleteClientByUserId(userId) {
+  static async deleteEmployerByUserId(userId) {
     try {
-      const result = await ClientsDAO.#clients.deleteOne({
+      const result = await EmployersDAO.#employers.deleteOne({
         user: ObjectId(userId),
       });
       if (result.deletedCount === 1) {
@@ -240,7 +245,7 @@ class ClientsDAO {
         return {
           success: false,
           data: {
-            error: "No client exist with this id.",
+            error: "No employer exist with this id.",
           },
           statusCode: 404,
         };
@@ -248,11 +253,11 @@ class ClientsDAO {
     } catch (e) {
       logger.error(
         `Error occurred while deleting user, ${e}`,
-        "deleteClient()",
+        "deleteEmployer()",
       );
       throw e;
     }
   }
 }
 
-export default ClientsDAO;
+export default EmployersDAO;

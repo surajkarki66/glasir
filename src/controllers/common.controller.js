@@ -8,7 +8,7 @@ async function me(req, res, next) {
     const { success, data, statusCode } =
       role === "freelancer"
         ? await DAOs.freelancersDAO.me(aud)
-        : await DAOs.clientsDAO.me(aud);
+        : await DAOs.employersDAO.me(aud);
     if (success) {
       const serverResponse = {
         status: "success",

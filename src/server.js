@@ -14,7 +14,7 @@ import apiErrorHandler from "./errors/api-error-handler";
 import userRoutes from "./routes/user.route";
 import freelancerRoutes from "./routes/freelancer.route";
 import commonRoutes from "./routes/common.route";
-import clientRoutes from "./routes/client.route";
+import employerRoutes from "./routes/employer.route";
 import jobRoutes from "./routes/job.route";
 
 const app = express();
@@ -78,7 +78,7 @@ app.use(
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/freelancer", freelancerRoutes);
 app.use("/api/v1/common", commonRoutes);
-app.use("/api/v1/client", clientRoutes);
+app.use("/api/v1/employer", employerRoutes);
 app.use("/api/v1/job", jobRoutes);
 
 // Error middleware

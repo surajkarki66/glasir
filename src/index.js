@@ -9,7 +9,7 @@ db()
     // Injecting connection
     DAOs.usersDAO.injectDB(client);
     DAOs.freelancersDAO.injectDB(client);
-    DAOs.clientsDAO.injectDB(client);
+    DAOs.employersDAO.injectDB(client);
     DAOs.jobsDAO.injectDB(client);
 
     // logging

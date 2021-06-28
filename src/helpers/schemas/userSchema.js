@@ -15,7 +15,7 @@ const schemas = {
       .min(8)
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
       .required(),
-    role: Joi.string().valid("freelancer", "client", "admin").required(),
+    role: Joi.string().valid("freelancer", "employer", "admin").required(),
   }),
   userACTIVATION: Joi.object().keys({
     token: Joi.string()

@@ -5,8 +5,6 @@ const schemas = {
     title: Joi.string().min(5).max(255).required(),
     description: Joi.string().min(50).max(5000).required(),
     jobStatus: Joi.string().default("opened").valid("opened", "closed"),
-    moneySpent: Joi.number().default(0),
-    isPaymentVerified: Joi.boolean().default(false),
     projectLengthInHours: Joi.number().greater(0).required(),
     category: Joi.string()
       .valid(

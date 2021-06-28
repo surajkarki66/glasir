@@ -7,14 +7,14 @@ import { writeServerResponse } from "../helpers/response";
 async function createJob(req, res, next) {
   try {
     const { aud } = req.jwt;
-    const client = await DAOs.clientsDAO.getClientByUserId(aud);
-    if (!client) {
-      next(ApiError.notfound("Client not found"));
+    const employer = await DAOs.employersDAO.getEmployerByUserId(aud);
+    if (!employer) {
+      next(ApiError.notfound("Employer not found"));
       return;
     }
-    const { _id } = client;
+    const { _id } = employer;
     const jobInfo = {
-      client: ObjectId(_id),
+      employer: ObjectId(_id),
       ...req.body,
     };
     const { success, data, statusCode } = await DAOs.jobsDAO.createJob(jobInfo);

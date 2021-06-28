@@ -6,16 +6,16 @@ import messageBird from "../configs/messageBird";
 import ApiError from "../errors/ApiError";
 import { writeServerResponse } from "../helpers/response";
 
-async function createClientProfile(req, res, next) {
+async function createEmployerProfile(req, res, next) {
   try {
-    const clientInfo = req.body;
+    const employerInfo = req.body;
     const { aud } = req.jwt;
-    const { phone } = clientInfo;
+    const { phone } = employerInfo;
 
     const phoneNumber = parsePhoneNumber(phone.phoneNumber);
     if (phoneNumber && phoneNumber.isValid()) {
       const info = {
-        ...clientInfo,
+        ...employerInfo,
         user: ObjectId(aud),
         phone: { ...phone, isVerified: false },
         isVerified: false,
@@ -23,13 +23,12 @@ async function createClientProfile(req, res, next) {
         updatedAt: new Date(),
       };
 
-      if (await DAOs.clientsDAO.getClientByPhone(phone.phoneNumber)) {
+      if (await DAOs.employersDAO.getEmployerByPhone(phone.phoneNumber)) {
         next(ApiError.conflict("Phone number is already used."));
         return;
       }
-      const { success, data, statusCode } = await DAOs.clientsDAO.createClient(
-        info,
-      );
+      const { success, data, statusCode } =
+        await DAOs.employersDAO.createEmployer(info);
       if (success) {
         const serverResponse = {
           status: "success",
@@ -57,26 +56,22 @@ async function createClientProfile(req, res, next) {
   }
 }
 
-async function getClients(req, res, next) {
+async function getEmployers(req, res, next) {
   try {
-    const { page, clientsPerPage } = req.query;
-    const {
-      success,
-      data,
-      statusCode,
-      totalNumClients,
-    } = await DAOs.clientsDAO.getClients({
-      page,
-      clientsPerPage,
-    });
+    const { page, employersPerPage } = req.query;
+    const { success, data, statusCode, totalNumEmployers } =
+      await DAOs.employersDAO.getEmployers({
+        page,
+        employersPerPage,
+      });
     if (success) {
       const serverResponse = {
         status: "success",
         data: data,
         page: Number(page),
         filters: {},
-        entries_per_page: Number(clientsPerPage),
-        totalResults: totalNumClients,
+        entries_per_page: Number(employersPerPage),
+        totalResults: totalNumEmployers,
       };
       return writeServerResponse(
         res,
@@ -92,12 +87,11 @@ async function getClients(req, res, next) {
     return;
   }
 }
-async function getClientDetails(req, res, next) {
+async function getEmployerDetails(req, res, next) {
   try {
-    const { clientId } = req.params;
-    const { success, data, statusCode } = await DAOs.clientsDAO.getClientById(
-      clientId,
-    );
+    const { employerId } = req.params;
+    const { success, data, statusCode } =
+      await DAOs.employersDAO.getEmployerById(employerId);
     if (success) {
       const serverResponse = {
         status: "success",
@@ -110,7 +104,7 @@ async function getClientDetails(req, res, next) {
         "application/json",
       );
     } else {
-      next(ApiError.notfound("Client doesn't exist."));
+      next(ApiError.notfound("Employer doesn't exist."));
       return;
     }
   } catch (error) {
@@ -119,27 +113,25 @@ async function getClientDetails(req, res, next) {
   }
 }
 
-async function changeClientDetails(req, res, next) {
+async function changeEmployerDetails(req, res, next) {
   try {
-    const { clientId } = req.params;
+    const { employerId } = req.params;
     const { phone } = req.body;
-    let clientDetails = {
+    let employerDetails = {
       ...req.body,
       isVerified: false,
       updatedAt: new Date(),
     };
     if (phone) {
-      clientDetails = {
+      employerDetails = {
         ...req.body,
         isVerified: false,
         phone: { ...phone, isVerified: false },
         updatedAt: new Date(),
       };
     }
-    const { success, data, statusCode } = await DAOs.clientsDAO.updateClient(
-      clientId,
-      clientDetails,
-    );
+    const { success, data, statusCode } =
+      await DAOs.employersDAO.updateEmployer(employerId, employerDetails);
     if (success) {
       const serverResponse = {
         status: "success",
@@ -161,19 +153,17 @@ async function changeClientDetails(req, res, next) {
   }
 }
 
-async function uploadClientAvatar(req, res, next) {
+async function uploadEmployerAvatar(req, res, next) {
   try {
     const file = req.file;
     if (!file) {
       next(ApiError.badRequest("No image selected."));
       return;
     }
-    const { clientId } = req.params;
+    const { employerId } = req.params;
     const updateObject = { avatar: file.filename, updatedAt: new Date() };
-    const { success, data, statusCode } = await DAOs.clientsDAO.updateClient(
-      clientId,
-      updateObject,
-    );
+    const { success, data, statusCode } =
+      await DAOs.employersDAO.updateEmployer(employerId, updateObject);
     if (success) {
       const serverResponse = {
         status: "success",
@@ -195,7 +185,7 @@ async function uploadClientAvatar(req, res, next) {
   }
 }
 
-async function verifyClientPhoneNumber(req, res, next) {
+async function verifyEmployerPhoneNumber(req, res, next) {
   try {
     const { phoneNumber } = req.body;
     const params = {
@@ -225,9 +215,9 @@ async function verifyClientPhoneNumber(req, res, next) {
   }
 }
 
-async function confirmClientPhoneNumber(req, res, next) {
+async function confirmEmployerPhoneNumber(req, res, next) {
   try {
-    const { id, token, clientId } = req.body;
+    const { id, token, employerId } = req.body;
     messageBird.verify.verify(id, token, function (err, response) {
       if (err) {
         const { statusCode } = err;
@@ -243,23 +233,25 @@ async function confirmClientPhoneNumber(req, res, next) {
         return;
       }
       const updateObject = { "phone.isVerified": true, updatedAt: new Date() };
-      DAOs.clientsDAO.updateClient(clientId, updateObject).then((response) => {
-        const { success, statusCode, data } = response;
-        if (success) {
-          const serverResponse = {
-            status: "success",
-            data: { message: "Phone number is verified." },
-          };
-          return writeServerResponse(
-            res,
-            serverResponse,
-            statusCode,
-            "application/json",
-          );
-        }
-        next(ApiError.notfound(data.error));
-        return;
-      });
+      DAOs.employersDAO
+        .updateEmployer(employerId, updateObject)
+        .then((response) => {
+          const { success, statusCode, data } = response;
+          if (success) {
+            const serverResponse = {
+              status: "success",
+              data: { message: "Phone number is verified." },
+            };
+            return writeServerResponse(
+              res,
+              serverResponse,
+              statusCode,
+              "application/json",
+            );
+          }
+          next(ApiError.notfound(data.error));
+          return;
+        });
     });
   } catch (error) {
     next(ApiError.internal(`Something went wrong: ${error.message}`));
@@ -267,11 +259,11 @@ async function confirmClientPhoneNumber(req, res, next) {
   }
 }
 export default {
-  createClientProfile,
-  getClients,
-  getClientDetails,
-  changeClientDetails,
-  uploadClientAvatar,
-  verifyClientPhoneNumber,
-  confirmClientPhoneNumber,
+  createEmployerProfile,
+  getEmployers,
+  getEmployerDetails,
+  changeEmployerDetails,
+  uploadEmployerAvatar,
+  verifyEmployerPhoneNumber,
+  confirmEmployerPhoneNumber,
 };

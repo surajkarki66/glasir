@@ -553,7 +553,7 @@ async function deleteUser(req, res, next) {
           "application/json",
         );
       }
-      next(ApiError.notfound("User or Freelancer or Client not found."));
+      next(ApiError.notfound("User or Freelancer or Employer not found."));
       return;
     }
     next(ApiError.notfound("User doesn't exist."));

@@ -7,14 +7,14 @@ import validations, { permissions, file } from "../middlewares/index";
 const router = new Router();
 
 const { checkAuth, dataValidation } = validations;
-const { authPermissions, clientPermissions } = permissions;
+const { authPermissions, employerPermissions } = permissions;
 
 router
   .route("/createJob")
   .post(checkAuth)
   .post(
     authPermissions.onlyActiveUserCanDoThisAction,
-    clientPermissions.onlyClientCanDoThisAction,
+    employerPermissions.onlyEmployerCanDoThisAction,
   )
   .post(dataValidation(Schemas.jobSchema.jobCREATE, "body"))
   .post(JobController.createJob);
