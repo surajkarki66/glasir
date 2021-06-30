@@ -177,6 +177,26 @@ async function changeJobDetails(req, res, next) {
     return;
   }
 }
+async function deleteJob(req, res, next) {
+  try {
+    const { jobId } = req.params;
+
+    const { success } = DAOs.jobsDAO.deleteJobById(jobId);
+
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: { message: "Deleted successfully." },
+      };
+      return writeServerResponse(res, serverResponse, 200, "application/json");
+    }
+    next(ApiError.notfound("Job doesn't exist."));
+    return;
+  } catch (e) {
+    next(ApiError.internal(`Something went wrong: ${e.message}`));
+    return;
+  }
+}
 
 export default {
   createJob,
@@ -184,4 +204,5 @@ export default {
   searchJob,
   getJobDetails,
   changeJobDetails,
+  deleteJob,
 };

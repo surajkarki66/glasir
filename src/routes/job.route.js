@@ -47,4 +47,11 @@ router
   .patch(dataValidation(Schemas.jobSchema.jobUPDATE, "body"))
   .patch(JobController.changeJobDetails);
 
+router
+  .route("/delete/:jobId")
+  .delete(checkAuth)
+  .delete(authPermissions.onlyAdminCanDoThisAction)
+  .delete(dataValidation(Schemas.jobSchema.jobDELETE, "params"))
+  .delete(JobController.deleteJob);
+
 export default router;

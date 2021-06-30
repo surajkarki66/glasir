@@ -117,6 +117,9 @@ const schemas = {
     }),
     updatedAt: Joi.date().default(new Date()),
   }),
+  jobDELETE: Joi.object().keys({
+    jobId: Joi.string().length(24).hex().required(),
+  }),
 };
 
 export default schemas;
