@@ -523,6 +523,9 @@ async function getUserDetails(req, res, next) {
   }
 }
 async function deleteUser(req, res, next) {
+  /**
+   * TODO: when we delete the user , it must delete its profile, job created by him/her, proposals etc
+   */
   try {
     const { password } = req.body;
     const { userId } = req.params;
