@@ -223,6 +223,54 @@ class JobsDAO {
       throw e;
     }
   }
+  static async getJobById(id) {
+    try {
+      const pipeline = [
+        { $match: { _id: ObjectId(id) } },
+        {
+          $lookup: {
+            from: "employers",
+            localField: "employer",
+            foreignField: "_id",
+            as: "employer",
+          },
+        },
+        {
+          $addFields: {
+            employer: { $arrayElemAt: ["$user", 0] },
+          },
+        },
+        {
+          $project: {
+            "employer.phone": 0,
+          },
+        },
+      ];
+
+      const job = await JobsDAO.#jobs.aggregate(pipeline).next();
+      if (job) {
+        return {
+          success: true,
+          data: job,
+          statusCode: 200,
+        };
+      } else {
+        const message = "No document matching id: " + id + " could be found!";
+        logger.error(message, "getJobById()");
+        return {
+          success: false,
+          data: {},
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Unable to convert cursor to array or problem counting documents, ${e.message}`,
+        "getJobById()",
+      );
+      throw e;
+    }
+  }
 }
 
 export default JobsDAO;
