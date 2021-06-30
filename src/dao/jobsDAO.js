@@ -308,6 +308,34 @@ class JobsDAO {
       throw e;
     }
   }
+  static async deleteJobById(jobId) {
+    try {
+      const result = await JobsDAO.#jobs.deleteOne({
+        _id: ObjectId(jobId),
+      });
+      if (result.deletedCount === 1) {
+        return {
+          success: true,
+          data: { message: "Deleted successfully." },
+          statusCode: 200,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No job exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while deleting job, ${e}`,
+        "deleteJobById()",
+      );
+      throw e;
+    }
+  }
 }
 
 export default JobsDAO;
