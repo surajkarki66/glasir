@@ -7,7 +7,7 @@ import validations, { permissions, file } from "../middlewares/index";
 const router = new Router();
 
 const { checkAuth, dataValidation } = validations;
-const { authPermissions, employerPermissions } = permissions;
+const { authPermissions, employerPermissions, jobPermissions } = permissions;
 
 router
   .route("/createJob")
@@ -35,5 +35,16 @@ router
   .get(checkAuth)
   .get(dataValidation(Schemas.jobSchema.jobDETAILS, "params"))
   .get(JobController.getJobDetails);
+
+router
+  .route("/update-job/:jobId")
+  .patch(checkAuth)
+  .patch(
+    authPermissions.onlyActiveUserCanDoThisAction,
+    employerPermissions.onlyEmployerCanDoThisAction,
+    jobPermissions.onlyJobOwnerCanDoThisAction,
+  )
+  .patch(dataValidation(Schemas.jobSchema.jobUPDATE, "body"))
+  .patch(JobController.changeJobDetails);
 
 export default router;

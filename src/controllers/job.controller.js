@@ -144,4 +144,44 @@ async function getJobDetails(req, res, next) {
   }
 }
 
-export default { createJob, getJobs, searchJob, getJobDetails };
+async function changeJobDetails(req, res, next) {
+  try {
+    const { jobId } = req.params;
+
+    let jobDetails = {
+      ...req.body,
+      updatedAt: new Date(),
+    };
+
+    const { success, data, statusCode } = await DAOs.jobsDAO.updateJob(
+      jobId,
+      jobDetails,
+    );
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: { message: "Updated successfully." },
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    } else {
+      next(ApiError.notfound(data.error));
+      return;
+    }
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+
+export default {
+  createJob,
+  getJobs,
+  searchJob,
+  getJobDetails,
+  changeJobDetails,
+};
