@@ -119,4 +119,29 @@ async function searchJob(req, res, next) {
   }
 }
 
-export default { createJob, getJobs, searchJob };
+async function getJobDetails(req, res, next) {
+  try {
+    const { jobId } = req.params;
+    const { success, data, statusCode } = await DAOs.jobsDAO.getJobById(jobId);
+
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: data,
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    }
+    next(ApiError.notfound("Job doesn't exist."));
+    return;
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+
+export default { createJob, getJobs, searchJob, getJobDetails };

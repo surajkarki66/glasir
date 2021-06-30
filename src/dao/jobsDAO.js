@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 import config from "../configs/config";
 import logger from "../configs/logger";
 
@@ -237,7 +239,7 @@ class JobsDAO {
         },
         {
           $addFields: {
-            employer: { $arrayElemAt: ["$user", 0] },
+            employer: { $arrayElemAt: ["$employer", 0] },
           },
         },
         {

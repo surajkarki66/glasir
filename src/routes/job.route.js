@@ -30,4 +30,10 @@ router
   .get(dataValidation(Schemas.jobSchema.jobSEARCH, "query"))
   .get(JobController.searchJob);
 
+router
+  .route("/:jobId")
+  .get(checkAuth)
+  .get(dataValidation(Schemas.jobSchema.jobDETAILS, "params"))
+  .get(JobController.getJobDetails);
+
 export default router;
