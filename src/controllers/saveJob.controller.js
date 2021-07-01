@@ -39,4 +39,36 @@ async function saveJob(req, res, next) {
   }
 }
 
-export default { saveJob };
+async function unsavedJob(req, res, next) {
+  try {
+    const { jobId } = req.body;
+    const { aud } = req.jwt;
+    const { success, statusCode, data } = await DAOs.saveJobsDAO.deleteSaveJob(
+      aud,
+      jobId,
+    );
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: { message: "Job is unsaved successfully" },
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    }
+    return writeServerResponse(
+      res,
+      { status: "failed", data: data },
+      statusCode,
+      "application/json",
+    );
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+
+export default { saveJob, unsavedJob };

@@ -51,6 +51,35 @@ class SaveJobsDAO {
   static async getSaveJobByJobId(jobId) {
     return await SaveJobsDAO.#saveJobs.findOne({ job: ObjectId(jobId) });
   }
+  static async deleteSaveJob(userId, jobId) {
+    try {
+      const result = await SaveJobsDAO.#saveJobs.deleteOne({
+        job: ObjectId(jobId),
+        user: ObjectId(userId),
+      });
+      if (result.deletedCount === 1) {
+        return {
+          success: true,
+          data: { message: "Deleted successfully." },
+          statusCode: 200,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "Job doesn't exist.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while deleting job, ${e}`,
+        "deleteSaveJob()",
+      );
+      throw e;
+    }
+  }
 }
 
 export default SaveJobsDAO;
