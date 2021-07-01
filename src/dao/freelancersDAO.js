@@ -356,14 +356,14 @@ class FreelancersDAO {
   static async addJobId(freelancerId, jobId) {
     try {
       /**
-       * TODO: Push jobId to freelancer's profile
+       * Push jobId to freelancer's profile
        * This is for freelancer to show how many jobs they already worked in past.
        */
       const result = await FreelancersDAO.freelancers.updateOne(
         {
           _id: ObjectId(freelancerId),
         },
-        { $addToSet: { jobsWorkedIn: jobId } },
+        { $addToSet: { jobsWorkedIn: ObjectId(jobId) } },
       );
       if (
         (result.modifiedCount === 1 && result.matchedCount === 1) ||
@@ -372,18 +372,9 @@ class FreelancersDAO {
         return {
           success: true,
           data: {
-            message: "Updated successfully.",
+            message: "jobId added successfully.",
           },
           statusCode: 201,
-        };
-      }
-      if (result.modifiedCount === 0) {
-        return {
-          success: false,
-          data: {
-            message: "jobId is already in the array",
-          },
-          statusCode: 400,
         };
       } else {
         return {
