@@ -23,4 +23,11 @@ router
   .post(dataValidation(Schemas.saveJobSchema.saveJobDELETE, "body"))
   .post(SaveJobController.unsavedJob);
 
+router
+  .route("/saved")
+  .post(checkAuth)
+  .post(freelancerPermissions.onlyFreelancerCanDoThisAction)
+  .post(dataValidation(Schemas.saveJobSchema.saveJobSAVED, "body"))
+  .post(SaveJobController.savedJob);
+
 export default router;

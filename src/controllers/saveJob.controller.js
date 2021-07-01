@@ -7,7 +7,7 @@ async function saveJob(req, res, next) {
   try {
     const { jobId } = req.body;
     const { aud } = req.jwt;
-    if (await DAOs.saveJobsDAO.getSaveJobByJobId(jobId)) {
+    if (await DAOs.saveJobsDAO.getSaveJobByJobIdAndUserId(aud, jobId)) {
       next(ApiError.badRequest("Job is already saved"));
       return;
     }
@@ -70,5 +70,27 @@ async function unsavedJob(req, res, next) {
     return;
   }
 }
+async function savedJob(req, res, next) {
+  try {
+    const { jobId } = req.body;
+    const { aud } = req.jwt;
+    const job = await DAOs.saveJobsDAO.getSaveJobByJobIdAndUserId(aud, jobId);
+    if (job) {
+      const serverResponse = {
+        status: "success",
+        data: { isSaved: true },
+      };
+      return writeServerResponse(res, serverResponse, 200, "application/json");
+    }
+    const serverResponse = {
+      status: "success",
+      data: { isSaved: false },
+    };
+    return writeServerResponse(res, serverResponse, 200, "application/json");
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
 
-export default { saveJob, unsavedJob };
+export default { saveJob, unsavedJob, savedJob };

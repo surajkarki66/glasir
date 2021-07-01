@@ -48,8 +48,11 @@ class SaveJobsDAO {
       throw e;
     }
   }
-  static async getSaveJobByJobId(jobId) {
-    return await SaveJobsDAO.#saveJobs.findOne({ job: ObjectId(jobId) });
+  static async getSaveJobByJobIdAndUserId(userId, jobId) {
+    return await SaveJobsDAO.#saveJobs.findOne({
+      job: ObjectId(jobId),
+      user: ObjectId(userId),
+    });
   }
   static async deleteSaveJob(userId, jobId) {
     try {
