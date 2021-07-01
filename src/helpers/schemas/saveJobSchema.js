@@ -12,6 +12,10 @@ const schemas = {
   saveJobSAVED: Joi.object().keys({
     jobId: Joi.string().length(24).hex().required(),
   }),
+  savedJobsLIST: Joi.object().keys({
+    page: Joi.number().min(0).required(),
+    jobsPerPage: Joi.number().min(1).required(),
+  }),
 };
 
 export default schemas;

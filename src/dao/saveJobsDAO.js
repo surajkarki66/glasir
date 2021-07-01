@@ -4,6 +4,7 @@ import { ObjectId } from "mongodb";
 
 class SaveJobsDAO {
   static #saveJobs;
+  static #DEFAULT_SORT = { createdAt: -1, updatedAt: -1 };
 
   static async injectDB(conn) {
     if (SaveJobsDAO.#saveJobs) {
@@ -79,6 +80,74 @@ class SaveJobsDAO {
       logger.error(
         `Error occurred while deleting job, ${e}`,
         "deleteSaveJob()",
+      );
+      throw e;
+    }
+  }
+  static async getJobs({ filter, page = 0, jobsPerPage = 20 } = {}) {
+    let queryParams = {};
+    if (filter) {
+      queryParams = filter;
+    }
+
+    const {
+      query = filter,
+      project = {
+        "job.projectLengthInHours": 0,
+        "job.category": 0,
+        "job.projectType": 0,
+        "job.proposals": 0,
+      },
+      sort = SaveJobsDAO.#DEFAULT_SORT,
+    } = queryParams;
+    let pipeline = [
+      { $match: query },
+      {
+        $lookup: {
+          from: "jobs",
+          localField: "job",
+          foreignField: "_id",
+          as: "job",
+        },
+      },
+      {
+        $addFields: {
+          job: { $arrayElemAt: ["$job", 0] },
+        },
+      },
+      {
+        $project: project,
+      },
+      { $sort: sort },
+    ];
+    let cursor;
+    try {
+      cursor = await SaveJobsDAO.#saveJobs.aggregate(pipeline);
+    } catch (e) {
+      console.error(`Unable to issue find command, ${e}`);
+      return {
+        success: false,
+        data: [],
+        totalNumJobs: 0,
+        statusCode: 404,
+      };
+    }
+    const displayCursor = cursor
+      .skip(parseInt(page) * parseInt(jobsPerPage))
+      .limit(parseInt(jobsPerPage));
+
+    try {
+      const documents = await displayCursor.toArray();
+      const totalNumJobs = documents.length;
+      return {
+        success: true,
+        data: documents,
+        totalNumJobs,
+        statusCode: documents.length > 0 ? 200 : 404,
+      };
+    } catch (e) {
+      logger.error(
+        `Unable to convert cursor to array or problem counting documents, ${e.message}`,
       );
       throw e;
     }

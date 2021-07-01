@@ -92,5 +92,39 @@ async function savedJob(req, res, next) {
     return;
   }
 }
+async function getSavedJobs(req, res, next) {
+  try {
+    const { page, jobsPerPage } = req.query;
+    const { userId } = req.body;
+    if (!userId) {
+      next(ApiError.badRequest("UserId is required"));
+      return;
+    }
+    const filter = { user: ObjectId(userId) };
+    const { success, data, totalNumJobs, statusCode } =
+      await DAOs.saveJobsDAO.getJobs({ filter, page, jobsPerPage });
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        savedJobs: data,
+        page: parseInt(page),
+        filters: {},
+        entriesPerPage: parseInt(jobsPerPage),
+        totalResults: totalNumJobs,
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    }
+    next(ApiError.notfound("Jobs are not found."));
+    return;
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
 
-export default { saveJob, unsavedJob, savedJob };
+export default { saveJob, unsavedJob, savedJob, getSavedJobs };
