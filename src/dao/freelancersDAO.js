@@ -410,7 +410,7 @@ class FreelancersDAO {
         return {
           success: true,
           data: {
-            message: "Employement added successfully.",
+            message: "Employment added successfully.",
           },
           statusCode: 201,
         };

@@ -311,21 +311,6 @@ async function changeFreelancerDetails(req, res, next) {
   }
 }
 
-async function incrementNoOfJobsWorkedIn(req, res, next) {
-  try {
-    const { freelancerId } = req.params;
-    const { jobId } = req.body;
-    /**
-     *  TODO 2: rating freelancer by employer.
-     * if employer rate the freelancer a/c to  how he/she job performs .
-     *
-     */
-  } catch (error) {
-    next(ApiError.internal(`Something went wrong: ${error.message}`));
-    return;
-  }
-}
-
 async function addEmployment(req, res, next) {
   try {
     const { freelancerId } = req.body;
