@@ -359,6 +359,41 @@ class FreelancersDAO {
        * TODO: Push jobId to freelancer's profile
        * This is for freelancer to show how many jobs they already worked in past.
        */
+      const result = await FreelancersDAO.freelancers.updateOne(
+        {
+          _id: ObjectId(freelancerId),
+        },
+        { $addToSet: { jobsWorkedIn: jobId } },
+      );
+      if (
+        (result.modifiedCount === 1 && result.matchedCount === 1) ||
+        result.matchedCount === 1
+      ) {
+        return {
+          success: true,
+          data: {
+            message: "Updated successfully.",
+          },
+          statusCode: 201,
+        };
+      }
+      if (result.modifiedCount === 0) {
+        return {
+          success: false,
+          data: {
+            message: "jobId is already in the array",
+          },
+          statusCode: 400,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No freelancer exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
     } catch (e) {
       logger.error(
         `Error occurred while adding job id, ${e}`,
