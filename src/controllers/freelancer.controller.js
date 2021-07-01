@@ -449,5 +449,4 @@ export default {
   updateEmployment,
   verifyFreelancerPhoneNumber,
   confirmFreelancerPhoneNumber,
-  incrementNoOfJobsWorkedIn,
 };

@@ -11,6 +11,7 @@ db()
     DAOs.freelancersDAO.injectDB(client);
     DAOs.employersDAO.injectDB(client);
     DAOs.jobsDAO.injectDB(client);
+    DAOs.saveJobsDAO.injectDB(client);
 
     // logging
     logger.info("Database connected successfully.");
