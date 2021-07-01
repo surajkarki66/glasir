@@ -3,6 +3,7 @@ import freelancerSchema from "./freelancerSchema";
 import employerSchema from "./employerSchema";
 import commonSchema from "./commonSchema";
 import jobSchema from "./jobSchema";
+import saveJobSchema from "./saveJobSchema";
 
 export default {
   userSchema,
@@ -10,4 +11,5 @@ export default {
   employerSchema,
   commonSchema,
   jobSchema,
+  saveJobSchema,
 };

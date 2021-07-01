@@ -1,5 +1,6 @@
 import logger from "../configs/logger";
 import config from "../configs/config";
+import { ObjectId } from "mongodb";
 
 class SaveJobsDAO {
   static #saveJobs;
@@ -46,6 +47,9 @@ class SaveJobsDAO {
       logger.error(`Error occurred while adding new job, ${e}.`);
       throw e;
     }
+  }
+  static async getSaveJobByJobId(jobId) {
+    return await SaveJobsDAO.#saveJobs.findOne({ job: ObjectId(jobId) });
   }
 }
 
