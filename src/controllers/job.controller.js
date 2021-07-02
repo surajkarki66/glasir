@@ -1,4 +1,4 @@
-import { ObjectId } from "bson";
+import { ObjectId } from "mongodb";
 
 import DAOs from "../dao/index";
 import ApiError from "../errors/ApiError";
@@ -6,16 +6,10 @@ import { writeServerResponse } from "../helpers/response";
 
 async function createJob(req, res, next) {
   try {
-    const { aud } = req.jwt;
-    const employer = await DAOs.employersDAO.getEmployerByUserId(aud);
-    if (!employer) {
-      next(ApiError.notfound("Employer not found"));
-      return;
-    }
-    const { _id } = employer;
+    const { employer } = req.body;
     const jobInfo = {
-      employer: ObjectId(_id),
       ...req.body,
+      employer: ObjectId(employer),
     };
     const { success, data, statusCode } = await DAOs.jobsDAO.createJob(jobInfo);
     if (success) {
