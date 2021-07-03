@@ -2,13 +2,15 @@ import path from "path";
 import multer from "multer";
 
 import ApiError from "../errors/ApiError";
+
 const fileUpload = (destination, fileType) => {
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, path.join(__dirname + destination));
     },
     filename: function (req, file, cb) {
-      const fileName = file.originalname;
+      const { aud } = req.jwt;
+      const fileName = aud.slice(15, 24) + "_" + file.originalname;
       cb(null, fileName);
     },
   });
