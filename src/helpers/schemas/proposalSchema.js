@@ -2,8 +2,8 @@ import Joi from "joi";
 
 const schemas = {
   proposalCREATE: Joi.object().keys({
-    job: Joi.string().length(24).hex().required(),
-    freelancer: Joi.string().length(24).hex().required(),
+    jobId: Joi.string().length(24).hex().required(),
+    freelancerId: Joi.string().length(24).hex().required(),
     projectLengthInHours: Joi.number().greater(0).required(),
     bidType: Joi.string().valid("fixed", "hourly").required(),
     fixedBidAmount: Joi.number()

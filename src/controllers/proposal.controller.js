@@ -6,7 +6,7 @@ import { writeServerResponse } from "../helpers/response";
 
 async function createProposal(req, res, next) {
   try {
-    const { freelancer, job } = req.body;
+    const { freelancerId, jobId } = req.body;
     const additionalFiles = req.files;
     const newAdditionalFiles = additionalFiles.map((file) => {
       const fileProperties = {
@@ -15,15 +15,18 @@ async function createProposal(req, res, next) {
       return fileProperties;
     });
     if (
-      await DAOs.proposalsDAO.getProposalByFreelancerIdAndJobId(freelancer, job)
+      await DAOs.proposalsDAO.getProposalByFreelancerIdAndJobId(
+        freelancerId,
+        jobId,
+      )
     ) {
       next(ApiError.badRequest("Proposal is already saved"));
       return;
     }
     const proposalInfo = {
       ...req.body,
-      freelancer: ObjectId(freelancer),
-      job: ObjectId(job),
+      freelancer: ObjectId(freelancerId),
+      job: ObjectId(jobId),
       additionalFiles: newAdditionalFiles,
     };
     const { success, data, statusCode } =
