@@ -17,6 +17,7 @@ import commonRoutes from "./routes/common.route";
 import employerRoutes from "./routes/employer.route";
 import jobRoutes from "./routes/job.route";
 import saveJobRoutes from "./routes/saveJob.route";
+import proposalRoutes from "./routes/proposal.route";
 
 const app = express();
 
@@ -82,6 +83,7 @@ app.use("/api/v1/common", commonRoutes);
 app.use("/api/v1/employer", employerRoutes);
 app.use("/api/v1/job", jobRoutes);
 app.use("/api/v1/saveJob", saveJobRoutes);
+app.use("/api/v1/proposal", proposalRoutes);
 
 // Error middleware
 app.use(apiErrorHandler);

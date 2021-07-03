@@ -44,6 +44,7 @@ router
       .fileUpload("../../../public/uploads/avatars/freelancers", [
         "image/jpeg",
         "image/jpg",
+        "image/png",
       ])
       .single("avatar"),
   )
@@ -62,6 +63,7 @@ router
       .fileUpload("../../../public/uploads/documents/", [
         "application/pdf",
         "application/docx",
+        "application/vnd.oasis.opendocument.text",
       ])
       .fields([
         { name: "citizenship", maxCount: 1 },

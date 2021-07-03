@@ -56,6 +56,7 @@ router
       .fileUpload("../../../public/uploads/avatars/employers", [
         "image/jpeg",
         "image/jpg",
+        "image/png",
       ])
       .single("avatar"),
   )

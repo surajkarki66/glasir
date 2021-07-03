@@ -21,15 +21,23 @@ const fileUpload = (destination, fileType) => {
   });
 
   const fileFilter = (req, file, cb) => {
-    if (file.mimetype === fileType[0] || file.mimetype === fileType[1]) {
+    if (fileType.length === 0) {
       cb(null, true);
     } else {
-      cb(
-        ApiError.badRequest(
-          `Only supports ${fileType[0]} and ${fileType[1]} formats.`,
-        ),
-        false,
-      );
+      if (
+        file.mimetype === fileType[0] ||
+        file.mimetype === fileType[1] ||
+        file.mimetype === fileType[2]
+      ) {
+        cb(null, true);
+      } else {
+        cb(
+          ApiError.badRequest(
+            `Only supports ${fileType[0]} ,${fileType[1]} and ${fileType[2]} formats.`,
+          ),
+          false,
+        );
+      }
     }
   };
 
