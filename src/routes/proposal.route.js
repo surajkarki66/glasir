@@ -20,4 +20,11 @@ router
   .post(dataValidation(Schemas.proposalSchema.proposalCREATE, "body"))
   .post(ProposalController.createProposal);
 
+router
+  .route("/isProposalExist")
+  .post(checkAuth)
+  .post(freelancerPermissions.onlyFreelancerCanDoThisAction)
+  .post(dataValidation(Schemas.proposalSchema.isProposalEXIST, "body"))
+  .post(ProposalController.isProposalExist);
+
 export default router;

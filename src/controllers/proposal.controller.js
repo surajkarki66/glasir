@@ -51,5 +51,29 @@ async function createProposal(req, res, next) {
     return;
   }
 }
+async function isProposalExist(req, res, next) {
+  try {
+    const { jobId, freelancerId } = req.body;
+    const proposal = await DAOs.proposalsDAO.getProposalByFreelancerIdAndJobId(
+      freelancerId,
+      jobId,
+    );
+    if (proposal) {
+      const serverResponse = {
+        status: "success",
+        data: { isProposalExist: true },
+      };
+      return writeServerResponse(res, serverResponse, 200, "application/json");
+    }
+    const serverResponse = {
+      status: "success",
+      data: { isProposalExist: false },
+    };
+    return writeServerResponse(res, serverResponse, 200, "application/json");
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
 
-export default { createProposal };
+export default { createProposal, isProposalExist };
