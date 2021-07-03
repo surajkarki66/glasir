@@ -5,6 +5,13 @@ import config from "../configs/config";
 
 class ProposalsDAO {
   static #proposals;
+  static #DEFAULT_SORT = { createdAt: -1, updatedAt: -1 };
+  static #DEFAULT_PROJECT = {
+    "job.title": 1,
+    status: 1,
+    createdAt: 1,
+    updatedAt: 1,
+  };
 
   static async injectDB(conn) {
     if (ProposalsDAO.#proposals) {
@@ -57,6 +64,69 @@ class ProposalsDAO {
       job: ObjectId(jobId),
       freelancer: ObjectId(freelancerId),
     });
+  }
+  static async getProposals({ filter, page = 0, proposalsPerPage = 20 } = {}) {
+    let queryParams = {};
+    if (filter) {
+      queryParams = filter;
+    }
+
+    const {
+      query = filter,
+      project = ProposalsDAO.#DEFAULT_PROJECT,
+      sort = ProposalsDAO.#DEFAULT_SORT,
+    } = queryParams;
+    let pipeline = [
+      { $match: query },
+      {
+        $lookup: {
+          from: "jobs",
+          localField: "job",
+          foreignField: "_id",
+          as: "job",
+        },
+      },
+      {
+        $addFields: {
+          job: { $arrayElemAt: ["$job", 0] },
+        },
+      },
+      {
+        $project: project,
+      },
+      { $sort: sort },
+    ];
+    let cursor;
+    try {
+      cursor = await ProposalsDAO.#proposals.aggregate(pipeline);
+    } catch (e) {
+      console.error(`Unable to issue find command, ${e}`);
+      return {
+        success: false,
+        data: [],
+        totalNumProposals: 0,
+        statusCode: 404,
+      };
+    }
+    const displayCursor = cursor
+      .skip(parseInt(page) * parseInt(proposalsPerPage))
+      .limit(parseInt(proposalsPerPage));
+
+    try {
+      const documents = await displayCursor.toArray();
+      const totalNumProposals = documents.length;
+      return {
+        success: true,
+        data: documents,
+        totalNumProposals,
+        statusCode: documents.length > 0 ? 200 : 404,
+      };
+    } catch (e) {
+      logger.error(
+        `Unable to convert cursor to array or problem counting documents, ${e.message}`,
+      );
+      throw e;
+    }
   }
 }
 

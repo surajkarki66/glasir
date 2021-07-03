@@ -1,4 +1,4 @@
-import { ObjectId } from "bson";
+import { ObjectId } from "mongodb";
 import parsePhoneNumber from "libphonenumber-js";
 
 import DAOs from "../dao/index";

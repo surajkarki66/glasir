@@ -27,4 +27,13 @@ router
   .post(dataValidation(Schemas.proposalSchema.isProposalEXIST, "body"))
   .post(ProposalController.isProposalExist);
 
+router
+  .route("/myProposals")
+  .get(checkAuth)
+  .get(dataValidation(Schemas.proposalSchema.getMyProposalsLIST, "query"))
+  .get(
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    freelancerPermissions.onlySameFreelancerCanDoThisAction,
+  )
+  .get(ProposalController.getMyProposals);
 export default router;
