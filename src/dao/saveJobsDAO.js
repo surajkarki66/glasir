@@ -49,17 +49,17 @@ class SaveJobsDAO {
       throw e;
     }
   }
-  static async getSaveJobByJobIdAndUserId(userId, jobId) {
+  static async getSaveJobByJobIdAndFreelancerId(freelancerId, jobId) {
     return await SaveJobsDAO.#saveJobs.findOne({
       job: ObjectId(jobId),
-      user: ObjectId(userId),
+      freelancer: ObjectId(freelancerId),
     });
   }
-  static async deleteSaveJob(userId, jobId) {
+  static async deleteSaveJob(freelancerId, jobId) {
     try {
       const result = await SaveJobsDAO.#saveJobs.deleteOne({
         job: ObjectId(jobId),
-        user: ObjectId(userId),
+        freelancer: ObjectId(freelancerId),
       });
       if (result.deletedCount === 1) {
         return {
