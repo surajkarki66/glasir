@@ -52,12 +52,12 @@ async function login(req, res, next) {
       }
     }
     const actualPassword = userData.password;
-    const { _id, role, isActive } = userData;
+    const { _id, role } = userData;
     if (!(await comparePassword(password, actualPassword))) {
       next(ApiError.badRequest("Oops! Password is incorrect."));
       return;
     }
-    const payload = { role, isActive };
+    const payload = { role };
     const token = await signToken(_id, payload, "ACCESS", config.jwtExpires);
 
     const serverResponse = {

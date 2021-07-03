@@ -167,9 +167,7 @@ async function changeEmployerDetails(req, res, next) {
 }
 
 async function uploadEmployerAvatar(req, res, next) {
-  // this is not working
   try {
-    console.log("l");
     const file = req.file;
     if (!file) {
       next(ApiError.badRequest("No image selected."));

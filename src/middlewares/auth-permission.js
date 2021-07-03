@@ -1,3 +1,4 @@
+import DAOs from "../dao/index";
 import ApiError from "../errors/ApiError";
 
 const onlySameUserCanDoThisAction = (req, res, next) => {
@@ -48,8 +49,10 @@ const onlyAdminCanDoThisAction = (req, res, next) => {
   }
 };
 
-const onlyActiveUserCanDoThisAction = (req, res, next) => {
-  const { isActive } = req.jwt;
+const onlyActiveUserCanDoThisAction = async (req, res, next) => {
+  const { aud } = req.jwt;
+  const { data } = await DAOs.usersDAO.getUserById(aud);
+  const { isActive } = data;
   if (isActive) {
     return next();
   }
