@@ -25,11 +25,11 @@ router
   .post(SaveJobController.unsavedJob);
 
 router
-  .route("/saved")
+  .route("/isJobSaved")
   .post(checkAuth)
   .post(freelancerPermissions.onlyFreelancerCanDoThisAction)
-  .post(dataValidation(Schemas.saveJobSchema.saveJobSAVED, "body"))
-  .post(SaveJobController.savedJob);
+  .post(dataValidation(Schemas.saveJobSchema.isJobSAVED, "body"))
+  .post(SaveJobController.isJobSaved);
 
 router
   .route("/getSavedJobs")

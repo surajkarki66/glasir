@@ -9,7 +9,7 @@ const schemas = {
   saveJobDELETE: Joi.object().keys({
     jobId: Joi.string().length(24).hex().required(),
   }),
-  saveJobSAVED: Joi.object().keys({
+  isJobSAVED: Joi.object().keys({
     jobId: Joi.string().length(24).hex().required(),
   }),
   savedJobsLIST: Joi.object().keys({

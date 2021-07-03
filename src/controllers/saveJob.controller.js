@@ -70,7 +70,7 @@ async function unsavedJob(req, res, next) {
     return;
   }
 }
-async function savedJob(req, res, next) {
+async function isJobSaved(req, res, next) {
   try {
     const { jobId } = req.body;
     const { aud } = req.jwt;
@@ -127,4 +127,4 @@ async function getSavedJobs(req, res, next) {
   }
 }
 
-export default { saveJob, unsavedJob, savedJob, getSavedJobs };
+export default { saveJob, unsavedJob, isJobSaved, getSavedJobs };
