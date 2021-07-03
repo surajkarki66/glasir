@@ -102,12 +102,8 @@ async function isJobSaved(req, res, next) {
 }
 async function getSavedJobs(req, res, next) {
   try {
-    const { page, jobsPerPage } = req.query;
-    const { freelancerId } = req.body;
-    if (!freelancerId) {
-      next(ApiError.badRequest("freelancerId is required"));
-      return;
-    }
+    const { page, jobsPerPage, freelancerId } = req.query;
+
     const filter = { freelancer: ObjectId(freelancerId) };
     const { success, data, totalNumJobs, statusCode } =
       await DAOs.saveJobsDAO.getJobs({ filter, page, jobsPerPage });

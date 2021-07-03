@@ -16,6 +16,7 @@ const schemas = {
     jobId: Joi.string().length(24).hex().required(),
   }),
   savedJobsLIST: Joi.object().keys({
+    freelancerId: Joi.string().length(24).hex().required(),
     page: Joi.number().min(0).required(),
     jobsPerPage: Joi.number().min(1).required(),
   }),

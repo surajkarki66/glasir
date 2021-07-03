@@ -32,12 +32,12 @@ router
 
 router
   .route("/getSavedJobs")
-  .post(checkAuth)
-  .post(
+  .get(checkAuth)
+  .get(
     freelancerPermissions.onlyFreelancerCanDoThisAction,
     freelancerPermissions.onlySameFreelancerCanDoThisAction,
   )
-  .post(dataValidation(Schemas.saveJobSchema.savedJobsLIST, "query"))
-  .post(SaveJobController.getSavedJobs);
+  .get(dataValidation(Schemas.saveJobSchema.savedJobsLIST, "query"))
+  .get(SaveJobController.getSavedJobs);
 
 export default router;
