@@ -26,6 +26,9 @@ const schemas = {
     proposalsPerPage: Joi.number().min(1).required(),
     freelancerId: Joi.string().length(24).hex().required(),
   }),
+  getProposalDETAILS: Joi.object().keys({
+    proposalId: Joi.string().length(24).hex().required(),
+  }),
 };
 
 export default schemas;

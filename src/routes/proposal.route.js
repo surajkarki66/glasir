@@ -36,4 +36,12 @@ router
     freelancerPermissions.onlySameFreelancerCanDoThisAction,
   )
   .get(ProposalController.getMyProposals);
+
+router
+  .route("/:proposalId")
+  .get(checkAuth)
+  .get(freelancerPermissions.onlyFreelancerCanDoThisAction)
+  .get(dataValidation(Schemas.proposalSchema.getProposalDETAILS, "params"))
+  .get(ProposalController.getProposalDetails);
+
 export default router;

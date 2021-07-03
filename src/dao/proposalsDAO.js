@@ -128,6 +128,77 @@ class ProposalsDAO {
       throw e;
     }
   }
+  static async getProposalById(id) {
+    try {
+      const pipeline = [
+        { $match: { _id: ObjectId(id) } },
+        {
+          $lookup: {
+            from: "jobs",
+            localField: "job",
+            foreignField: "_id",
+            as: "job",
+          },
+        },
+        {
+          $addFields: {
+            job: { $arrayElemAt: ["$job", 0] },
+          },
+        },
+        {
+          $lookup: {
+            from: "employers",
+            localField: "job.employer",
+            foreignField: "_id",
+            as: "job.employer",
+          },
+        },
+        {
+          $addFields: {
+            "job.employer": { $arrayElemAt: ["$job.employer", 0] },
+          },
+        },
+
+        {
+          $project: {
+            "job.proposals": 0,
+            "job.employer.avatar": 0,
+            "job.employer.company.website": 0,
+            "job.employer.company.tagline": 0,
+            "job.employer.company.phone": 0,
+            "job.employer.location.zip": 0,
+            "job.employer.user": 0,
+            "job.employer.isVerified": 0,
+            "job.employer.createdAt": 0,
+            "job.employer.updatedAt": 0,
+          },
+        },
+      ];
+
+      const proposal = await ProposalsDAO.#proposals.aggregate(pipeline).next();
+      if (proposal) {
+        return {
+          success: true,
+          data: proposal,
+          statusCode: 200,
+        };
+      } else {
+        const message = "No document matching id: " + id + " could be found!";
+        logger.error(message, "getProposalById()");
+        return {
+          success: false,
+          data: {},
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Unable to convert cursor to array or problem counting documents, ${e.message}`,
+        "getProposalById()",
+      );
+      throw e;
+    }
+  }
 }
 
 export default ProposalsDAO;
