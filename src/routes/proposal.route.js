@@ -44,4 +44,14 @@ router
   .get(dataValidation(Schemas.proposalSchema.getProposalDETAILS, "params"))
   .get(ProposalController.getProposalDetails);
 
+router
+  .route("/withdrawProposal")
+  .delete(checkAuth)
+  .delete(dataValidation(Schemas.proposalSchema.proposalDELETE, "body"))
+  .delete(
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    freelancerPermissions.onlySameFreelancerCanDoThisAction,
+  )
+  .delete(ProposalController.withdrawProposal);
+
 export default router;

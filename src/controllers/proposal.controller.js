@@ -6,7 +6,7 @@ import { writeServerResponse } from "../helpers/response";
 
 async function createProposal(req, res, next) {
   try {
-    const { freelancerId, jobId } = req.body;
+    const { freelancer, job } = req.body;
     const additionalFiles = req.files;
     const newAdditionalFiles = additionalFiles.map((file) => {
       const fileProperties = {
@@ -15,18 +15,15 @@ async function createProposal(req, res, next) {
       return fileProperties;
     });
     if (
-      await DAOs.proposalsDAO.getProposalByFreelancerIdAndJobId(
-        freelancerId,
-        jobId,
-      )
+      await DAOs.proposalsDAO.getProposalByFreelancerIdAndJobId(freelancer, job)
     ) {
       next(ApiError.badRequest("Proposal is already saved"));
       return;
     }
     const proposalInfo = {
       ...req.body,
-      freelancer: ObjectId(freelancerId),
-      job: ObjectId(jobId),
+      freelancer: ObjectId(freelancer),
+      job: ObjectId(job),
       additionalFiles: newAdditionalFiles,
     };
     const { success, data, statusCode } =
@@ -138,9 +135,38 @@ async function getProposalDetails(req, res, next) {
     return;
   }
 }
+
+async function withdrawProposal(req, res, next) {
+  try {
+    const { proposalId } = req.body;
+    const proposal = await DAOs.proposalsDAO.getProposalByProposalId(
+      proposalId,
+    );
+    if (proposal && proposal.status === "accepted") {
+      next(ApiError.forbidden("Accepted proposal is not allowed to withdraw."));
+      return;
+    }
+
+    const { success } = await DAOs.proposalsDAO.deleteProposalById(proposalId);
+
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: { message: "Deleted successfully." },
+      };
+      return writeServerResponse(res, serverResponse, 200, "application/json");
+    }
+    next(ApiError.notfound("Proposal doesn't exist."));
+    return;
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
 export default {
   createProposal,
   isProposalExist,
   getMyProposals,
   getProposalDetails,
+  withdrawProposal,
 };

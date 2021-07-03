@@ -199,6 +199,38 @@ class ProposalsDAO {
       throw e;
     }
   }
+  static async getProposalByProposalId(proposalId) {
+    return await ProposalsDAO.#proposals.findOne({ _id: ObjectId(proposalId) });
+  }
+  static async deleteProposalById(proposalId) {
+    try {
+      const result = await ProposalsDAO.#proposals.deleteOne({
+        _id: ObjectId(proposalId),
+      });
+
+      if (result.deletedCount === 1) {
+        return {
+          success: true,
+          data: { message: "Deleted successfully." },
+          statusCode: 200,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No proposal exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while deleting proposal, ${e}`,
+        "deleteProposalById()",
+      );
+      throw e;
+    }
+  }
 }
 
 export default ProposalsDAO;

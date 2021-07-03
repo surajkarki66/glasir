@@ -2,8 +2,8 @@ import Joi from "joi";
 
 const schemas = {
   proposalCREATE: Joi.object().keys({
-    jobId: Joi.string().length(24).hex().required(),
-    freelancerId: Joi.string().length(24).hex().required(),
+    job: Joi.string().length(24).hex().required(),
+    freelancer: Joi.string().length(24).hex().required(),
     projectLengthInHours: Joi.number().greater(0).required(),
     bidType: Joi.string().valid("fixed", "hourly").required(),
     fixedBidAmount: Joi.number()
@@ -28,6 +28,10 @@ const schemas = {
   }),
   getProposalDETAILS: Joi.object().keys({
     proposalId: Joi.string().length(24).hex().required(),
+  }),
+  proposalDELETE: Joi.object().keys({
+    proposalId: Joi.string().length(24).hex().required(),
+    freelancerId: Joi.string().length(24).hex().required(),
   }),
 };
 
