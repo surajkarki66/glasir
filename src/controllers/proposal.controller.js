@@ -29,6 +29,7 @@ async function createProposal(req, res, next) {
     const { success, data, statusCode } =
       await DAOs.proposalsDAO.createProposal(proposalInfo);
     if (success) {
+      await DAOs.jobsDAO.addProposalId(data._id, job);
       const serverResponse = {
         status: "success",
         data: { message: "Proposal is created successfully" },
@@ -148,8 +149,8 @@ async function withdrawProposal(req, res, next) {
     }
 
     const { success } = await DAOs.proposalsDAO.deleteProposalById(proposalId);
-
     if (success) {
+      await DAOs.jobsDAO.removeProposalId(proposalId, proposal.job);
       const serverResponse = {
         status: "success",
         data: { message: "Deleted successfully." },

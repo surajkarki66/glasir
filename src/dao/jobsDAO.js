@@ -338,9 +338,6 @@ class JobsDAO {
   }
   static async addProposalId(proposalId, jobId) {
     try {
-      /**
-       * Push proposalId to job
-       */
       const result = await JobsDAO.#jobs.updateOne(
         {
           _id: ObjectId(jobId),
@@ -371,6 +368,42 @@ class JobsDAO {
       logger.error(
         `Error occurred while adding proposal id, ${e}`,
         "addProposalId()",
+      );
+      throw e;
+    }
+  }
+  static async removeProposalId(proposalId, jobId) {
+    try {
+      const result = await JobsDAO.#jobs.updateOne(
+        {
+          _id: ObjectId(jobId),
+        },
+        { $pull: { proposals: ObjectId(proposalId) } },
+      );
+      if (
+        (result.modifiedCount === 1 && result.matchedCount === 1) ||
+        result.matchedCount === 1
+      ) {
+        return {
+          success: true,
+          data: {
+            message: "proposalId removed successfully.",
+          },
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No job exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while removing proposal id, ${e}`,
+        "removeProposalId()",
       );
       throw e;
     }
