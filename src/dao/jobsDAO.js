@@ -336,6 +336,45 @@ class JobsDAO {
       throw e;
     }
   }
+  static async addProposalId(proposalId, jobId) {
+    try {
+      /**
+       * Push proposalId to job
+       */
+      const result = await JobsDAO.#jobs.updateOne(
+        {
+          _id: ObjectId(jobId),
+        },
+        { $addToSet: { proposals: ObjectId(proposalId) } },
+      );
+      if (
+        (result.modifiedCount === 1 && result.matchedCount === 1) ||
+        result.matchedCount === 1
+      ) {
+        return {
+          success: true,
+          data: {
+            message: "proposalId added successfully.",
+          },
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No job exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while adding proposal id, ${e}`,
+        "addProposalId()",
+      );
+      throw e;
+    }
+  }
 }
 
 export default JobsDAO;
