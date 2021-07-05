@@ -231,6 +231,62 @@ class ProposalsDAO {
       throw e;
     }
   }
+  static async getProposalByJobId(jobId) {
+    const query = { job: ObjectId(jobId) };
+    const project = {}; // TODO
+    const sort = { createdAt: -1, updatedAt: -1 };
+    let pipeline = [
+      { $match: query },
+      {
+        $lookup: {
+          from: "freelancers",
+          localField: "freelancer",
+          foreignField: "_id",
+          as: "freelancer",
+        },
+      },
+      {
+        $addFields: {
+          freelancer: { $arrayElemAt: ["$freelancer", 0] },
+        },
+      },
+      {
+        $project: project,
+      },
+      { $sort: sort },
+    ];
+    let cursor;
+    try {
+      cursor = await ProposalsDAO.#proposals.aggregate(pipeline);
+    } catch (e) {
+      console.error(`Unable to issue find command, ${e}`);
+      return {
+        success: false,
+        data: [],
+        totalNumProposals: 0,
+        statusCode: 404,
+      };
+    }
+    const displayCursor = cursor
+      .skip(parseInt(page) * parseInt(proposalsPerPage))
+      .limit(parseInt(proposalsPerPage));
+
+    try {
+      const documents = await displayCursor.toArray();
+      const totalNumProposals = documents.length;
+      return {
+        success: true,
+        data: documents,
+        totalNumProposals,
+        statusCode: documents.length > 0 ? 200 : 404,
+      };
+    } catch (e) {
+      logger.error(
+        `Unable to convert cursor to array or problem counting documents, ${e.message}`,
+      );
+      throw e;
+    }
+  }
 }
 
 export default ProposalsDAO;
