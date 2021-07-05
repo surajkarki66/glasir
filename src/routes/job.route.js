@@ -25,6 +25,16 @@ router
   .get(JobController.getJobs);
 
 router
+  .route("/getEmployerJobs")
+  .get(checkAuth)
+  .get(dataValidation(Schemas.jobSchema.getEmployerJOBS, "query"))
+  .get(
+    employerPermissions.onlyEmployerCanDoThisAction,
+    employerPermissions.onlySameEmployerCanDoThisAction,
+  )
+  .get(JobController.getEmployerJobs);
+
+router
   .route("/search")
   .get(checkAuth)
   .get(dataValidation(Schemas.jobSchema.jobSEARCH, "query"))

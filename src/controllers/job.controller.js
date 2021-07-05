@@ -67,6 +67,43 @@ async function getJobs(req, res, next) {
     return;
   }
 }
+async function getEmployerJobs(req, res, next) {
+  try {
+    const { page, jobsPerPage, employerId, jobStatus } = req.query;
+    let filter = { employer: ObjectId(employerId) };
+    if (jobStatus) {
+      filter = { ...filter, jobStatus: jobStatus };
+    }
+
+    const { success, data, totalNumJobs, statusCode } =
+      await DAOs.jobsDAO.getEmployerJobs({
+        filter,
+        page,
+        jobsPerPage,
+      });
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        jobs: data,
+        page: parseInt(page),
+        filters: {},
+        entriesPerPage: parseInt(jobsPerPage),
+        totalResults: totalNumJobs,
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    }
+    next(ApiError.notfound("Jobs are not found."));
+    return;
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
 async function searchJob(req, res, next) {
   try {
     let filters = {};
@@ -199,4 +236,5 @@ export default {
   getJobDetails,
   changeJobDetails,
   deleteJob,
+  getEmployerJobs,
 };

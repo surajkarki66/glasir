@@ -225,6 +225,48 @@ class JobsDAO {
       throw e;
     }
   }
+  static async getEmployerJobs({ filter, page = 0, jobsPerPage = 20 } = {}) {
+    const sort = JobsDAO.#DEFAULT_SORT;
+    const projection = {
+      title: 1,
+      pay: 1,
+      proposals: 1,
+      hired: 1,
+      jobStatus: 1,
+      createdAt: 1,
+      updatedAt: 1,
+    };
+    let cursor;
+    try {
+      cursor = await JobsDAO.#jobs.find(filter).project(projection).sort(sort);
+    } catch (e) {
+      logger.error(`Unable to issue find command, ${e.message}`);
+      return {
+        success: false,
+        data: [],
+        totalNumJobs: 0,
+        statusCode: 404,
+      };
+    }
+    const displayCursor = cursor
+      .skip(parseInt(page) * parseInt(jobsPerPage))
+      .limit(parseInt(jobsPerPage));
+    try {
+      const documents = await displayCursor.toArray();
+      const totalNumJobs = documents.length;
+      return {
+        success: true,
+        data: documents,
+        totalNumJobs,
+        statusCode: documents.length > 0 ? 200 : 404,
+      };
+    } catch (e) {
+      logger.error(
+        `Unable to convert cursor to array or problem counting documents, ${e.message}`,
+      );
+      throw e;
+    }
+  }
   static async getJobById(id) {
     try {
       const pipeline = [

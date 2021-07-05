@@ -122,6 +122,12 @@ const schemas = {
   jobDELETE: Joi.object().keys({
     jobId: Joi.string().length(24).hex().required(),
   }),
+  getEmployerJOBS: Joi.object().keys({
+    page: Joi.number().min(0).required(),
+    jobsPerPage: Joi.number().min(1).required(),
+    employerId: Joi.string().length(24).hex().required(),
+    jobStatus: Joi.string().valid("opened", "closed"),
+  }),
 };
 
 export default schemas;

@@ -12,7 +12,8 @@ const onlyEmployerCanDoThisAction = (req, res, next) => {
 
 const onlySameEmployerCanDoThisAction = async (req, res, next) => {
   const { aud } = req.jwt;
-  const employerId = req.params.employerId || req.body.employerId;
+  const employerId =
+    req.params.employerId || req.body.employerId || req.query.employerId;
   const result = await DAOs.employersDAO.getEmployerByUserId(aud);
   if (result && result._id.toString() === employerId) {
     return next();
