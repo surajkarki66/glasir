@@ -37,8 +37,12 @@ async function createFreelancerProfile(req, res, next) {
 
     const phoneNumber = parsePhoneNumber(phone.phoneNumber);
     if (phoneNumber && phoneNumber.isValid()) {
-      const newHourlyRate =
-        freelancerInfo.hourlyRate - config.feeRate * freelancerInfo.hourlyRate;
+      const newHourlyRate = {
+        ...freelancerInfo.hourlyRate,
+        amount:
+          freelancerInfo.hourlyRate.amount -
+          config.feeRate * freelancerInfo.hourlyRate.amount,
+      };
       const info = {
         ...freelancerInfo,
         user: ObjectId(aud),
@@ -271,18 +275,26 @@ async function getFreelancerDetails(req, res, next) {
 async function changeFreelancerDetails(req, res, next) {
   try {
     const { freelancerId } = req.params;
-    const { phone } = req.body;
+    const { phone, hourlyRate } = req.body;
     let freelancerDetails = {
       ...req.body,
       isVerified: false,
       updatedAt: new Date(),
     };
+    if (hourlyRate) {
+      const newHourlyRate = {
+        ...hourlyRate,
+        amount: hourlyRate.amount - config.feeRate * hourlyRate.amount,
+      };
+      freelancerDetails = {
+        ...freelancerDetails,
+        hourlyRate: newHourlyRate,
+      };
+    }
     if (phone) {
       freelancerDetails = {
-        ...req.body,
-        isVerified: false,
+        ...freelancerDetails,
         phone: { ...phone, isVerified: false },
-        updatedAt: new Date(),
       };
     }
     const { success, data, statusCode } =

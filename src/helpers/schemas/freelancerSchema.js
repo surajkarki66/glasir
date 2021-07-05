@@ -11,7 +11,18 @@ const schemas = {
     title: Joi.string().min(10).max(70).required(),
     avatar: Joi.string().required(),
     overview: Joi.string().min(10).max(5000).required(),
-    hourlyRate: Joi.number().greater(0).required(),
+    hourlyRate: Joi.object()
+      .keys({
+        currencyCode: Joi.string().valid("USD").default("USD"),
+        amount: Joi.number().greater(0).required(),
+      })
+      .required(),
+    totalEarned: Joi.object()
+      .keys({
+        currencyCode: Joi.string().valid("USD").default("USD"),
+        amount: Joi.number().default(0),
+      })
+      .required(),
     jobsWorkedIn: Joi.array().items(Joi.string()).default([]),
     location: Joi.object()
       .keys({
@@ -163,7 +174,10 @@ const schemas = {
     lastName: Joi.string().min(2).max(32),
     title: Joi.string().min(10).max(70),
     overview: Joi.string().min(10).max(5000),
-    hourlyRate: Joi.number().greater(0),
+    hourlyRate: Joi.object().keys({
+      currencyCode: Joi.string().valid("USD").default("USD"),
+      amount: Joi.number().greater(0).required(),
+    }),
     location: Joi.object().keys({
       country: Joi.string().valid("Nepal").required(),
       street: Joi.string().min(5).max(70).required(),

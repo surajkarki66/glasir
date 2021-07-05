@@ -10,6 +10,7 @@ class FreelancersDAO {
     lastName: 1,
     expertise: 1,
     hourlyRate: 1,
+    totalEarned: 1,
     title: 1,
     englishLanguage: 1,
     isVerified: 1,
@@ -461,7 +462,7 @@ class FreelancersDAO {
         return {
           success: true,
           data: {
-            message: "Employement updated successfully.",
+            message: "Employment updated successfully.",
           },
           statusCode: 201,
         };
