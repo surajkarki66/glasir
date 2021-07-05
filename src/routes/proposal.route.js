@@ -6,7 +6,7 @@ import validations, { permissions, file } from "../middlewares/index";
 const router = new Router();
 
 const { checkAuth, dataValidation } = validations;
-const { freelancerPermissions } = permissions;
+const { freelancerPermissions, employerPermissions } = permissions;
 
 router
   .route("/createProposal")
@@ -26,6 +26,13 @@ router
   .post(freelancerPermissions.onlyFreelancerCanDoThisAction)
   .post(dataValidation(Schemas.proposalSchema.isProposalEXIST, "body"))
   .post(ProposalController.isProposalExist);
+
+router
+  .route("/getJobProposals")
+  .get(checkAuth)
+  .get(dataValidation(Schemas.proposalSchema.getJobProposalsLIST, "query"))
+  .get(employerPermissions.onlyEmployerCanDoThisAction)
+  .get(ProposalController.getJobProposals);
 
 router
   .route("/getFreelancerProposals")

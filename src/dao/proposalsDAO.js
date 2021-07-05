@@ -231,9 +231,21 @@ class ProposalsDAO {
       throw e;
     }
   }
-  static async getProposalByJobId(jobId) {
-    const query = { job: ObjectId(jobId) };
-    const project = {}; // TODO
+  static async getProposalByJobId({
+    filter,
+    page = 0,
+    proposalsPerPage = 20,
+  } = {}) {
+    const query = filter;
+    const project = {
+      coverLetter: 1,
+      "freelancer.firstName": 1,
+      "freelancer.lastName": 1,
+      "freelancer.title": 1,
+      "freelancer.location": 1,
+      "freelancer.hourlyRate": 1,
+      "freelancer.totalMoneyEarned": 1,
+    };
     const sort = { createdAt: -1, updatedAt: -1 };
     let pipeline = [
       { $match: query },

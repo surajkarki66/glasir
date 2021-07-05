@@ -181,10 +181,44 @@ async function getFreelancerProposals(req, res, next) {
     return;
   }
 }
+async function getJobProposals(req, res, next) {
+  try {
+    const { page, proposalsPerPage, jobId } = req.query;
+    const filter = { job: ObjectId(jobId) };
+    const { success, data, totalNumProposals, statusCode } =
+      await DAOs.proposalsDAO.getProposalByJobId({
+        filter,
+        page,
+        proposalsPerPage,
+      });
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        proposals: data,
+        page: parseInt(page),
+        filters: {},
+        entriesPerPage: parseInt(proposalsPerPage),
+        totalResults: totalNumProposals,
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    }
+    next(ApiError.notfound("Proposals are not found."));
+    return;
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
 export default {
   createProposal,
   isProposalExist,
   getProposalDetails,
   withdrawProposal,
   getFreelancerProposals,
+  getJobProposals,
 };
