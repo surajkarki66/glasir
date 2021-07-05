@@ -17,7 +17,7 @@ const schemas = {
         amount: Joi.number().greater(0).required(),
       })
       .required(),
-    totalEarned: Joi.object()
+    totalMoneyEarned: Joi.object()
       .keys({
         currencyCode: Joi.string().valid("USD").default("USD"),
         amount: Joi.number().default(0),

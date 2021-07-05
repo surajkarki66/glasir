@@ -10,7 +10,7 @@ class FreelancersDAO {
     lastName: 1,
     expertise: 1,
     hourlyRate: 1,
-    totalEarned: 1,
+    totalMoneyEarned: 1,
     title: 1,
     englishLanguage: 1,
     isVerified: 1,
