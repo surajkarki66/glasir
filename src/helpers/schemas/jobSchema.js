@@ -39,12 +39,14 @@ const schemas = {
             is: "hourly",
             then: Joi.object()
               .keys({
+                currencyCode: Joi.string().valid("USD").default("USD"),
                 minRate: Joi.number().required(),
                 maxRate: Joi.number().required(),
               })
               .required(),
             otherwise: Joi.object().keys({
-              total: Joi.number().required(),
+              currencyCode: Joi.string().valid("USD").default("USD"),
+              amount: Joi.number().required(),
             }),
           })
           .required(),
@@ -107,12 +109,14 @@ const schemas = {
           is: "hourly",
           then: Joi.object()
             .keys({
+              currencyCode: Joi.string().valid("USD").default("USD"),
               minRate: Joi.number().required(),
               maxRate: Joi.number().required(),
             })
             .required(),
           otherwise: Joi.object().keys({
-            total: Joi.number().required(),
+            currencyCode: Joi.string().valid("USD").default("USD"),
+            amount: Joi.number().required(),
           }),
         })
         .required(),
