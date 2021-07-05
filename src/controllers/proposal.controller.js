@@ -77,40 +77,6 @@ async function isProposalExist(req, res, next) {
   }
 }
 
-async function getMyProposals(req, res, next) {
-  try {
-    const { page, proposalsPerPage, freelancerId } = req.query;
-    const filter = { freelancer: ObjectId(freelancerId) };
-    const { success, data, totalNumProposals, statusCode } =
-      await DAOs.proposalsDAO.getProposals({
-        filter,
-        page,
-        proposalsPerPage,
-      });
-    if (success) {
-      const serverResponse = {
-        status: "success",
-        proposals: data,
-        page: parseInt(page),
-        filters: {},
-        entriesPerPage: parseInt(proposalsPerPage),
-        totalResults: totalNumProposals,
-      };
-      return writeServerResponse(
-        res,
-        serverResponse,
-        statusCode,
-        "application/json",
-      );
-    }
-    next(ApiError.notfound("Proposals are not found."));
-    return;
-  } catch (error) {
-    next(ApiError.internal(`Something went wrong: ${error.message}`));
-    return;
-  }
-}
-
 async function getProposalDetails(req, res, next) {
   try {
     const { proposalId } = req.params;
@@ -164,10 +130,43 @@ async function withdrawProposal(req, res, next) {
     return;
   }
 }
+async function getFreelancerProposals(req, res, next) {
+  try {
+    const { page, proposalsPerPage, freelancerId } = req.query;
+    const filter = { freelancer: ObjectId(freelancerId) };
+    const { success, data, totalNumProposals, statusCode } =
+      await DAOs.proposalsDAO.getProposals({
+        filter,
+        page,
+        proposalsPerPage,
+      });
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        proposals: data,
+        page: parseInt(page),
+        filters: {},
+        entriesPerPage: parseInt(proposalsPerPage),
+        totalResults: totalNumProposals,
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    }
+    next(ApiError.notfound("Proposals are not found."));
+    return;
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
 export default {
   createProposal,
   isProposalExist,
-  getMyProposals,
   getProposalDetails,
   withdrawProposal,
+  getFreelancerProposals,
 };

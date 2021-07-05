@@ -28,15 +28,16 @@ router
   .post(ProposalController.isProposalExist);
 
 router
-  .route("/myProposals")
+  .route("/getFreelancerProposals")
   .get(checkAuth)
-  .get(dataValidation(Schemas.proposalSchema.getMyProposalsLIST, "query"))
+  .get(
+    dataValidation(Schemas.proposalSchema.getFreelancerProposalsLIST, "query"),
+  )
   .get(
     freelancerPermissions.onlyFreelancerCanDoThisAction,
     freelancerPermissions.onlySameFreelancerCanDoThisAction,
   )
-  .get(ProposalController.getMyProposals);
-
+  .get(ProposalController.getFreelancerProposals);
 router
   .route("/:proposalId")
   .get(checkAuth)

@@ -21,16 +21,17 @@ const schemas = {
     jobId: Joi.string().length(24).hex().required(),
     freelancerId: Joi.string().length(24).hex().required(),
   }),
-  getMyProposalsLIST: Joi.object().keys({
-    page: Joi.number().min(0).required(),
-    proposalsPerPage: Joi.number().min(1).required(),
-    freelancerId: Joi.string().length(24).hex().required(),
-  }),
+
   getProposalDETAILS: Joi.object().keys({
     proposalId: Joi.string().length(24).hex().required(),
   }),
   proposalDELETE: Joi.object().keys({
     proposalId: Joi.string().length(24).hex().required(),
+    freelancerId: Joi.string().length(24).hex().required(),
+  }),
+  getFreelancerProposalsLIST: Joi.object().keys({
+    page: Joi.number().min(0).required(),
+    proposalsPerPage: Joi.number().min(1).required(),
     freelancerId: Joi.string().length(24).hex().required(),
   }),
 };
