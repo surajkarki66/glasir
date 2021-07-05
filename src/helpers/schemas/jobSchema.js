@@ -51,6 +51,7 @@ const schemas = {
       })
       .required(),
     proposals: Joi.array().items(Joi.string().length(24).hex()).default([]),
+    hired: Joi.array().items(Joi.string().length(24).hex()).default([]),
     createdAt: Joi.date().default(new Date()),
     updatedAt: Joi.date().default(new Date()),
   }),
