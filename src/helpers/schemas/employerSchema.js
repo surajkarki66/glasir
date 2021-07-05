@@ -26,7 +26,15 @@ const schemas = {
         zip: Joi.number().integer().default(null),
       })
       .required(),
-    totalMoneySpent: Joi.number().default(0),
+    totalMoneySpent: Joi.object()
+      .keys({
+        currencyCode: Joi.string().valid("USD").default("USD"),
+        amount: Joi.number().default(0),
+      })
+      .default({
+        currencyCode: "USD",
+        amount: 0,
+      }),
     payment: Joi.object()
       .keys({
         method: Joi.string().valid("paypal", "creditCard", null).required(),

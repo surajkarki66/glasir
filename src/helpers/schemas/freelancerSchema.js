@@ -22,7 +22,10 @@ const schemas = {
         currencyCode: Joi.string().valid("USD").default("USD"),
         amount: Joi.number().default(0),
       })
-      .required(),
+      .default({
+        currencyCode: "USD",
+        amount: 0,
+      }),
     jobsWorkedIn: Joi.array().items(Joi.string()).default([]),
     location: Joi.object()
       .keys({
