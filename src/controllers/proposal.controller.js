@@ -6,7 +6,7 @@ import { writeServerResponse } from "../helpers/response";
 
 async function createProposal(req, res, next) {
   try {
-    const { freelancer, job } = req.body;
+    const { freelancer, job, bidType } = req.body;
     const additionalFiles = req.files;
     const newAdditionalFiles = additionalFiles.map((file) => {
       const fileProperties = {
@@ -26,8 +26,26 @@ async function createProposal(req, res, next) {
       job: ObjectId(job),
       additionalFiles: newAdditionalFiles,
     };
+    let newProposalInfo = {};
+    if (bidType === "fixed") {
+      newProposalInfo = {
+        ...proposalInfo,
+        fixedBidAmount: {
+          currencyCode: "USD",
+          amount: proposalInfo.fixedBidAmount,
+        },
+      };
+    } else {
+      newProposalInfo = {
+        ...proposalInfo,
+        hourlyBidAmount: {
+          currencyCode: "USD",
+          amount: proposalInfo.hourlyBidAmount,
+        },
+      };
+    }
     const { success, data, statusCode } =
-      await DAOs.proposalsDAO.createProposal(proposalInfo);
+      await DAOs.proposalsDAO.createProposal(newProposalInfo);
     if (success) {
       await DAOs.jobsDAO.addProposalId(data._id, job);
       const serverResponse = {
