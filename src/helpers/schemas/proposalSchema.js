@@ -39,6 +39,9 @@ const schemas = {
     proposalsPerPage: Joi.number().min(1).required(),
     jobId: Joi.string().length(24).hex().required(),
   }),
+  getJobProposalDETAILS: Joi.object().keys({
+    proposalId: Joi.string().length(24).hex().required(),
+  }),
 };
 
 export default schemas;

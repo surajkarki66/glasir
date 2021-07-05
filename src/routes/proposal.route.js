@@ -28,6 +28,13 @@ router
   .post(ProposalController.isProposalExist);
 
 router
+  .route("/getJobProposalDetails/:proposalId")
+  .get(checkAuth)
+  .get(dataValidation(Schemas.proposalSchema.getJobProposalDETAILS, "params"))
+  .get(employerPermissions.onlyEmployerCanDoThisAction)
+  .get(ProposalController.getJobProposalDetails);
+
+router
   .route("/getJobProposals")
   .get(checkAuth)
   .get(dataValidation(Schemas.proposalSchema.getJobProposalsLIST, "query"))

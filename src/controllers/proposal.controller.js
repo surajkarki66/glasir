@@ -214,6 +214,32 @@ async function getJobProposals(req, res, next) {
     return;
   }
 }
+
+async function getJobProposalDetails(req, res, next) {
+  try {
+    const { proposalId } = req.params;
+    const { success, data, statusCode } =
+      await DAOs.proposalsDAO.getJobProposalById(proposalId);
+
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: data,
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    }
+    next(ApiError.notfound("Proposal doesn't exist."));
+    return;
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
 export default {
   createProposal,
   isProposalExist,
@@ -221,4 +247,5 @@ export default {
   withdrawProposal,
   getFreelancerProposals,
   getJobProposals,
+  getJobProposalDetails,
 };

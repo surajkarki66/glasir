@@ -242,6 +242,7 @@ class ProposalsDAO {
       "freelancer.firstName": 1,
       "freelancer.lastName": 1,
       "freelancer.title": 1,
+      "freelancer.avatar": 1,
       "freelancer.location": 1,
       "freelancer.hourlyRate": 1,
       "freelancer.totalMoneyEarned": 1,
@@ -295,6 +296,54 @@ class ProposalsDAO {
     } catch (e) {
       logger.error(
         `Unable to convert cursor to array or problem counting documents, ${e.message}`,
+      );
+      throw e;
+    }
+  }
+  static async getJobProposalById(id) {
+    try {
+      const pipeline = [
+        { $match: { _id: ObjectId(id) } },
+        {
+          $lookup: {
+            from: "freelancers",
+            localField: "freelancer",
+            foreignField: "_id",
+            as: "freelancer",
+          },
+        },
+        {
+          $addFields: {
+            freelancer: { $arrayElemAt: ["$freelancer", 0] },
+          },
+        },
+        {
+          $project: {
+            "freelancer.phone": 0,
+          },
+        },
+      ];
+
+      const proposal = await ProposalsDAO.#proposals.aggregate(pipeline).next();
+      if (proposal) {
+        return {
+          success: true,
+          data: proposal,
+          statusCode: 200,
+        };
+      } else {
+        const message = "No document matching id: " + id + " could be found!";
+        logger.error(message, "getProposalById()");
+        return {
+          success: false,
+          data: {},
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Unable to convert cursor to array or problem counting documents, ${e.message}`,
+        "getProposalById()",
       );
       throw e;
     }
