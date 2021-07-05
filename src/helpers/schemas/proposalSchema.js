@@ -42,6 +42,17 @@ const schemas = {
   getJobProposalDETAILS: Joi.object().keys({
     proposalId: Joi.string().length(24).hex().required(),
   }),
+  changeProposalDETAILS: Joi.object().keys({
+    freelancerId: Joi.string().length(24).hex().required(),
+    proposalId: Joi.string().length(24).hex().required(),
+    bidType: Joi.string().valid("fixed", "hourly").required(),
+    fixedBidAmount: Joi.number()
+      .greater(0)
+      .when("bidType", { is: "fixed", then: Joi.required() }),
+    hourlyBidAmount: Joi.number()
+      .greater(0)
+      .when("bidType", { is: "hourly", then: Joi.required() }),
+  }),
 };
 
 export default schemas;

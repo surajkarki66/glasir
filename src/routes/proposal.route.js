@@ -60,6 +60,16 @@ router
   .get(ProposalController.getProposalDetails);
 
 router
+  .route("/changeProposalDetails")
+  .post(checkAuth)
+  .post(dataValidation(Schemas.proposalSchema.changeProposalDETAILS, "body"))
+  .post(
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    freelancerPermissions.onlySameFreelancerCanDoThisAction,
+  )
+  .post(ProposalController.changeProposalDetails);
+
+router
   .route("/withdrawProposal")
   .delete(checkAuth)
   .delete(dataValidation(Schemas.proposalSchema.proposalDELETE, "body"))

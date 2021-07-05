@@ -348,6 +348,44 @@ class ProposalsDAO {
       throw e;
     }
   }
+  static async updateProposal(proposalId, updateObject) {
+    try {
+      const result = await ProposalsDAO.#proposals.updateOne(
+        {
+          _id: ObjectId(proposalId),
+        },
+        {
+          $set: updateObject,
+        },
+      );
+      if (
+        (result.modifiedCount === 1 && result.matchedCount === 1) ||
+        result.matchedCount === 1
+      ) {
+        return {
+          success: true,
+          data: {
+            message: "Updated successfully.",
+          },
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No proposal exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while updating job, ${e}`,
+        "updateProposal()",
+      );
+      throw e;
+    }
+  }
 }
 
 export default ProposalsDAO;

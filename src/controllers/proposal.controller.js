@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 
 import DAOs from "../dao/index";
 import ApiError from "../errors/ApiError";
+import config from "../configs/config";
 import { writeServerResponse } from "../helpers/response";
 
 async function createProposal(req, res, next) {
@@ -40,7 +41,9 @@ async function createProposal(req, res, next) {
         ...proposalInfo,
         hourlyBidAmount: {
           currencyCode: "USD",
-          amount: proposalInfo.hourlyBidAmount,
+          amount:
+            proposalInfo.hourlyBidAmount -
+            config.feeRate * proposalInfo.hourlyBidAmount,
         },
       };
     }
@@ -240,6 +243,56 @@ async function getJobProposalDetails(req, res, next) {
     return;
   }
 }
+async function changeProposalDetails(req, res, next) {
+  try {
+    const { bidType, proposalId } = req.body;
+
+    let proposalDetails = {
+      ...req.body,
+      updatedAt: new Date(),
+    };
+    if (bidType === "fixed") {
+      proposalDetails = {
+        ...proposalDetails,
+        fixedBidAmount: {
+          currencyCode: "USD",
+          amount: proposalDetails.fixedBidAmount,
+        },
+      };
+    } else {
+      proposalDetails = {
+        ...proposalDetails,
+        hourlyBidAmount: {
+          currencyCode: "USD",
+          amount:
+            proposalDetails.hourlyBidAmount -
+            config.feeRate * proposalDetails.hourlyBidAmount,
+        },
+      };
+    }
+
+    const { success, data, statusCode } =
+      await DAOs.proposalsDAO.updateProposal(proposalId, proposalDetails);
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: { message: "Updated successfully." },
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    } else {
+      next(ApiError.notfound(data.error));
+      return;
+    }
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
 export default {
   createProposal,
   isProposalExist,
@@ -248,4 +301,5 @@ export default {
   getFreelancerProposals,
   getJobProposals,
   getJobProposalDetails,
+  changeProposalDetails,
 };
