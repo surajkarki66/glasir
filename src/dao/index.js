@@ -4,6 +4,7 @@ import employersDAO from "./employersDAO";
 import jobsDAO from "./jobsDAO";
 import saveJobsDAO from "./saveJobsDAO";
 import proposalsDAO from "./proposalsDAO";
+import hiresDAO from "./hiresDAO";
 
 export default {
   usersDAO,
@@ -12,4 +13,5 @@ export default {
   jobsDAO,
   saveJobsDAO,
   proposalsDAO,
+  hiresDAO,
 };
