@@ -239,6 +239,9 @@ class ProposalsDAO {
     const query = filter;
     const project = {
       coverLetter: 1,
+      bidType: 1,
+      hourlyBidAmount: 1,
+      fixedBidAmount: 1,
       "freelancer.firstName": 1,
       "freelancer.lastName": 1,
       "freelancer.title": 1,

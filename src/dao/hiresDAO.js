@@ -22,6 +22,30 @@ class HiresDAO {
       throw e;
     }
   }
+  static async createHire(hireInfo) {
+    try {
+      const result = await HiresDAO.#hires.insertOne(hireInfo);
+      if (result && result.insertedCount === 1) {
+        const data = result.ops[0];
+        return {
+          success: true,
+          data: data,
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "Hire is not created",
+          },
+          statusCode: 500,
+        };
+      }
+    } catch (error) {
+      logger.error(`Error occurred while adding new hire, ${error.message}.`);
+      throw error;
+    }
+  }
 }
 
 export default HiresDAO;
