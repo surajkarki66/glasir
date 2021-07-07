@@ -297,6 +297,43 @@ class EmployersDAO {
       throw e;
     }
   }
+
+  static async isRated(employerId, freelancerId) {
+    try {
+      const pipeline = [
+        {
+          $match: {
+            _id: ObjectId(employerId),
+            "ratings.freelancer": ObjectId(freelancerId),
+          },
+        },
+        {
+          $project: {
+            ratings: {
+              $filter: {
+                input: "$ratings",
+                as: "rate",
+                cond: {
+                  $eq: ["$$rate.freelancer", ObjectId(freelancerId)],
+                },
+              },
+            },
+          },
+        },
+        { $addFields: { rating: { $arrayElemAt: ["$ratings", 0] } } },
+        { $project: { rating: 1 } },
+      ];
+      const result = await EmployersDAO.#employers.aggregate(pipeline).next();
+      if (result) {
+        return { success: true, data: result, statusCode: 200 };
+      } else {
+        return { success: false, data: result, statusCode: 404 };
+      }
+    } catch (e) {
+      logger.error(`Error occurred while checking rating ${e}`, "isRated()");
+      throw e;
+    }
+  }
 }
 
 export default EmployersDAO;

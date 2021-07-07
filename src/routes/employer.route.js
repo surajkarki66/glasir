@@ -21,6 +21,12 @@ router
   .post(EmployerController.createEmployerProfile);
 
 router
+  .route("/isRated")
+  .get(checkAuth)
+  .get(dataValidation(Schemas.employerSchema.isRated, "query"))
+  .get(freelancerPermissions.onlyFreelancerCanDoThisAction)
+  .get(EmployerController.isRated);
+router
   .route("/get-employers")
   .get(checkAuth)
   .get(authPermissions.onlyAdminCanDoThisAction)

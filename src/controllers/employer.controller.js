@@ -291,6 +291,33 @@ async function rateEmployer(req, res, next) {
     return;
   }
 }
+async function isRated(req, res, next) {
+  try {
+    const { freelancerId, employerId } = req.query;
+    const { data, success, statusCode } = await DAOs.employersDAO.isRated(
+      employerId,
+      freelancerId,
+    );
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: data,
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    } else {
+      next(ApiError.notfound("Not rated yet"));
+      return;
+    }
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
 export default {
   createEmployerProfile,
   getEmployers,
@@ -300,4 +327,5 @@ export default {
   verifyEmployerPhoneNumber,
   confirmEmployerPhoneNumber,
   rateEmployer,
+  isRated,
 };
