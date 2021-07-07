@@ -258,6 +258,10 @@ class ProposalsDAO {
       "freelancer.location": 1,
       "freelancer.hourlyRate": 1,
       "freelancer.totalMoneyEarned": 1,
+      "freelancer.rating": {
+        averageScore: { $avg: "$freelancer.ratings.ratingScore" },
+        rateCounts: { $size: "$freelancer.ratings" },
+      },
     };
     const sort = { createdAt: -1, updatedAt: -1 };
     let pipeline = [
@@ -330,8 +334,16 @@ class ProposalsDAO {
           },
         },
         {
+          $addFields: {
+            "freelancer.rating": {
+              averageScore: { $avg: "$freelancer.ratings.ratingScore" },
+              rateCounts: { $size: "$freelancer.ratings" },
+            },
+          },
+        },
+        {
           $project: {
-            "freelancer.phone": 0,
+            "freelancer.ratings": 0,
           },
         },
       ];

@@ -18,17 +18,6 @@ async function myJobs(req, res, next) {
   }
 }
 
-async function rateFreelancer(req, res, next) {
-  try {
-    /**
-     *  TODO: rating freelancer by employer.
-     */
-  } catch (error) {
-    next(ApiError.internal(`Something went wrong: ${error.message}`));
-    return;
-  }
-}
-
 async function createFreelancerProfile(req, res, next) {
   try {
     const freelancerInfo = req.body;
@@ -449,6 +438,100 @@ async function confirmFreelancerPhoneNumber(req, res, next) {
   }
 }
 
+async function rateFreelancer(req, res, next) {
+  try {
+    const { freelancerId, ratingScore, employerId } = req.body;
+    const rateObj = {
+      employer: ObjectId(employerId),
+      ratingScore: ratingScore,
+    };
+    const { data, success, statusCode } = await DAOs.freelancersDAO.pushRate(
+      freelancerId,
+      rateObj,
+    );
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: { message: "Rated successfully." },
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    } else {
+      next(ApiError.notfound(data.error));
+      return;
+    }
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+async function isRated(req, res, next) {
+  try {
+    const { freelancerId, employerId } = req.query;
+    const { data, success, statusCode } = await DAOs.freelancersDAO.isRated(
+      employerId,
+      freelancerId,
+    );
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: data,
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    } else {
+      const serverResponse = {
+        status: "success",
+        data: data,
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    }
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+async function unrateEmployer(req, res, next) {
+  try {
+    const { employerId, freelancerId } = req.body;
+    const { success, statusCode, data } = await DAOs.freelancersDAO.pullRate(
+      employerId,
+      freelancerId,
+    );
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: { message: "Unrated successfully." },
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    } else {
+      next(ApiError.notfound(data.error));
+      return;
+    }
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+
 export default {
   createFreelancerProfile,
   uploadFreelancerAvatar,
@@ -461,4 +544,7 @@ export default {
   updateEmployment,
   verifyFreelancerPhoneNumber,
   confirmFreelancerPhoneNumber,
+  rateFreelancer,
+  isRated,
+  unrateEmployer,
 };

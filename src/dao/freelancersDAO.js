@@ -167,10 +167,15 @@ class FreelancersDAO {
       {
         $project: {
           ...project,
+          rating: {
+            averageScore: { $avg: "$ratings.ratingScore" },
+            rateCounts: { $size: "$ratings" },
+          },
           "location.country": 1,
           "location.province": 1,
         },
       },
+
       { $sort: sort },
     ];
     if (searchText) {
@@ -180,6 +185,10 @@ class FreelancersDAO {
         {
           $project: {
             ...project,
+            rating: {
+              averageScore: { $avg: "$ratings.ratingScore" },
+              rateCounts: { $size: "$ratings" },
+            },
             "location.country": 1,
             "location.province": 1,
             score: { $meta: "searchScore" },
@@ -244,10 +253,15 @@ class FreelancersDAO {
         {
           $addFields: {
             user: { $arrayElemAt: ["$user", 0] },
+            rating: {
+              averageScore: { $avg: "$ratings.ratingScore" },
+              rateCounts: { $size: "$ratings" },
+            },
           },
         },
         {
           $project: {
+            ratings: 0,
             "user.password": 0,
             "user.role": 0,
           },
@@ -296,8 +310,16 @@ class FreelancersDAO {
             as: "user",
           },
         },
-        { $addFields: { user: { $arrayElemAt: ["$user", 0] } } },
-        { $project: { "user.password": 0 } },
+        {
+          $addFields: {
+            user: { $arrayElemAt: ["$user", 0] },
+            rating: {
+              averageScore: { $avg: "$ratings.ratingScore" },
+              rateCounts: { $size: "$ratings" },
+            },
+          },
+        },
+        { $project: { "user.password": 0, ratings: 0 } },
       ];
       const profile = await FreelancersDAO.freelancers
         .aggregate(pipeline)
@@ -508,6 +530,117 @@ class FreelancersDAO {
         `Error occurred while deleting user, ${e}`,
         "deleteFreelancer()",
       );
+      throw e;
+    }
+  }
+
+  static async pushRate(freelancerId, rateObject) {
+    try {
+      const result = await FreelancersDAO.freelancers.updateOne(
+        {
+          _id: ObjectId(freelancerId),
+        },
+        { $addToSet: { ratings: rateObject } },
+      );
+      if (result.modifiedCount === 1 && result.matchedCount === 1) {
+        return {
+          success: true,
+          data: {
+            message: "Rating added successfully.",
+          },
+          statusCode: 201,
+        };
+      } else if (result.matchedCount === 1 && result.modifiedCount === 0) {
+        return {
+          success: false,
+          data: {
+            error: "Freelancer is already rated",
+          },
+          statusCode: 200,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No freelancer exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(`Error occurred while adding rating ${e}`, "pushRate()");
+      throw e;
+    }
+  }
+
+  static async isRated(employerId, freelancerId) {
+    try {
+      const pipeline = [
+        {
+          $match: {
+            _id: ObjectId(freelancerId),
+            "ratings.employer": ObjectId(employerId),
+          },
+        },
+        {
+          $project: {
+            ratings: {
+              $filter: {
+                input: "$ratings",
+                as: "rate",
+                cond: {
+                  $eq: ["$$rate.employer", ObjectId(employerId)],
+                },
+              },
+            },
+          },
+        },
+        { $addFields: { rating: { $arrayElemAt: ["$ratings", 0] } } },
+        { $project: { rating: 1 } },
+      ];
+      const result = await FreelancersDAO.freelancers
+        .aggregate(pipeline)
+        .next();
+      if (result) {
+        return { success: true, data: result, statusCode: 200 };
+      } else {
+        return { success: false, data: result, statusCode: 404 };
+      }
+    } catch (e) {
+      logger.error(`Error occurred while checking rating ${e}`, "isRated()");
+      throw e;
+    }
+  }
+  static async pullRate(employerId, freelancerId) {
+    try {
+      const result = await FreelancersDAO.freelancers.updateOne(
+        {
+          _id: ObjectId(freelancerId),
+        },
+        { $pull: { ratings: { employer: ObjectId(employerId) } } },
+      );
+      if (result.modifiedCount === 1 && result.matchedCount === 1) {
+        return {
+          success: true,
+          data: { message: "Pulled rate successfully" },
+          statusCode: 201,
+        };
+      }
+      if (result.matchedCount === 1 && result.modifiedCount === 0) {
+        return {
+          success: false,
+          data: { error: "Already unrated" },
+          statusCode: 404,
+        };
+      } else {
+        return {
+          success: false,
+          data: { error: "No freelancer exist with this id." },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(`Error occurred while pulling rating ${e}`, "pullRate()");
       throw e;
     }
   }

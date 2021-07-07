@@ -95,13 +95,13 @@ router
   .post(EmployerController.rateEmployer);
 
 router
-  .route("/unRateEmployer")
+  .route("/unrateEmployer")
   .post(checkAuth)
   .post(dataValidation(Schemas.employerSchema.unRateEmployer, "body"))
   .post(
     freelancerPermissions.onlyFreelancerCanDoThisAction,
     freelancerPermissions.onlySameFreelancerCanDoThisAction,
   )
-  .post(EmployerController.unRateEmployer);
+  .post(EmployerController.unrateEmployer);
 
 export default router;

@@ -7,7 +7,8 @@ import validations, { permissions, file } from "../middlewares/index";
 const router = new Router();
 
 const { checkAuth, dataValidation } = validations;
-const { authPermissions, freelancerPermissions } = permissions;
+const { authPermissions, freelancerPermissions, employerPermissions } =
+  permissions;
 
 router
   .route("/create-profile")
@@ -18,6 +19,13 @@ router
   )
   .post(dataValidation(Schemas.freelancerSchema.freelancerCREATE, "body"))
   .post(FreelancerController.createFreelancerProfile);
+
+router
+  .route("/isRated")
+  .get(checkAuth)
+  .get(dataValidation(Schemas.freelancerSchema.isRated, "query"))
+  .get(employerPermissions.onlyEmployerCanDoThisAction)
+  .get(FreelancerController.isRated);
 
 router
   .route("/get-freelancers")
@@ -128,5 +136,22 @@ router
     freelancerPermissions.onlySameFreelancerCanDoThisAction,
   )
   .post(FreelancerController.confirmFreelancerPhoneNumber);
+
+router
+  .route("/rateFreelancer")
+  .post(checkAuth)
+  .post(dataValidation(Schemas.freelancerSchema.rateFreelancer, "body"))
+  .post(employerPermissions.onlyEmployerCanDoThisAction)
+  .post(FreelancerController.rateFreelancer);
+
+router
+  .route("/unrateEmployer")
+  .post(checkAuth)
+  .post(dataValidation(Schemas.freelancerSchema.unrateFreelancer, "body"))
+  .post(
+    employerPermissions.onlyEmployerCanDoThisAction,
+    employerPermissions.onlySameEmployerCanDoThisAction,
+  )
+  .post(FreelancerController.unrateEmployer);
 
 export default router;

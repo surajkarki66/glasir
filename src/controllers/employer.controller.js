@@ -327,7 +327,7 @@ async function isRated(req, res, next) {
   }
 }
 
-async function unRateEmployer(req, res, next) {
+async function unrateEmployer(req, res, next) {
   try {
     const { employerId, freelancerId } = req.body;
     const { success, statusCode, data } = await DAOs.employersDAO.pullRate(
@@ -364,5 +364,5 @@ export default {
   confirmEmployerPhoneNumber,
   rateEmployer,
   isRated,
-  unRateEmployer,
+  unrateEmployer,
 };
