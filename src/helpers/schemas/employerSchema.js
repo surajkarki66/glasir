@@ -86,6 +86,11 @@ const schemas = {
     id: Joi.string().required(),
     employerId: Joi.string().length(24).hex().required(),
   }),
+  rateEmployer: Joi.object().keys({
+    employerId: Joi.string().length(24).hex().required(),
+    freelancerId: Joi.string().length(24).hex().required(),
+    ratingScore: Joi.number().valid(1, 2, 3, 4, 5).required(),
+  }),
 };
 
 export default schemas;

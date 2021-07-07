@@ -258,6 +258,45 @@ class EmployersDAO {
       throw e;
     }
   }
+
+  static async pushRate(employerId, rateObject) {
+    try {
+      const result = await EmployersDAO.#employers.updateOne(
+        {
+          _id: ObjectId(employerId),
+        },
+        { $addToSet: { ratings: rateObject } },
+      );
+      if (result.modifiedCount === 1 && result.matchedCount === 1) {
+        return {
+          success: true,
+          data: {
+            message: "Rating added successfully.",
+          },
+          statusCode: 201,
+        };
+      } else if (result.matchedCount === 1 && result.modifiedCount === 0) {
+        return {
+          success: false,
+          data: {
+            error: "Employer is already rated",
+          },
+          statusCode: 200,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No employer exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(`Error occurred while adding rating ${e}`, "pushRate()");
+      throw e;
+    }
+  }
 }
 
 export default EmployersDAO;

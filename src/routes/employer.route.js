@@ -7,7 +7,8 @@ import validations, { permissions, file } from "../middlewares/index";
 const router = new Router();
 
 const { checkAuth, dataValidation } = validations;
-const { authPermissions, employerPermissions } = permissions;
+const { authPermissions, employerPermissions, freelancerPermissions } =
+  permissions;
 
 router
   .route("/create-profile")
@@ -79,5 +80,12 @@ router
     employerPermissions.onlySameEmployerCanDoThisAction,
   )
   .post(EmployerController.confirmEmployerPhoneNumber);
+
+router
+  .route("/rateEmployer")
+  .post(checkAuth)
+  .post(dataValidation(Schemas.employerSchema.rateEmployer, "body"))
+  .post(freelancerPermissions.onlyFreelancerCanDoThisAction)
+  .post(EmployerController.rateEmployer);
 
 export default router;

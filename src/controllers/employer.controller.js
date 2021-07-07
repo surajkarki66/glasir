@@ -1,23 +1,10 @@
-import { ObjectId } from "bson";
+import { ObjectId } from "mongodb";
 import parsePhoneNumber from "libphonenumber-js";
 
 import DAOs from "../dao/index";
 import messageBird from "../configs/messageBird";
 import ApiError from "../errors/ApiError";
 import { writeServerResponse } from "../helpers/response";
-
-async function rateEmployer(req, res, next) {
-  try {
-    /**
-     *  TODO 1: rating employer by freelancer.
-     * if freelancer rate an employer a/c to one job then when next job is given by same employer
-     * then we we have to update employer rating
-     */
-  } catch (error) {
-    next(ApiError.internal(`Something went wrong: ${error.message}`));
-    return;
-  }
-}
 
 async function createEmployerProfile(req, res, next) {
   try {
@@ -272,6 +259,38 @@ async function confirmEmployerPhoneNumber(req, res, next) {
     return;
   }
 }
+
+async function rateEmployer(req, res, next) {
+  try {
+    const { freelancerId, ratingScore, employerId } = req.body;
+    const rateObj = {
+      freelancer: ObjectId(freelancerId),
+      ratingScore: ratingScore,
+    };
+    const { data, success, statusCode } = await DAOs.employersDAO.pushRate(
+      employerId,
+      rateObj,
+    );
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: { message: "Rated successfully." },
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    } else {
+      next(ApiError.notfound(data.error));
+      return;
+    }
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
 export default {
   createEmployerProfile,
   getEmployers,
@@ -280,4 +299,5 @@ export default {
   uploadEmployerAvatar,
   verifyEmployerPhoneNumber,
   confirmEmployerPhoneNumber,
+  rateEmployer,
 };
