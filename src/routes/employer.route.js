@@ -94,4 +94,14 @@ router
   .post(freelancerPermissions.onlyFreelancerCanDoThisAction)
   .post(EmployerController.rateEmployer);
 
+router
+  .route("/unRateEmployer")
+  .post(checkAuth)
+  .post(dataValidation(Schemas.employerSchema.unRateEmployer, "body"))
+  .post(
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    freelancerPermissions.onlySameFreelancerCanDoThisAction,
+  )
+  .post(EmployerController.unRateEmployer);
+
 export default router;

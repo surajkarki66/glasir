@@ -334,6 +334,39 @@ class EmployersDAO {
       throw e;
     }
   }
+  static async pullRate(employerId, freelancerId) {
+    try {
+      const result = await EmployersDAO.#employers.updateOne(
+        {
+          _id: ObjectId(employerId),
+        },
+        { $pull: { ratings: { freelancer: ObjectId(freelancerId) } } },
+      );
+      if (result.modifiedCount === 1 && result.matchedCount === 1) {
+        return {
+          success: true,
+          data: { message: "Pulled rate successfully" },
+          statusCode: 201,
+        };
+      }
+      if (result.matchedCount === 1 && result.modifiedCount === 0) {
+        return {
+          success: false,
+          data: { error: "Already unrated" },
+          statusCode: 404,
+        };
+      } else {
+        return {
+          success: false,
+          data: { error: "No employer exist with this id." },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(`Error occurred while pulling rating ${e}`, "pullRate()");
+      throw e;
+    }
+  }
 }
 
 export default EmployersDAO;

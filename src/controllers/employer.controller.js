@@ -326,6 +326,34 @@ async function isRated(req, res, next) {
     return;
   }
 }
+
+async function unRateEmployer(req, res, next) {
+  try {
+    const { employerId, freelancerId } = req.body;
+    const { success, statusCode, data } = await DAOs.employersDAO.pullRate(
+      employerId,
+      freelancerId,
+    );
+    if (success) {
+      const serverResponse = {
+        status: "success",
+        data: { message: "Unrated successfully." },
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    } else {
+      next(ApiError.notfound(data.error));
+      return;
+    }
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
 export default {
   createEmployerProfile,
   getEmployers,
@@ -336,4 +364,5 @@ export default {
   confirmEmployerPhoneNumber,
   rateEmployer,
   isRated,
+  unRateEmployer,
 };
