@@ -310,8 +310,16 @@ async function isRated(req, res, next) {
         "application/json",
       );
     } else {
-      next(ApiError.notfound("Not rated yet"));
-      return;
+      const serverResponse = {
+        status: "success",
+        data: data,
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
     }
   } catch (error) {
     next(ApiError.internal(`Something went wrong: ${error.message}`));
