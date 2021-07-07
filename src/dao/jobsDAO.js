@@ -11,6 +11,7 @@ class JobsDAO {
     "employer.location.country": 1,
     "employer.totalMoneySpent": 1,
     "employer.payment.isVerified": 1,
+    "employer.rating": 1,
     jobStatus: 1,
     projectLengthInHours: 1,
     moneySpent: 1,
@@ -167,6 +168,14 @@ class JobsDAO {
         },
       },
       {
+        $addFields: {
+          "employer.rating": {
+            averageScore: { $avg: "$employer.ratings.ratingScore" },
+            rateCounts: { $size: "$employer.ratings" },
+          },
+        },
+      },
+      {
         $project: project,
       },
       { $sort: sort },
@@ -186,6 +195,14 @@ class JobsDAO {
         {
           $addFields: {
             employer: { $arrayElemAt: ["$employer", 0] },
+          },
+        },
+        {
+          $addFields: {
+            "employer.rating": {
+              averageScore: { $avg: "$employer.ratings.ratingScore" },
+              rateCounts: { $size: "$employer.ratings" },
+            },
           },
         },
         {
@@ -285,7 +302,16 @@ class JobsDAO {
           },
         },
         {
+          $addFields: {
+            "employer.rating": {
+              averageScore: { $avg: "$employer.ratings.ratingScore" },
+              rateCounts: { $size: "$employer.ratings" },
+            },
+          },
+        },
+        {
           $project: {
+            "employer.ratings": 0,
             "employer.phone": 0,
           },
         },

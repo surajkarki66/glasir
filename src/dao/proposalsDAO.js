@@ -158,6 +158,14 @@ class ProposalsDAO {
             "job.employer": { $arrayElemAt: ["$job.employer", 0] },
           },
         },
+        {
+          $addFields: {
+            "job.employer.rating": {
+              averageScore: { $avg: "$job.employer.ratings.ratingScore" },
+              rateCounts: { $size: "$job.employer.ratings" },
+            },
+          },
+        },
 
         {
           $project: {
@@ -171,6 +179,7 @@ class ProposalsDAO {
             "job.employer.isVerified": 0,
             "job.employer.createdAt": 0,
             "job.employer.updatedAt": 0,
+            "job.employer.ratings": 0,
           },
         },
       ];

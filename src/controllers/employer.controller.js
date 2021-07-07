@@ -95,7 +95,7 @@ async function getEmployerDetails(req, res, next) {
     if (success) {
       const serverResponse = {
         status: "success",
-        data: { ...data, password: null },
+        data: data,
       };
       return writeServerResponse(
         res,

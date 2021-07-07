@@ -125,10 +125,15 @@ class EmployersDAO {
         {
           $addFields: {
             user: { $arrayElemAt: ["$user", 0] },
+            rating: {
+              averageScore: { $avg: "$ratings.ratingScore" },
+              rateCounts: { $size: "$ratings" },
+            },
           },
         },
         {
           $project: {
+            ratings: 0,
             "user.password": 0,
             "user.role": 0,
           },
@@ -175,8 +180,21 @@ class EmployersDAO {
             as: "user",
           },
         },
-        { $addFields: { user: { $arrayElemAt: ["$user", 0] } } },
-        { $project: { "user.password": 0 } },
+        {
+          $addFields: {
+            user: { $arrayElemAt: ["$user", 0] },
+            rating: {
+              averageScore: { $avg: "$ratings.ratingScore" },
+              rateCounts: { $size: "$ratings" },
+            },
+          },
+        },
+        {
+          $project: {
+            ratings: 0,
+            "user.password": 0,
+          },
+        },
       ];
       const profile = await EmployersDAO.#employers.aggregate(pipeline).next();
       let profileObj;
