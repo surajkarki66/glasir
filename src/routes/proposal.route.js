@@ -6,7 +6,12 @@ import validations, { permissions, file } from "../middlewares/index";
 const router = new Router();
 
 const { checkAuth, dataValidation } = validations;
-const { freelancerPermissions, employerPermissions } = permissions;
+const {
+  freelancerPermissions,
+  employerPermissions,
+  jobPermissions,
+  proposalPermissions,
+} = permissions;
 
 router
   .route("/createProposal")
@@ -21,11 +26,14 @@ router
   .post(ProposalController.createProposal);
 
 router
-  .route("/isProposalExist")
-  .post(checkAuth)
-  .post(freelancerPermissions.onlyFreelancerCanDoThisAction)
-  .post(dataValidation(Schemas.proposalSchema.isProposalEXIST, "body"))
-  .post(ProposalController.isProposalExist);
+  .route("/isProposalExist/:jobId/:freelancerId")
+  .get(checkAuth)
+  .get(dataValidation(Schemas.proposalSchema.isProposalEXIST, "params"))
+  .get(
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    freelancerPermissions.onlySameFreelancerCanDoThisAction,
+  )
+  .get(ProposalController.isProposalExist);
 
 router
   .route("/getJobProposalDetails/:proposalId")
@@ -38,7 +46,10 @@ router
   .route("/getJobProposals")
   .get(checkAuth)
   .get(dataValidation(Schemas.proposalSchema.getJobProposalsLIST, "query"))
-  .get(employerPermissions.onlyEmployerCanDoThisAction)
+  .get(
+    employerPermissions.onlyEmployerCanDoThisAction,
+    jobPermissions.onlyJobOwnerCanDoThisAction,
+  )
   .get(ProposalController.getJobProposals);
 
 router
@@ -55,7 +66,10 @@ router
 router
   .route("/:proposalId")
   .get(checkAuth)
-  .get(freelancerPermissions.onlyFreelancerCanDoThisAction)
+  .get(
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    proposalPermissions.onlyProposalOwnerCanDoThisAction,
+  )
   .get(dataValidation(Schemas.proposalSchema.getProposalDETAILS, "params"))
   .get(ProposalController.getProposalDetails);
 
@@ -66,6 +80,7 @@ router
   .post(
     freelancerPermissions.onlyFreelancerCanDoThisAction,
     freelancerPermissions.onlySameFreelancerCanDoThisAction,
+    proposalPermissions.onlyProposalOwnerCanDoThisAction,
   )
   .post(ProposalController.changeProposalDetails);
 
@@ -76,6 +91,7 @@ router
   .delete(
     freelancerPermissions.onlyFreelancerCanDoThisAction,
     freelancerPermissions.onlySameFreelancerCanDoThisAction,
+    proposalPermissions.onlyProposalOwnerCanDoThisAction,
   )
   .delete(ProposalController.withdrawProposal);
 

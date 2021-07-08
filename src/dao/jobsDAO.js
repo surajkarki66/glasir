@@ -513,6 +513,43 @@ class JobsDAO {
     }
   }
 
+  static async removeFreelancerId(freelancerId, jobId) {
+    try {
+      const result = await JobsDAO.#jobs.updateOne(
+        {
+          _id: ObjectId(jobId),
+        },
+        { $pull: { hired: ObjectId(freelancerId) } },
+      );
+      if (
+        (result.modifiedCount === 1 && result.matchedCount === 1) ||
+        result.matchedCount === 1
+      ) {
+        return {
+          success: true,
+          data: {
+            message: "freelancerId removed successfully.",
+          },
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No job exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while removing freelancer id, ${e}`,
+        "removeFreelancerId()",
+      );
+      throw e;
+    }
+  }
+
   static async isHired(jobId, freelancerId) {
     return await JobsDAO.#jobs.findOne({
       _id: ObjectId(jobId),

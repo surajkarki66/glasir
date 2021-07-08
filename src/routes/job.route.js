@@ -41,14 +41,14 @@ router
   .post(JobController.hireFreelancer);
 
 router
-  .route("/isFreelancerHired")
-  .post(checkAuth)
-  .post(dataValidation(Schemas.jobSchema.isFreelancerHIRED, "body"))
-  .post(
+  .route("/isFreelancerHired/:jobId/:freelancerId")
+  .get(checkAuth)
+  .get(dataValidation(Schemas.jobSchema.isFreelancerHIRED, "params"))
+  .get(
     employerPermissions.onlyEmployerCanDoThisAction,
     jobPermissions.onlyJobOwnerCanDoThisAction,
   )
-  .post(JobController.isFreelancerHired);
+  .get(JobController.isFreelancerHired);
 
 router
   .route("/get-jobs")

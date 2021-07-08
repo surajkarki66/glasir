@@ -6,7 +6,8 @@ import validations, { permissions } from "../middlewares/index";
 const router = new Router();
 
 const { checkAuth, dataValidation } = validations;
-const { freelancerPermissions, employerPermissions } = permissions;
+const { freelancerPermissions, employerPermissions, contractPermissions } =
+  permissions;
 
 router
   .route("/getFreelancerContracts")
@@ -34,6 +35,29 @@ router
   .route("/getContractDetails/:contractId")
   .get(checkAuth)
   .get(dataValidation(Schemas.contractSchema.getContractDETAILS, "params"))
+  .get(contractPermissions.onlyContractOwnerCanDoThisAction)
   .get(ContractController.getContractDetails);
+
+router
+  .route("/activateContract")
+  .post(checkAuth)
+  .post(dataValidation(Schemas.contractSchema.contractACTIVATE, "body"))
+  .post(
+    employerPermissions.onlyEmployerCanDoThisAction,
+    employerPermissions.onlySameEmployerCanDoThisAction,
+    contractPermissions.onlyContractOwnerCanDoThisAction,
+  )
+  .post(ContractController.activateContract);
+
+router
+  .route("/closeContract")
+  .post(checkAuth)
+  .post(dataValidation(Schemas.contractSchema.contractCLOSE, "body"))
+  .post(
+    employerPermissions.onlyEmployerCanDoThisAction,
+    employerPermissions.onlySameEmployerCanDoThisAction,
+    contractPermissions.onlyContractOwnerCanDoThisAction,
+  )
+  .post(ContractController.closeContract);
 
 export default router;

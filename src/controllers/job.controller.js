@@ -215,6 +215,11 @@ async function deleteJob(req, res, next) {
     const { success } = DAOs.jobsDAO.deleteJobById(jobId);
 
     if (success) {
+      await Promise.all([
+        DAOs.proposalsDAO.deleteProposalsByJobId(jobId),
+        DAOs.saveJobsDAO.deleteSaveJobsByJobId(jobId),
+        DAOs.contractsDAO.deleteContractsByJobId(jobId),
+      ]);
       const serverResponse = {
         status: "success",
         data: { message: "Deleted successfully." },
@@ -292,6 +297,11 @@ async function hireFreelancer(req, res, next) {
       await Promise.all([
         DAOs.jobsDAO.addFreelancerId(freelancerId, jobId),
         DAOs.freelancersDAO.addJobId(freelancerId, jobId),
+        DAOs.proposalsDAO.updateProposalByFreelancerIdAndJobId(
+          freelancerId,
+          jobId,
+          { status: "accepted" },
+        ),
       ]);
 
       const serverResponse = {
@@ -319,7 +329,7 @@ async function hireFreelancer(req, res, next) {
 
 async function isFreelancerHired(req, res, next) {
   try {
-    const { jobId, freelancerId } = req.body;
+    const { jobId, freelancerId } = req.params;
     const job = await DAOs.jobsDAO.isHired(jobId, freelancerId);
     if (job) {
       const serverResponse = {

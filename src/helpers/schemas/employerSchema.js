@@ -37,13 +37,14 @@ const schemas = {
       }),
     payment: Joi.object()
       .keys({
-        method: Joi.string().valid("paypal", "creditCard", null).required(),
+        method: Joi.string().valid("paypal", "card", null).required(),
         isVerified: Joi.boolean().default(false),
       })
       .default({
-        method: null,
+        method: "card",
         isVerified: false,
       }),
+    ratings: Joi.array().default([]),
   }),
   employerLIST: Joi.object().keys({
     page: Joi.number().min(0).required(),
@@ -71,7 +72,7 @@ const schemas = {
       zip: Joi.number().integer().required(),
     }),
     payment: Joi.object().keys({
-      method: Joi.string().valid("paypal", "creditCard", null).required(),
+      method: Joi.string().valid("paypal", "card").required(),
       isVerified: Joi.boolean().default(false),
     }),
   }),

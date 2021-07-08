@@ -78,7 +78,7 @@ async function unsavedJob(req, res, next) {
 }
 async function isJobSaved(req, res, next) {
   try {
-    const { jobId, freelancerId } = req.body;
+    const { jobId, freelancerId } = req.params;
     const job = await DAOs.saveJobsDAO.getSaveJobByJobIdAndFreelancerId(
       freelancerId,
       jobId,

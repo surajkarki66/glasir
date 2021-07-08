@@ -247,6 +247,50 @@ class ContractsDAO {
       throw e;
     }
   }
+  static async updateContract(contractId, updateObject) {
+    try {
+      const result = await ContractsDAO.#contracts.updateOne(
+        {
+          _id: ObjectId(contractId),
+        },
+        {
+          $set: updateObject,
+        },
+      );
+      if (
+        (result.modifiedCount === 1 && result.matchedCount === 1) ||
+        result.matchedCount === 1
+      ) {
+        return {
+          success: true,
+          data: {
+            message: "Updated successfully.",
+          },
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No contract exist with this id.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while updating contract, ${e}`,
+        "updateContract()",
+      );
+      throw e;
+    }
+  }
+  static async getContractByContractId(contractId) {
+    return await ContractsDAO.#contracts.findOne({ _id: ObjectId(contractId) });
+  }
+  static async deleteContractsByJobId(jobId) {
+    return await ContractsDAO.#contracts.deleteMany({ job: ObjectId(jobId) });
+  }
 }
 
 export default ContractsDAO;

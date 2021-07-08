@@ -15,16 +15,9 @@ async function createFreelancerProfile(req, res, next) {
 
     const phoneNumber = parsePhoneNumber(phone.phoneNumber);
     if (phoneNumber && phoneNumber.isValid()) {
-      const newHourlyRate = {
-        ...freelancerInfo.hourlyRate,
-        amount:
-          freelancerInfo.hourlyRate.amount -
-          config.feeRate * freelancerInfo.hourlyRate.amount,
-      };
       const info = {
         ...freelancerInfo,
         user: ObjectId(aud),
-        hourlyRate: newHourlyRate,
         phone: { ...phone, isVerified: false },
         isVerified: false,
         createdAt: new Date(),

@@ -644,6 +644,107 @@ class FreelancersDAO {
       throw e;
     }
   }
+
+  static async incrementCurrentBalance(freelancerId, amount) {
+    try {
+      const result = await FreelancersDAO.freelancers.updateOne(
+        {
+          _id: ObjectId(freelancerId),
+        },
+        {
+          $inc: {
+            "currentBalance.amount": amount,
+          },
+        },
+      );
+      if (result.modifiedCount === 1 && result.matchedCount === 1) {
+        return {
+          success: true,
+          data: { message: "Incremented successfully" },
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: { error: "No freelancer exist with this id." },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while increasing current balance ${e}`,
+        "incrementCurrentBalance()",
+      );
+      throw e;
+    }
+  }
+
+  static async decrementCurrentBalance(freelancerId, amount) {
+    try {
+      const result = await FreelancersDAO.freelancers.updateOne(
+        {
+          _id: ObjectId(freelancerId),
+        },
+        {
+          $inc: {
+            "currentBalance.amount": amount,
+          },
+        },
+      );
+      if (result.modifiedCount === 1 && result.matchedCount === 1) {
+        return {
+          success: true,
+          data: { message: "Decremented successfully" },
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: { error: "No freelancer exist with this id." },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while decreasing current balance ${e}`,
+        "decrementCurrentBalance()",
+      );
+      throw e;
+    }
+  }
+  static async incrementTotalMoneyEarned(freelancerId, amount) {
+    try {
+      const result = await FreelancersDAO.freelancers.updateOne(
+        {
+          _id: ObjectId(freelancerId),
+        },
+        {
+          $inc: {
+            "totalMoneyEarned.amount": amount,
+          },
+        },
+      );
+      if (result.modifiedCount === 1 && result.matchedCount === 1) {
+        return {
+          success: true,
+          data: { message: "Incremented successfully" },
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: { error: "No freelancer exist with this id." },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while increasing current balance ${e}`,
+        "incrementTotalMoneyEarned()",
+      );
+      throw e;
+    }
+  }
 }
 
 export default FreelancersDAO;

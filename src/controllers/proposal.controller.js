@@ -72,7 +72,7 @@ async function createProposal(req, res, next) {
 }
 async function isProposalExist(req, res, next) {
   try {
-    const { jobId, freelancerId } = req.body;
+    const { jobId, freelancerId } = req.params;
     const proposal = await DAOs.proposalsDAO.getProposalByFreelancerIdAndJobId(
       freelancerId,
       jobId,

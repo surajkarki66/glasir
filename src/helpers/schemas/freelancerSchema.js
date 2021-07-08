@@ -1,9 +1,5 @@
 import Joi from "joi";
 
-/**
- * TODO: add hourlyRate: {"currencyCode": "USD","amount"}
- */
-
 const schemas = {
   freelancerCREATE: Joi.object().keys({
     firstName: Joi.string().min(2).max(32).required(),
@@ -27,6 +23,16 @@ const schemas = {
         amount: 0,
       }),
     jobsWorkedIn: Joi.array().items(Joi.string()).default([]),
+    currentBalance: Joi.object()
+      .keys({
+        currencyCode: Joi.string().valid("USD").default("USD"),
+        amount: Joi.number().default(0),
+      })
+      .default({
+        currencyCode: "USD",
+        amount: 0,
+      }),
+    ratings: Joi.array().default([]),
     location: Joi.object()
       .keys({
         country: Joi.string().valid("Nepal").required(),

@@ -385,6 +385,39 @@ class EmployersDAO {
       throw e;
     }
   }
+  static async incrementMoneySpent(employerId, amount) {
+    try {
+      const result = await EmployersDAO.#employers.updateOne(
+        {
+          _id: ObjectId(employerId),
+        },
+        {
+          $inc: {
+            "totalMoneySpent.amount": amount,
+          },
+        },
+      );
+      if (result.modifiedCount === 1 && result.matchedCount === 1) {
+        return {
+          success: true,
+          data: { message: "Incremented successfully" },
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: { error: "No employer exist with this id." },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while increasing money spent ${e}`,
+        "incrementMoneySpent()",
+      );
+      throw e;
+    }
+  }
 }
 
 export default EmployersDAO;

@@ -1,9 +1,11 @@
 import fileUpload from "./upload";
 
-import authPermissions from "./auth-permission";
-import freelancerPermissions from "./freelancer-permission";
-import employerPermissions from "./employer-permission";
+import authPermissions from "./auth-permissions";
+import freelancerPermissions from "./freelancer-permissions";
+import employerPermissions from "./employer-permissions";
 import jobPermissions from "./job-permissions";
+import proposalPermissions from "./proposal-permissions";
+import contractPermissions from "./contract-permissions";
 
 import validations from "./validation";
 
@@ -12,6 +14,8 @@ export const permissions = {
   freelancerPermissions,
   employerPermissions,
   jobPermissions,
+  proposalPermissions,
+  contractPermissions,
 };
 
 export default validations;

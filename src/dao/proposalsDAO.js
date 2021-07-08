@@ -372,6 +372,49 @@ class ProposalsDAO {
       throw e;
     }
   }
+  static async updateProposalByFreelancerIdAndJobId(
+    freelancerId,
+    jobId,
+    updateObject,
+  ) {
+    try {
+      const result = await ProposalsDAO.#proposals.updateOne(
+        {
+          freelancer: ObjectId(freelancerId),
+          job: ObjectId(jobId),
+        },
+        {
+          $set: updateObject,
+        },
+      );
+      if (
+        (result.modifiedCount === 1 && result.matchedCount === 1) ||
+        result.matchedCount === 1
+      ) {
+        return {
+          success: true,
+          data: {
+            message: "Updated successfully.",
+          },
+          statusCode: 201,
+        };
+      } else {
+        return {
+          success: false,
+          data: {
+            error: "No proposal exist with this jobId and freelancerId.",
+          },
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Error occurred while updating job, ${e}`,
+        "updateProposalByFreelancerIdAndJobId()",
+      );
+      throw e;
+    }
+  }
   static async updateProposal(proposalId, updateObject) {
     try {
       const result = await ProposalsDAO.#proposals.updateOne(
@@ -409,6 +452,9 @@ class ProposalsDAO {
       );
       throw e;
     }
+  }
+  static async deleteProposalsByJobId(jobId) {
+    return await ProposalsDAO.#proposals.deleteMany({ job: ObjectId(jobId) });
   }
 }
 

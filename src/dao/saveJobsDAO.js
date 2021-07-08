@@ -152,6 +152,9 @@ class SaveJobsDAO {
       throw e;
     }
   }
+  static async deleteSaveJobsByJobId(jobId) {
+    return await SaveJobsDAO.#saveJobs.deleteMany({ job: ObjectId(jobId) });
+  }
 }
 
 export default SaveJobsDAO;

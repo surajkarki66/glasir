@@ -58,7 +58,7 @@ const CLIENT_URL = process.env.CLIENT_URL;
 const DATABASE = process.env.DATABASE;
 const SERVICE_FEE_RATE = process.env.SERVICE_FEE_RATE;
 const JWT_EXPIRES = process.env.JWT_EXPIRES_NUM;
-const STRIPE_PUBLIC_KEY = process.env.STRIPE_PUBLIC_KEY;
+const STRIPE_PRIVATE_KEY = process.env.STRIPE_PRIVATE_KEY;
 const config = {
   mongo: MONGO,
   server: SERVER,
@@ -70,7 +70,7 @@ const config = {
   database: DATABASE,
   feeRate: SERVICE_FEE_RATE,
   jwtExpires: JWT_EXPIRES,
-  stripePubKey: STRIPE_PUBLIC_KEY,
+  stripePrivKey: STRIPE_PRIVATE_KEY,
 };
 
 export default config;

@@ -12,23 +12,32 @@ const { freelancerPermissions } = permissions;
 router
   .route("/saveJob")
   .post(checkAuth)
-  .post(freelancerPermissions.onlyFreelancerCanDoThisAction)
+  .post(
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    freelancerPermissions.onlySameFreelancerCanDoThisAction,
+  )
   .post(dataValidation(Schemas.saveJobSchema.saveJobCREATE, "body"))
   .post(SaveJobController.saveJob);
 
 router
   .route("/unsavedJob")
   .post(checkAuth)
-  .post(freelancerPermissions.onlyFreelancerCanDoThisAction)
+  .post(
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    freelancerPermissions.onlySameFreelancerCanDoThisAction,
+  )
   .post(dataValidation(Schemas.saveJobSchema.saveJobDELETE, "body"))
   .post(SaveJobController.unsavedJob);
 
 router
-  .route("/isJobSaved")
-  .post(checkAuth)
-  .post(freelancerPermissions.onlyFreelancerCanDoThisAction)
-  .post(dataValidation(Schemas.saveJobSchema.isJobSAVED, "body"))
-  .post(SaveJobController.isJobSaved);
+  .route("/isJobSaved/:jobId/:freelancerId")
+  .get(checkAuth)
+  .get(dataValidation(Schemas.saveJobSchema.isJobSAVED, "params"))
+  .get(
+    freelancerPermissions.onlyFreelancerCanDoThisAction,
+    freelancerPermissions.onlySameFreelancerCanDoThisAction,
+  )
+  .get(SaveJobController.isJobSaved);
 
 router
   .route("/getSavedJobs")
