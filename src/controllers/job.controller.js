@@ -229,6 +229,114 @@ async function deleteJob(req, res, next) {
   }
 }
 
+async function hireFreelancer(req, res, next) {
+  try {
+    const {
+      freelancerId,
+      jobId,
+      employerId,
+      contractTitle,
+      workDetails,
+      bidType,
+      fixedBidAmount,
+      hourlyBidAmount,
+    } = req.body;
+    const workDetailsFiles = req.file;
+    if (!workDetailsFiles) {
+      next(ApiError.badRequest("File not found"));
+      return;
+    }
+    let contractInfo = {
+      freelancer: ObjectId(freelancerId),
+      employer: ObjectId(employerId),
+      job: ObjectId(jobId),
+      contractTitle,
+      workDetails,
+      workDetailsFiles: workDetailsFiles.filename,
+      bidType,
+      isCompleted: false,
+      isActive: false,
+    };
+    if (bidType === "fixed") {
+      contractInfo = {
+        ...contractInfo,
+        fixedBidAmount: {
+          currencyCode: "USD",
+          amount: fixedBidAmount,
+        },
+      };
+    } else {
+      contractInfo = {
+        ...contractInfo,
+        hourlyBidAmount: {
+          currencyCode: "USD",
+          amount: hourlyBidAmount,
+        },
+      };
+    }
+    if (
+      await DAOs.contractsDAO.getContractByFreelancerIdAndJobIdAndEmployerId(
+        freelancerId,
+        jobId,
+        employerId,
+      )
+    ) {
+      next(ApiError.badRequest("Freelancer is already hired"));
+      return;
+    }
+    const { success, data, statusCode } =
+      await DAOs.contractsDAO.createContract(contractInfo);
+    if (success) {
+      await Promise.all([
+        DAOs.jobsDAO.addFreelancerId(freelancerId, jobId),
+        DAOs.freelancersDAO.addJobId(freelancerId, jobId),
+      ]);
+
+      const serverResponse = {
+        status: "success",
+        data: { message: "Freelancer is hired successfully" },
+      };
+      return writeServerResponse(
+        res,
+        serverResponse,
+        statusCode,
+        "application/json",
+      );
+    }
+    return writeServerResponse(
+      res,
+      { status: "failed", data: data },
+      statusCode,
+      "application/json",
+    );
+  } catch (e) {
+    next(ApiError.internal(`Something went wrong: ${e.message}`));
+    return;
+  }
+}
+
+async function isFreelancerHired(req, res, next) {
+  try {
+    const { jobId, freelancerId } = req.body;
+    const job = await DAOs.jobsDAO.isHired(jobId, freelancerId);
+    if (job) {
+      const serverResponse = {
+        status: "success",
+        data: { isHired: true },
+      };
+      return writeServerResponse(res, serverResponse, 200, "application/json");
+    }
+    const serverResponse = {
+      status: "success",
+      data: { isHired: false },
+    };
+    return writeServerResponse(res, serverResponse, 200, "application/json");
+  } catch (error) {
+    next(ApiError.internal(`Something went wrong: ${error.message}`));
+    return;
+  }
+}
+
 export default {
   createJob,
   getJobs,
@@ -237,4 +345,6 @@ export default {
   changeJobDetails,
   deleteJob,
   getEmployerJobs,
+  hireFreelancer,
+  isFreelancerHired,
 };

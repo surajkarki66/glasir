@@ -18,6 +18,38 @@ router
   )
   .post(dataValidation(Schemas.jobSchema.jobCREATE, "body"))
   .post(JobController.createJob);
+
+router
+  .route("/hireFreelancer")
+  .post(checkAuth)
+  .post(
+    file
+      .fileUpload("../../../public/uploads/documents/workDetails/", [
+        "application/pdf",
+        "application/docx",
+        "application/vnd.oasis.opendocument.text",
+      ])
+      .single("workDetailsFile"),
+  )
+  .post(dataValidation(Schemas.jobSchema.hireFreelancer, "body"))
+  .post(
+    employerPermissions.onlyEmployerCanDoThisAction,
+    employerPermissions.onlySameEmployerCanDoThisAction,
+    jobPermissions.onlyJobOwnerCanDoThisAction,
+  )
+
+  .post(JobController.hireFreelancer);
+
+router
+  .route("/isFreelancerHired")
+  .post(checkAuth)
+  .post(dataValidation(Schemas.jobSchema.isFreelancerHIRED, "body"))
+  .post(
+    employerPermissions.onlyEmployerCanDoThisAction,
+    jobPermissions.onlyJobOwnerCanDoThisAction,
+  )
+  .post(JobController.isFreelancerHired);
+
 router
   .route("/get-jobs")
   .get(checkAuth)

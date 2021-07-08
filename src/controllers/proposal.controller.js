@@ -2,7 +2,6 @@ import { ObjectId } from "mongodb";
 
 import DAOs from "../dao/index";
 import ApiError from "../errors/ApiError";
-import config from "../configs/config";
 import { writeServerResponse } from "../helpers/response";
 
 async function createProposal(req, res, next) {
@@ -41,9 +40,7 @@ async function createProposal(req, res, next) {
         ...proposalInfo,
         hourlyBidAmount: {
           currencyCode: "USD",
-          amount:
-            proposalInfo.hourlyBidAmount -
-            config.feeRate * proposalInfo.hourlyBidAmount,
+          amount: proposalInfo.hourlyBidAmount,
         },
       };
     }
@@ -264,9 +261,7 @@ async function changeProposalDetails(req, res, next) {
         ...proposalDetails,
         hourlyBidAmount: {
           currencyCode: "USD",
-          amount:
-            proposalDetails.hourlyBidAmount -
-            config.feeRate * proposalDetails.hourlyBidAmount,
+          amount: proposalDetails.hourlyBidAmount,
         },
       };
     }

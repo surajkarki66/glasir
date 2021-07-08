@@ -512,6 +512,13 @@ class JobsDAO {
       throw e;
     }
   }
+
+  static async isHired(jobId, freelancerId) {
+    return await JobsDAO.#jobs.findOne({
+      _id: ObjectId(jobId),
+      hired: { $in: [ObjectId(freelancerId)] },
+    });
+  }
 }
 
 export default JobsDAO;

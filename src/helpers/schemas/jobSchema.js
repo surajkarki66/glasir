@@ -132,6 +132,24 @@ const schemas = {
     employerId: Joi.string().length(24).hex().required(),
     jobStatus: Joi.string().valid("opened", "closed"),
   }),
+  hireFreelancer: Joi.object().keys({
+    freelancerId: Joi.string().length(24).hex().required(),
+    employerId: Joi.string().length(24).hex().required(),
+    jobId: Joi.string().length(24).hex().required(),
+    contractTitle: Joi.string().min(3).max(50).required(),
+    workDetails: Joi.string().required(),
+    bidType: Joi.string().valid("fixed", "hourly").required(),
+    fixedBidAmount: Joi.number()
+      .greater(0)
+      .when("bidType", { is: "fixed", then: Joi.required() }),
+    hourlyBidAmount: Joi.number()
+      .greater(0)
+      .when("bidType", { is: "hourly", then: Joi.required() }),
+  }),
+  isFreelancerHIRED: Joi.object().keys({
+    freelancerId: Joi.string().length(24).hex().required(),
+    jobId: Joi.string().length(24).hex().required(),
+  }),
 };
 
 export default schemas;
