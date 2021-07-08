@@ -5,6 +5,17 @@ import logger from "../configs/logger";
 
 class ContractsDAO {
   static #contracts;
+  static #DEFAULT_PROJECTS = {
+    "job.title": 1,
+    "job.description": 1,
+    workDetails: 1,
+    contractTitle: 1,
+    isActive: 1,
+    isClosed: 1,
+    createdAt: 1,
+    updatedAt: 1,
+  };
+  static #DEFAULT_SORT = { createdAt: 1, updatedAt: 1 };
 
   static async injectDB(conn) {
     if (ContractsDAO.#contracts) {
@@ -62,6 +73,179 @@ class ContractsDAO {
       freelancer: ObjectId(freelancerId),
       employer: ObjectId(employerId),
     });
+  }
+  static async getContracts({ filter, page = 0, contractsPerPage = 20 } = {}) {
+    let queryParams = {};
+    if (filter) {
+      queryParams = filter;
+    }
+
+    const {
+      query = filter,
+      project = ContractsDAO.#DEFAULT_PROJECTS,
+      sort = ContractsDAO.#DEFAULT_SORT,
+    } = queryParams;
+    let pipeline = [
+      { $match: query },
+      {
+        $lookup: {
+          from: "jobs",
+          localField: "job",
+          foreignField: "_id",
+          as: "job",
+        },
+      },
+      {
+        $addFields: {
+          job: { $arrayElemAt: ["$job", 0] },
+        },
+      },
+      {
+        $project: project,
+      },
+      { $sort: sort },
+    ];
+    let cursor;
+    try {
+      cursor = await ContractsDAO.#contracts.aggregate(pipeline);
+    } catch (e) {
+      console.error(`Unable to issue find command, ${e}`);
+      return {
+        success: false,
+        data: [],
+        totalNumContracts: 0,
+        statusCode: 404,
+      };
+    }
+    const displayCursor = cursor
+      .skip(parseInt(page) * parseInt(contractsPerPage))
+      .limit(parseInt(contractsPerPage));
+
+    try {
+      const documents = await displayCursor.toArray();
+      const totalNumContracts = documents.length;
+      return {
+        success: true,
+        data: documents,
+        totalNumContracts,
+        statusCode: documents.length > 0 ? 200 : 404,
+      };
+    } catch (e) {
+      logger.error(
+        `Unable to convert cursor to array or problem counting documents, ${e.message}`,
+      );
+      throw e;
+    }
+  }
+  static async getContractById(id, forWhom) {
+    try {
+      let pipeline = [];
+      if (forWhom === "freelancer") {
+        pipeline = [
+          { $match: { _id: ObjectId(id) } },
+          {
+            $lookup: {
+              from: "employers",
+              localField: "employer",
+              foreignField: "_id",
+              as: "employer",
+            },
+          },
+          {
+            $lookup: {
+              from: "jobs",
+              localField: "job",
+              foreignField: "_id",
+              as: "job",
+            },
+          },
+          {
+            $addFields: {
+              employer: { $arrayElemAt: ["$employer", 0] },
+              job: { $arrayElemAt: ["$job", 0] },
+            },
+          },
+          {
+            $addFields: {
+              "employer.rating": {
+                averageScore: { $avg: "$employer.ratings.ratingScore" },
+                rateCounts: { $size: "$employer.ratings" },
+              },
+            },
+          },
+          {
+            $project: {
+              "employer.ratings": 0,
+              "employer.phone": 0,
+            },
+          },
+        ];
+      }
+      if (forWhom === "employer") {
+        pipeline = [
+          { $match: { _id: ObjectId(id) } },
+          {
+            $lookup: {
+              from: "freelancers",
+              localField: "freelancer",
+              foreignField: "_id",
+              as: "freelancer",
+            },
+          },
+          {
+            $lookup: {
+              from: "jobs",
+              localField: "job",
+              foreignField: "_id",
+              as: "job",
+            },
+          },
+          {
+            $addFields: {
+              freelancer: { $arrayElemAt: ["$freelancer", 0] },
+              job: { $arrayElemAt: ["$job", 0] },
+            },
+          },
+          {
+            $addFields: {
+              "freelancer.rating": {
+                averageScore: { $avg: "$freelancer.ratings.ratingScore" },
+                rateCounts: { $size: "$freelancer.ratings" },
+              },
+            },
+          },
+          {
+            $project: {
+              "freelancer.ratings": 0,
+              "freelancer.phone": 0,
+            },
+          },
+        ];
+      }
+
+      const contract = await ContractsDAO.#contracts.aggregate(pipeline).next();
+      if (contract) {
+        return {
+          success: true,
+          data: contract,
+          statusCode: 200,
+        };
+      } else {
+        const message = "No document matching id: " + id + " could be found!";
+        logger.error(message, "getContractById()");
+        return {
+          success: false,
+          data: {},
+          statusCode: 404,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        `Unable to convert cursor to array or problem counting documents, ${e.message}`,
+        "getContractById()",
+      );
+      throw e;
+    }
   }
 }
 

@@ -254,8 +254,10 @@ async function hireFreelancer(req, res, next) {
       workDetails,
       workDetailsFiles: workDetailsFiles.filename,
       bidType,
-      isCompleted: false,
+      isClosed: false,
       isActive: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     if (bidType === "fixed") {
       contractInfo = {

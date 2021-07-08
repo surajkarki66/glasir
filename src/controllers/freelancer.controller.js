@@ -7,17 +7,6 @@ import ApiError from "../errors/ApiError";
 import messageBird from "../configs/messageBird";
 import { writeServerResponse } from "../helpers/response";
 
-async function myJobs(req, res, next) {
-  try {
-    /**
-     *  TODO: Getting all jobs which is applied by freelancer.
-     */
-  } catch (error) {
-    next(ApiError.internal(`Something went wrong: ${error.message}`));
-    return;
-  }
-}
-
 async function createFreelancerProfile(req, res, next) {
   try {
     const freelancerInfo = req.body;

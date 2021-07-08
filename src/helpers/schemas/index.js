@@ -5,6 +5,7 @@ import commonSchema from "./commonSchema";
 import jobSchema from "./jobSchema";
 import saveJobSchema from "./saveJobSchema";
 import proposalSchema from "./proposalSchema";
+import contractSchema from "./contractSchema";
 
 export default {
   userSchema,
@@ -14,4 +15,5 @@ export default {
   jobSchema,
   saveJobSchema,
   proposalSchema,
+  contractSchema,
 };
