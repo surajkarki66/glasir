@@ -523,9 +523,6 @@ async function getUserDetails(req, res, next) {
   }
 }
 async function deleteUser(req, res, next) {
-  /**
-   * TODO: when we delete the user , it must delete its profile, job created by him/her, proposals etc
-   */
   try {
     const { password } = req.body;
     const { userId } = req.params;
@@ -538,12 +535,27 @@ async function deleteUser(req, res, next) {
         next(ApiError.unauthorized("Oops! Password is incorrect."));
         return;
       }
-      const deleteUser = DAOs.usersDAO.deleteUser(userId);
-      const deleteFreelancerOrClient =
-        role === "freelancer"
-          ? DAOs.freelancersDAO.deleteFreelancerByUserId(userId)
-          : DAOs.clientsDAO.deleteClientByUserId(userId);
-      const result = await Promise.all([deleteUser, deleteFreelancerOrClient]);
+      let deletes = [DAOs.usersDAO.deleteUser(userId)];
+      if (role === "freelancer") {
+        const { _id } = await DAOs.freelancersDAO.getFreelancerByUserId(userId);
+        deletes = [
+          ...deletes,
+          DAOs.freelancersDAO.deleteFreelancerByUserId(userId),
+          DAOs.proposalsDAO.deleteProposalByFreelancerId(_id),
+          DAOs.saveJobsDAO.deleteSaveJobsByFreelancerId(_id),
+          DAOs.contractsDAO.deleteContractsByFreelancerId(_id),
+        ];
+      }
+      if (role === "employer") {
+        const { _id } = await DAOs.employersDAO.getEmployerByUserId(userId);
+        deletes = [
+          ...deletes,
+          DAOs.employersDAO.deleteEmployerByUserId(userId),
+          DAOs.contractsDAO.deleteContractsByEmployerId(_id),
+          DAOs.jobsDAO.deleteJobsByEmployerId(_id),
+        ];
+      }
+      const result = await Promise.all(deletes);
       if (result) {
         const serverResponse = {
           status: "success",
@@ -556,8 +568,6 @@ async function deleteUser(req, res, next) {
           "application/json",
         );
       }
-      next(ApiError.notfound("User or Freelancer or Employer not found."));
-      return;
     }
     next(ApiError.notfound("User doesn't exist."));
     return;

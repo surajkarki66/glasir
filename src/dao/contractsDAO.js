@@ -291,6 +291,16 @@ class ContractsDAO {
   static async deleteContractsByJobId(jobId) {
     return await ContractsDAO.#contracts.deleteMany({ job: ObjectId(jobId) });
   }
+  static async deleteContractsByFreelancerId(freelancerId) {
+    return await ContractsDAO.#contracts.deleteMany({
+      freelancer: ObjectId(freelancerId),
+    });
+  }
+  static async deleteContractsByEmployerId(employerId) {
+    return await ContractsDAO.#contracts.deleteMany({
+      employer: ObjectId(employerId),
+    });
+  }
 }
 
 export default ContractsDAO;

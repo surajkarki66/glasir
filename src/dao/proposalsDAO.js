@@ -456,6 +456,11 @@ class ProposalsDAO {
   static async deleteProposalsByJobId(jobId) {
     return await ProposalsDAO.#proposals.deleteMany({ job: ObjectId(jobId) });
   }
+  static async deleteProposalByFreelancerId(freelancerId) {
+    return await ProposalsDAO.#proposals.deleteMany({
+      freelancer: ObjectId(freelancerId),
+    });
+  }
 }
 
 export default ProposalsDAO;

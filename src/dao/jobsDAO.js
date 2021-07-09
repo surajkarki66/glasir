@@ -556,6 +556,9 @@ class JobsDAO {
       hired: { $in: [ObjectId(freelancerId)] },
     });
   }
+  static async deleteJobsByEmployerId(employerId) {
+    return await JobsDAO.#jobs.deleteMany({ employer: ObjectId(employerId) });
+  }
 }
 
 export default JobsDAO;
