@@ -98,6 +98,16 @@ async function activateContract(req, res, next) {
   try {
     const { contractId, freelancerId, employerId, token, fixedBidAmount } =
       req.body;
+    const { isActive, isClosed } =
+      await DAOs.contractsDAO.getContractByContractId(contractId);
+    if (isActive) {
+      next(ApiError.forbidden("Contract is already activated."));
+      return;
+    }
+    if (isClosed) {
+      next(ApiError.forbidden("Contract is closed."));
+      return;
+    }
     const { currencyCode, amount } = fixedBidAmount;
     const stripe = new Stripe(config.stripePrivKey);
     const idempotencyKey = uuidv4();
