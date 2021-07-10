@@ -6,7 +6,7 @@ import { writeServerResponse } from "../helpers/response";
 
 async function createProposal(req, res, next) {
   try {
-    const { freelancer, job, bidType } = req.body;
+    const { freelancerId, jobId, bidType } = req.body;
     const additionalFiles = req.files;
     const newAdditionalFiles = additionalFiles.map((file) => {
       const fileProperties = {
@@ -15,15 +15,18 @@ async function createProposal(req, res, next) {
       return fileProperties;
     });
     if (
-      await DAOs.proposalsDAO.getProposalByFreelancerIdAndJobId(freelancer, job)
+      await DAOs.proposalsDAO.getProposalByFreelancerIdAndJobId(
+        freelancerId,
+        jobId,
+      )
     ) {
       next(ApiError.badRequest("Proposal is already saved"));
       return;
     }
     const proposalInfo = {
       ...req.body,
-      freelancer: ObjectId(freelancer),
-      job: ObjectId(job),
+      freelancerId: ObjectId(freelancerId),
+      jobId: ObjectId(jobId),
       additionalFiles: newAdditionalFiles,
     };
     let newProposalInfo = {};
@@ -47,7 +50,7 @@ async function createProposal(req, res, next) {
     const { success, data, statusCode } =
       await DAOs.proposalsDAO.createProposal(newProposalInfo);
     if (success) {
-      await DAOs.jobsDAO.addProposalId(data._id, job);
+      await DAOs.jobsDAO.addProposalId(data._id, jobId);
       const serverResponse = {
         status: "success",
         data: { message: "Proposal is created successfully" },
@@ -134,7 +137,7 @@ async function withdrawProposal(req, res, next) {
 
     const { success } = await DAOs.proposalsDAO.deleteProposalById(proposalId);
     if (success) {
-      await DAOs.jobsDAO.removeProposalId(proposalId, proposal.job);
+      await DAOs.jobsDAO.removeProposalId(proposalId, proposal.jobId);
       const serverResponse = {
         status: "success",
         data: { message: "Deleted successfully." },
@@ -151,7 +154,7 @@ async function withdrawProposal(req, res, next) {
 async function getFreelancerProposals(req, res, next) {
   try {
     const { page, proposalsPerPage, freelancerId } = req.query;
-    const filter = { freelancer: ObjectId(freelancerId) };
+    const filter = { freelancerId: ObjectId(freelancerId) };
     const { success, data, totalNumProposals, statusCode } =
       await DAOs.proposalsDAO.getProposals({
         filter,
@@ -184,7 +187,7 @@ async function getFreelancerProposals(req, res, next) {
 async function getJobProposals(req, res, next) {
   try {
     const { page, proposalsPerPage, jobId } = req.query;
-    const filter = { job: ObjectId(jobId) };
+    const filter = { jobId: ObjectId(jobId) };
     const { success, data, totalNumProposals, statusCode } =
       await DAOs.proposalsDAO.getProposalByJobId({
         filter,

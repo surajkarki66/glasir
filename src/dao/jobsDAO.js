@@ -157,7 +157,7 @@ class JobsDAO {
       {
         $lookup: {
           from: "employers",
-          localField: "employer",
+          localField: "employerId",
           foreignField: "_id",
           as: "employer",
         },
@@ -187,7 +187,7 @@ class JobsDAO {
         {
           $lookup: {
             from: "employers",
-            localField: "employer",
+            localField: "employerId",
             foreignField: "_id",
             as: "employer",
           },
@@ -291,7 +291,7 @@ class JobsDAO {
         {
           $lookup: {
             from: "employers",
-            localField: "employer",
+            localField: "employerId",
             foreignField: "_id",
             as: "employer",
           },
@@ -313,6 +313,7 @@ class JobsDAO {
           $project: {
             "employer.ratings": 0,
             "employer.phone": 0,
+            employerId: 0,
           },
         },
       ];
@@ -557,7 +558,7 @@ class JobsDAO {
     });
   }
   static async deleteJobsByEmployerId(employerId) {
-    return await JobsDAO.#jobs.deleteMany({ employer: ObjectId(employerId) });
+    return await JobsDAO.#jobs.deleteMany({ employerId: ObjectId(employerId) });
   }
 }
 

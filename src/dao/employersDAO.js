@@ -107,7 +107,7 @@ class EmployersDAO {
   }
   static async getEmployerByUserId(userId) {
     return await EmployersDAO.#employers.findOne({
-      user: ObjectId(userId),
+      userId: ObjectId(userId),
     });
   }
   static async getEmployerById(id) {
@@ -117,7 +117,7 @@ class EmployersDAO {
         {
           $lookup: {
             from: "users",
-            localField: "user",
+            localField: "userId",
             foreignField: "_id",
             as: "user",
           },
@@ -136,6 +136,7 @@ class EmployersDAO {
             ratings: 0,
             "user.password": 0,
             "user.role": 0,
+            userId: 0,
           },
         },
       ];
@@ -169,13 +170,13 @@ class EmployersDAO {
       const pipeline = [
         {
           $match: {
-            user: ObjectId(userId),
+            userId: ObjectId(userId),
           },
         },
         {
           $lookup: {
             from: "users",
-            localField: "user",
+            localField: "userId",
             foreignField: "_id",
             as: "user",
           },
@@ -193,6 +194,7 @@ class EmployersDAO {
           $project: {
             ratings: 0,
             "user.password": 0,
+            userId: 0,
           },
         },
       ];
@@ -251,7 +253,7 @@ class EmployersDAO {
   static async deleteEmployerByUserId(userId) {
     try {
       const result = await EmployersDAO.#employers.deleteOne({
-        user: ObjectId(userId),
+        userId: ObjectId(userId),
       });
       if (result.deletedCount === 1) {
         return {
@@ -322,7 +324,7 @@ class EmployersDAO {
         {
           $match: {
             _id: ObjectId(employerId),
-            "ratings.freelancer": ObjectId(freelancerId),
+            "ratings.freelancerId": ObjectId(freelancerId),
           },
         },
         {
@@ -332,7 +334,7 @@ class EmployersDAO {
                 input: "$ratings",
                 as: "rate",
                 cond: {
-                  $eq: ["$$rate.freelancer", ObjectId(freelancerId)],
+                  $eq: ["$$rate.freelancerId", ObjectId(freelancerId)],
                 },
               },
             },
@@ -358,7 +360,7 @@ class EmployersDAO {
         {
           _id: ObjectId(employerId),
         },
-        { $pull: { ratings: { freelancer: ObjectId(freelancerId) } } },
+        { $pull: { ratings: { freelancerId: ObjectId(freelancerId) } } },
       );
       if (result.modifiedCount === 1 && result.matchedCount === 1) {
         return {

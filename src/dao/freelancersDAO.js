@@ -235,7 +235,7 @@ class FreelancersDAO {
   }
   static async getFreelancerByUserId(userId) {
     return await FreelancersDAO.freelancers.findOne({
-      user: ObjectId(userId),
+      userId: ObjectId(userId),
     });
   }
   static async getFreelancerById(id) {
@@ -245,7 +245,7 @@ class FreelancersDAO {
         {
           $lookup: {
             from: "users",
-            localField: "user",
+            localField: "userId",
             foreignField: "_id",
             as: "user",
           },
@@ -264,6 +264,7 @@ class FreelancersDAO {
             ratings: 0,
             "user.password": 0,
             "user.role": 0,
+            userId: 0,
           },
         },
       ];
@@ -299,13 +300,13 @@ class FreelancersDAO {
       const pipeline = [
         {
           $match: {
-            user: ObjectId(userId),
+            userId: ObjectId(userId),
           },
         },
         {
           $lookup: {
             from: "users",
-            localField: "user",
+            localField: "userId",
             foreignField: "_id",
             as: "user",
           },
@@ -508,7 +509,7 @@ class FreelancersDAO {
   static async deleteFreelancerByUserId(userId) {
     try {
       const result = await FreelancersDAO.freelancers.deleteOne({
-        user: ObjectId(userId),
+        userId: ObjectId(userId),
       });
       if (result.deletedCount === 1) {
         return {
@@ -579,7 +580,7 @@ class FreelancersDAO {
         {
           $match: {
             _id: ObjectId(freelancerId),
-            "ratings.employer": ObjectId(employerId),
+            "ratings.employerId": ObjectId(employerId),
           },
         },
         {
@@ -589,7 +590,7 @@ class FreelancersDAO {
                 input: "$ratings",
                 as: "rate",
                 cond: {
-                  $eq: ["$$rate.employer", ObjectId(employerId)],
+                  $eq: ["$$rate.employerId", ObjectId(employerId)],
                 },
               },
             },
@@ -617,7 +618,7 @@ class FreelancersDAO {
         {
           _id: ObjectId(freelancerId),
         },
-        { $pull: { ratings: { employer: ObjectId(employerId) } } },
+        { $pull: { ratings: { employerId: ObjectId(employerId) } } },
       );
       if (result.modifiedCount === 1 && result.matchedCount === 1) {
         return {

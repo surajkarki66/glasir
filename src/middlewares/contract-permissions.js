@@ -7,10 +7,10 @@ const onlyContractOwnerCanDoThisAction = async (req, res, next) => {
     req.params.contractId || req.body.contractId || req.query.contractId;
   const contract = await DAOs.contractsDAO.getContractByContractId(contractId);
   if (contract) {
-    const { freelancer, employer } = contract;
+    const { freelancerId, employerId } = contract;
     if (role === "freelancer") {
       const f = await DAOs.freelancersDAO.getFreelancerByUserId(aud);
-      if (f && f._id.toString() === freelancer.toString()) {
+      if (f && f._id.toString() === freelancerId.toString()) {
         return next();
       }
       next(
@@ -22,7 +22,7 @@ const onlyContractOwnerCanDoThisAction = async (req, res, next) => {
     }
     if (role === "employer") {
       const e = await DAOs.employersDAO.getEmployerByUserId(aud);
-      if (e && e._id.toString() === employer.toString()) {
+      if (e && e._id.toString() === employerId.toString()) {
         return next();
       }
       next(

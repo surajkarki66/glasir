@@ -9,7 +9,7 @@ const onlyJobOwnerCanDoThisAction = async (req, res, next) => {
     result &&
     result.data &&
     result.data.employer &&
-    result.data.employer.user.toString() === aud
+    result.data.employer.userId.toString() === aud
   ) {
     return next();
   }

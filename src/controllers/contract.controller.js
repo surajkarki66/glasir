@@ -10,7 +10,7 @@ import { writeServerResponse } from "../helpers/response";
 async function getFreelancerContracts(req, res, next) {
   try {
     const { freelancerId, page, contractsPerPage } = req.query;
-    const filter = { freelancer: ObjectId(freelancerId), isActive: true };
+    const filter = { freelancerId: ObjectId(freelancerId), isActive: true };
     const { success, data, totalNumContracts, statusCode } =
       await DAOs.contractsDAO.getContracts({ filter, page, contractsPerPage });
     if (success) {
@@ -40,7 +40,7 @@ async function getFreelancerContracts(req, res, next) {
 async function getEmployerContracts(req, res, next) {
   try {
     const { employerId, page, contractsPerPage } = req.query;
-    const filter = { employer: ObjectId(employerId) };
+    const filter = { employerId: ObjectId(employerId) };
     const { success, data, totalNumContracts, statusCode } =
       await DAOs.contractsDAO.getContracts({ filter, page, contractsPerPage });
     if (success) {

@@ -16,7 +16,7 @@ async function createEmployerProfile(req, res, next) {
     if (phoneNumber && phoneNumber.isValid()) {
       const info = {
         ...employerInfo,
-        user: ObjectId(aud),
+        userId: ObjectId(aud),
         phone: { ...phone, isVerified: false },
         isVerified: false,
         createdAt: new Date(),
@@ -264,7 +264,7 @@ async function rateEmployer(req, res, next) {
   try {
     const { freelancerId, ratingScore, employerId } = req.body;
     const rateObj = {
-      freelancer: ObjectId(freelancerId),
+      freelancerId: ObjectId(freelancerId),
       ratingScore: ratingScore,
     };
     const { data, success, statusCode } = await DAOs.employersDAO.pushRate(

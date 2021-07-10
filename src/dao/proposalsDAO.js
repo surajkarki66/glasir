@@ -61,8 +61,8 @@ class ProposalsDAO {
   }
   static async getProposalByFreelancerIdAndJobId(freelancerId, jobId) {
     return await ProposalsDAO.#proposals.findOne({
-      job: ObjectId(jobId),
-      freelancer: ObjectId(freelancerId),
+      jobId: ObjectId(jobId),
+      freelancerId: ObjectId(freelancerId),
     });
   }
   static async getProposals({ filter, page = 0, proposalsPerPage = 20 } = {}) {
@@ -81,7 +81,7 @@ class ProposalsDAO {
       {
         $lookup: {
           from: "jobs",
-          localField: "job",
+          localField: "jobId",
           foreignField: "_id",
           as: "job",
         },
@@ -135,7 +135,7 @@ class ProposalsDAO {
         {
           $lookup: {
             from: "jobs",
-            localField: "job",
+            localField: "jobId",
             foreignField: "_id",
             as: "job",
           },
@@ -148,7 +148,7 @@ class ProposalsDAO {
         {
           $lookup: {
             from: "employers",
-            localField: "job.employer",
+            localField: "job.employerId",
             foreignField: "_id",
             as: "job.employer",
           },
@@ -175,11 +175,13 @@ class ProposalsDAO {
             "job.employer.company.tagline": 0,
             "job.employer.company.phone": 0,
             "job.employer.location.zip": 0,
-            "job.employer.user": 0,
+            "job.employer.userId": 0,
             "job.employer.isVerified": 0,
             "job.employer.createdAt": 0,
             "job.employer.updatedAt": 0,
             "job.employer.ratings": 0,
+            "job.employerId": 0,
+            jobId: 0,
           },
         },
       ];
@@ -269,7 +271,7 @@ class ProposalsDAO {
       {
         $lookup: {
           from: "freelancers",
-          localField: "freelancer",
+          localField: "freelancerId",
           foreignField: "_id",
           as: "freelancer",
         },
@@ -323,7 +325,7 @@ class ProposalsDAO {
         {
           $lookup: {
             from: "freelancers",
-            localField: "freelancer",
+            localField: "freelancerId",
             foreignField: "_id",
             as: "freelancer",
           },
@@ -344,6 +346,7 @@ class ProposalsDAO {
         {
           $project: {
             "freelancer.ratings": 0,
+            freelancerId: 0,
           },
         },
       ];
@@ -380,8 +383,8 @@ class ProposalsDAO {
     try {
       const result = await ProposalsDAO.#proposals.updateOne(
         {
-          freelancer: ObjectId(freelancerId),
-          job: ObjectId(jobId),
+          freelancerId: ObjectId(freelancerId),
+          jobId: ObjectId(jobId),
         },
         {
           $set: updateObject,
@@ -454,11 +457,11 @@ class ProposalsDAO {
     }
   }
   static async deleteProposalsByJobId(jobId) {
-    return await ProposalsDAO.#proposals.deleteMany({ job: ObjectId(jobId) });
+    return await ProposalsDAO.#proposals.deleteMany({ jobId: ObjectId(jobId) });
   }
   static async deleteProposalByFreelancerId(freelancerId) {
     return await ProposalsDAO.#proposals.deleteMany({
-      freelancer: ObjectId(freelancerId),
+      freelancerId: ObjectId(freelancerId),
     });
   }
 }

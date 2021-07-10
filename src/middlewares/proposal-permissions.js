@@ -16,7 +16,7 @@ const onlyProposalOwnerCanDoThisAction = async (req, res, next) => {
     return;
   }
   const { _id } = freelancer;
-  if (_id.toString() === proposal.freelancer.toString()) {
+  if (_id.toString() === proposal.freelancerId.toString()) {
     return next();
   }
   next(

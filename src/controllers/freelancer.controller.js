@@ -2,7 +2,6 @@ import { ObjectId } from "mongodb";
 import parsePhoneNumber from "libphonenumber-js";
 
 import DAOs from "../dao/index";
-import config from "../configs/config";
 import ApiError from "../errors/ApiError";
 import messageBird from "../configs/messageBird";
 import { writeServerResponse } from "../helpers/response";
@@ -17,7 +16,7 @@ async function createFreelancerProfile(req, res, next) {
     if (phoneNumber && phoneNumber.isValid()) {
       const info = {
         ...freelancerInfo,
-        user: ObjectId(aud),
+        userId: ObjectId(aud),
         phone: { ...phone, isVerified: false },
         isVerified: false,
         createdAt: new Date(),
@@ -255,7 +254,7 @@ async function changeFreelancerDetails(req, res, next) {
     if (hourlyRate) {
       const newHourlyRate = {
         ...hourlyRate,
-        amount: hourlyRate.amount - config.feeRate * hourlyRate.amount,
+        amount: hourlyRate.amount,
       };
       freelancerDetails = {
         ...freelancerDetails,
@@ -424,7 +423,7 @@ async function rateFreelancer(req, res, next) {
   try {
     const { freelancerId, ratingScore, employerId } = req.body;
     const rateObj = {
-      employer: ObjectId(employerId),
+      employerId: ObjectId(employerId),
       ratingScore: ratingScore,
     };
     const { data, success, statusCode } = await DAOs.freelancersDAO.pushRate(

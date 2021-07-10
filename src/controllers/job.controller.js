@@ -6,10 +6,10 @@ import { writeServerResponse } from "../helpers/response";
 
 async function createJob(req, res, next) {
   try {
-    const { employer } = req.body;
+    const { employerId } = req.body;
     const jobInfo = {
       ...req.body,
-      employer: ObjectId(employer),
+      employerId: ObjectId(employerId),
     };
     const { success, data, statusCode } = await DAOs.jobsDAO.createJob(jobInfo);
     if (success) {
@@ -70,7 +70,7 @@ async function getJobs(req, res, next) {
 async function getEmployerJobs(req, res, next) {
   try {
     const { page, jobsPerPage, employerId, jobStatus } = req.query;
-    let filter = { employer: ObjectId(employerId) };
+    let filter = { employerId: ObjectId(employerId) };
     if (jobStatus) {
       filter = { ...filter, jobStatus: jobStatus };
     }
@@ -252,9 +252,9 @@ async function hireFreelancer(req, res, next) {
       return;
     }
     let contractInfo = {
-      freelancer: ObjectId(freelancerId),
-      employer: ObjectId(employerId),
-      job: ObjectId(jobId),
+      freelancerId: ObjectId(freelancerId),
+      employerId: ObjectId(employerId),
+      jobId: ObjectId(jobId),
       contractTitle,
       workDetails,
       workDetailsFiles: workDetailsFiles.filename,

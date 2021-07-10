@@ -51,15 +51,15 @@ class SaveJobsDAO {
   }
   static async getSaveJobByJobIdAndFreelancerId(freelancerId, jobId) {
     return await SaveJobsDAO.#saveJobs.findOne({
-      job: ObjectId(jobId),
-      freelancer: ObjectId(freelancerId),
+      jobId: ObjectId(jobId),
+      freelancerId: ObjectId(freelancerId),
     });
   }
   static async deleteSaveJob(freelancerId, jobId) {
     try {
       const result = await SaveJobsDAO.#saveJobs.deleteOne({
-        job: ObjectId(jobId),
-        freelancer: ObjectId(freelancerId),
+        jobId: ObjectId(jobId),
+        freelancerId: ObjectId(freelancerId),
       });
       if (result.deletedCount === 1) {
         return {
@@ -93,6 +93,7 @@ class SaveJobsDAO {
     const {
       query = filter,
       project = {
+        jobId: 0,
         "job.projectLengthInHours": 0,
         "job.category": 0,
         "job.projectType": 0,
@@ -105,7 +106,7 @@ class SaveJobsDAO {
       {
         $lookup: {
           from: "jobs",
-          localField: "job",
+          localField: "jobId",
           foreignField: "_id",
           as: "job",
         },
@@ -153,11 +154,11 @@ class SaveJobsDAO {
     }
   }
   static async deleteSaveJobsByJobId(jobId) {
-    return await SaveJobsDAO.#saveJobs.deleteMany({ job: ObjectId(jobId) });
+    return await SaveJobsDAO.#saveJobs.deleteMany({ jobId: ObjectId(jobId) });
   }
   static async deleteSaveJobsByFreelancerId(freelancerId) {
     return await SaveJobsDAO.#saveJobs.deleteMany({
-      freelancer: ObjectId(freelancerId),
+      freelancerId: ObjectId(freelancerId),
     });
   }
 }

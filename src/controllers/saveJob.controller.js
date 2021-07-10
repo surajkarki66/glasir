@@ -16,8 +16,8 @@ async function saveJob(req, res, next) {
       return;
     }
     const saveJobInfo = {
-      job: ObjectId(jobId),
-      freelancer: ObjectId(freelancerId),
+      jobId: ObjectId(jobId),
+      freelancerId: ObjectId(freelancerId),
     };
     const { success, data, statusCode } = await DAOs.saveJobsDAO.createSaveJob(
       saveJobInfo,
@@ -104,7 +104,7 @@ async function getSavedJobs(req, res, next) {
   try {
     const { page, jobsPerPage, freelancerId } = req.query;
 
-    const filter = { freelancer: ObjectId(freelancerId) };
+    const filter = { freelancerId: ObjectId(freelancerId) };
     const { success, data, totalNumJobs, statusCode } =
       await DAOs.saveJobsDAO.getJobs({ filter, page, jobsPerPage });
     if (success) {

@@ -69,9 +69,9 @@ class ContractsDAO {
     employerId,
   ) {
     return await ContractsDAO.#contracts.findOne({
-      job: ObjectId(jobId),
-      freelancer: ObjectId(freelancerId),
-      employer: ObjectId(employerId),
+      jobId: ObjectId(jobId),
+      freelancerId: ObjectId(freelancerId),
+      employerId: ObjectId(employerId),
     });
   }
   static async getContracts({ filter, page = 0, contractsPerPage = 20 } = {}) {
@@ -90,7 +90,7 @@ class ContractsDAO {
       {
         $lookup: {
           from: "jobs",
-          localField: "job",
+          localField: "jobId",
           foreignField: "_id",
           as: "job",
         },
@@ -146,7 +146,7 @@ class ContractsDAO {
           {
             $lookup: {
               from: "employers",
-              localField: "employer",
+              localField: "employerId",
               foreignField: "_id",
               as: "employer",
             },
@@ -154,7 +154,7 @@ class ContractsDAO {
           {
             $lookup: {
               from: "jobs",
-              localField: "job",
+              localField: "jobId",
               foreignField: "_id",
               as: "job",
             },
@@ -175,8 +175,10 @@ class ContractsDAO {
           },
           {
             $project: {
+              employerId: 0,
               "employer.ratings": 0,
               "employer.phone": 0,
+              jobId: 0,
             },
           },
         ];
@@ -187,7 +189,7 @@ class ContractsDAO {
           {
             $lookup: {
               from: "freelancers",
-              localField: "freelancer",
+              localField: "freelancerId",
               foreignField: "_id",
               as: "freelancer",
             },
@@ -195,7 +197,7 @@ class ContractsDAO {
           {
             $lookup: {
               from: "jobs",
-              localField: "job",
+              localField: "jobId",
               foreignField: "_id",
               as: "job",
             },
@@ -218,6 +220,8 @@ class ContractsDAO {
             $project: {
               "freelancer.ratings": 0,
               "freelancer.phone": 0,
+              freelancerId: 0,
+              jobId: 0,
             },
           },
         ];
@@ -289,16 +293,16 @@ class ContractsDAO {
     return await ContractsDAO.#contracts.findOne({ _id: ObjectId(contractId) });
   }
   static async deleteContractsByJobId(jobId) {
-    return await ContractsDAO.#contracts.deleteMany({ job: ObjectId(jobId) });
+    return await ContractsDAO.#contracts.deleteMany({ jobId: ObjectId(jobId) });
   }
   static async deleteContractsByFreelancerId(freelancerId) {
     return await ContractsDAO.#contracts.deleteMany({
-      freelancer: ObjectId(freelancerId),
+      freelancerId: ObjectId(freelancerId),
     });
   }
   static async deleteContractsByEmployerId(employerId) {
     return await ContractsDAO.#contracts.deleteMany({
-      employer: ObjectId(employerId),
+      employerId: ObjectId(employerId),
     });
   }
 }
