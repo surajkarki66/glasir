@@ -96,8 +96,17 @@ class SaveJobsDAO {
         jobId: 0,
         "job.projectLengthInHours": 0,
         "job.category": 0,
+        "job.hired": 0,
         "job.projectType": 0,
         "job.proposals": 0,
+        "job.employer.ratings": 0,
+        "job.employer.phone": 0,
+        "job.employerId": 0,
+        "job.employer.firstName": 0,
+        "job.employer.lastName": 0,
+        "job.employer.avatar": 0,
+        "job.employer.isVerified": 0,
+        "job.employer.totalMoneySpent": 0,
       },
       sort = SaveJobsDAO.#DEFAULT_SORT,
     } = queryParams;
@@ -116,6 +125,28 @@ class SaveJobsDAO {
           job: { $arrayElemAt: ["$job", 0] },
         },
       },
+      {
+        $lookup: {
+          from: "employers",
+          localField: "job.employerId",
+          foreignField: "_id",
+          as: "job.employer",
+        },
+      },
+      {
+        $addFields: {
+          "job.employer": { $arrayElemAt: ["$job.employer", 0] },
+        },
+      },
+      {
+        $addFields: {
+          "job.employer.rating": {
+            averageScore: { $avg: "$job.employer.ratings.ratingScore" },
+            rateCounts: { $size: "$job.employer.ratings" },
+          },
+        },
+      },
+
       {
         $project: project,
       },
