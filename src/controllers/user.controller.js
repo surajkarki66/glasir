@@ -193,12 +193,8 @@ async function activation(req, res, next) {
 }
 
 function logout(req, res, next) {
-  const options = {
-    maxAge: 0,
-    secure: config.env === "production" ? true : false,
-    httpOnly: config.env === "production" ? true : false,
-  };
-  res.cookie("logout", "", options).send();
+  res.clearCookie("token");
+  res.send();
 }
 
 async function forgotPassword(req, res, next) {
