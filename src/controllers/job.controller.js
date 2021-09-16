@@ -39,7 +39,7 @@ async function createJob(req, res, next) {
 async function getJobs(req, res, next) {
   try {
     const { page, jobsPerPage } = req.query;
-    const { success, data, totalNumJobs, statusCode } =
+    const { success, data, totalJobsCount, totalJobsCountInPage, statusCode } =
       await DAOs.jobsDAO.getJobs({
         page,
         jobsPerPage,
@@ -49,9 +49,10 @@ async function getJobs(req, res, next) {
         status: "success",
         jobs: data,
         page: parseInt(page),
-        filters: {},
         entriesPerPage: parseInt(jobsPerPage),
-        totalResults: totalNumJobs,
+        totalResultsInPage: totalJobsCountInPage,
+        totalResults: totalJobsCount,
+        filters: {},
       };
       return writeServerResponse(
         res,
@@ -119,7 +120,7 @@ async function searchJob(req, res, next) {
       }
     });
 
-    const { success, data, totalNumJobs, statusCode } =
+    const { success, data, totalJobsCount, totalJobsCountInPage, statusCode } =
       await DAOs.jobsDAO.getJobs({
         filters,
         page,
@@ -131,9 +132,10 @@ async function searchJob(req, res, next) {
         status: "success",
         jobs: data,
         page: parseInt(page),
-        filters: {},
         entriesPerPage: parseInt(jobsPerPage),
-        totalResults: totalNumJobs,
+        totalResultsInPage: totalJobsCountInPage,
+        totalResults: totalJobsCount,
+        filters: {},
       };
       return writeServerResponse(
         res,
