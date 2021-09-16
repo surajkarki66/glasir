@@ -108,7 +108,7 @@ class JobsDAO {
     };
     return query;
   }
-  static async getJobs({ filters = null, page = 0, jobsPerPage = 20 } = {}) {
+  static async getJobs({ filters = null, page = 1, jobsPerPage = 20 } = {}) {
     let queryParams = {};
 
     if (filters) {
@@ -182,57 +182,63 @@ class JobsDAO {
     ];
     if (searchText) {
       pipeline = [
-        { $search: searchText },
+        {$search: searchText},
         { $match: query },
-        {
-          $lookup: {
-            from: "employers",
-            localField: "employerId",
-            foreignField: "_id",
-            as: "employer",
+      {
+        $lookup: {
+          from: "employers",
+          localField: "employerId",
+          foreignField: "_id",
+          as: "employer",
+        },
+      },
+      {
+        $addFields: {
+          employer: { $arrayElemAt: ["$employer", 0] },
+        },
+      },
+      {
+        $addFields: {
+          "employer.rating": {
+            averageScore: { $avg: "$employer.ratings.ratingScore" },
+            rateCounts: { $size: "$employer.ratings" },
           },
         },
-        {
-          $addFields: {
-            employer: { $arrayElemAt: ["$employer", 0] },
-          },
-        },
-        {
-          $addFields: {
-            "employer.rating": {
-              averageScore: { $avg: "$employer.ratings.ratingScore" },
-              rateCounts: { $size: "$employer.ratings" },
-            },
-          },
-        },
-        {
-          $project: project,
-        },
+      },
+      {
+        $project: project,
+      },
+      { $sort: sort },
       ];
     }
     let cursor;
+    let totalJobsCount;
     try {
       cursor = await JobsDAO.#jobs.aggregate(pipeline);
+      const jobs = await cursor.toArray()
+      totalJobsCount = jobs.length
     } catch (e) {
       console.error(`Unable to issue find command, ${e}`);
       return {
         success: false,
         data: [],
-        totalNumJobs: 0,
+        totalJobsCount: 0,
+        totalJobsCountInPage: 0,
         statusCode: 404,
       };
     }
     const displayCursor = cursor
-      .skip(parseInt(page) * parseInt(jobsPerPage))
+      .skip(parseInt(page - 1) * parseInt(jobsPerPage))
       .limit(parseInt(jobsPerPage));
 
     try {
       const documents = await displayCursor.toArray();
-      const totalNumJobs = documents.length;
+      const totalJobsCountInPage = documents.length;
       return {
         success: true,
         data: documents,
-        totalNumJobs,
+        totalJobsCount,
+        totalJobsCountInPage,
         statusCode: documents.length > 0 ? 200 : 404,
       };
     } catch (e) {
