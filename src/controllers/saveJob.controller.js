@@ -105,16 +105,17 @@ async function getSavedJobs(req, res, next) {
     const { page, jobsPerPage, freelancerId } = req.query;
 
     const filter = { freelancerId: ObjectId(freelancerId) };
-    const { success, data, totalNumJobs, statusCode } =
+    const { success, data, totalJobsCount, totalJobsCountInPage, statusCode } =
       await DAOs.saveJobsDAO.getJobs({ filter, page, jobsPerPage });
     if (success) {
       const serverResponse = {
         status: "success",
-        savedJobs: data,
+        jobs: data,
         page: parseInt(page),
-        filters: {},
         entriesPerPage: parseInt(jobsPerPage),
-        totalResults: totalNumJobs,
+        totalResultsInPage: totalJobsCountInPage,
+        totalResults: totalJobsCount,
+        filters: {},
       };
       return writeServerResponse(
         res,

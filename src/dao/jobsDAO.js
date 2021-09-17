@@ -182,41 +182,41 @@ class JobsDAO {
     ];
     if (searchText) {
       pipeline = [
-        {$search: searchText},
+        { $search: searchText },
         { $match: query },
-      {
-        $lookup: {
-          from: "employers",
-          localField: "employerId",
-          foreignField: "_id",
-          as: "employer",
-        },
-      },
-      {
-        $addFields: {
-          employer: { $arrayElemAt: ["$employer", 0] },
-        },
-      },
-      {
-        $addFields: {
-          "employer.rating": {
-            averageScore: { $avg: "$employer.ratings.ratingScore" },
-            rateCounts: { $size: "$employer.ratings" },
+        {
+          $lookup: {
+            from: "employers",
+            localField: "employerId",
+            foreignField: "_id",
+            as: "employer",
           },
         },
-      },
-      {
-        $project: project,
-      },
-      { $sort: sort },
+        {
+          $addFields: {
+            employer: { $arrayElemAt: ["$employer", 0] },
+          },
+        },
+        {
+          $addFields: {
+            "employer.rating": {
+              averageScore: { $avg: "$employer.ratings.ratingScore" },
+              rateCounts: { $size: "$employer.ratings" },
+            },
+          },
+        },
+        {
+          $project: project,
+        },
+        { $sort: sort },
       ];
     }
     let cursor;
     let totalJobsCount;
     try {
       cursor = await JobsDAO.#jobs.aggregate(pipeline);
-      const jobs = await cursor.toArray()
-      totalJobsCount = jobs.length
+      const jobs = await cursor.toArray();
+      totalJobsCount = jobs.length;
     } catch (e) {
       console.error(`Unable to issue find command, ${e}`);
       return {
