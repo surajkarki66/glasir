@@ -22,7 +22,7 @@ router
       .array("additionalFiles", 10),
   )
   .post(freelancerPermissions.onlyFreelancerCanDoThisAction)
-  //.post(dataValidation(Schemas.proposalSchema.proposalCREATE, "body"))
+  .post(dataValidation(Schemas.proposalSchema.proposalCREATE, "body"))
   .post(ProposalController.createProposal);
 
 router
