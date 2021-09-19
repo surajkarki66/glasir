@@ -30,12 +30,13 @@ const schemas = {
     freelancerId: Joi.string().length(24).hex().required(),
   }),
   getFreelancerProposalsLIST: Joi.object().keys({
-    page: Joi.number().min(0).required(),
+    page: Joi.number().min(1).required(),
     proposalsPerPage: Joi.number().min(1).required(),
     freelancerId: Joi.string().length(24).hex().required(),
+    status: Joi.string().valid("initial", "active", "accepted").required(),
   }),
   getJobProposalsLIST: Joi.object().keys({
-    page: Joi.number().min(0).required(),
+    page: Joi.number().min(1).required(),
     proposalsPerPage: Joi.number().min(1).required(),
     jobId: Joi.string().length(24).hex().required(),
   }),

@@ -153,14 +153,19 @@ async function withdrawProposal(req, res, next) {
 }
 async function getFreelancerProposals(req, res, next) {
   try {
-    const { page, proposalsPerPage, freelancerId } = req.query;
-    const filter = { freelancerId: ObjectId(freelancerId) };
-    const { success, data, totalNumProposals, statusCode } =
-      await DAOs.proposalsDAO.getProposals({
-        filter,
-        page,
-        proposalsPerPage,
-      });
+    const { page, proposalsPerPage, freelancerId, status } = req.query;
+    const filter = { freelancerId: ObjectId(freelancerId), status: status };
+    const {
+      success,
+      data,
+      totalProposalsCount,
+      totalProposalsCountInPage,
+      statusCode,
+    } = await DAOs.proposalsDAO.getProposals({
+      filter,
+      page,
+      proposalsPerPage,
+    });
     if (success) {
       const serverResponse = {
         status: "success",
@@ -168,7 +173,8 @@ async function getFreelancerProposals(req, res, next) {
         page: parseInt(page),
         filters: {},
         entriesPerPage: parseInt(proposalsPerPage),
-        totalResults: totalNumProposals,
+        totalResultsInPage: totalProposalsCountInPage,
+        totalResults: totalProposalsCount,
       };
       return writeServerResponse(
         res,

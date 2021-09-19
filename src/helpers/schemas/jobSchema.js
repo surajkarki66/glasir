@@ -58,7 +58,7 @@ const schemas = {
     updatedAt: Joi.date().default(new Date()),
   }),
   jobLIST: Joi.object().keys({
-    page: Joi.number().min(0).required(),
+    page: Joi.number().min(1).required(),
     jobsPerPage: Joi.number().min(1).required(),
   }),
   jobSEARCH: Joi.object().keys({
@@ -80,7 +80,7 @@ const schemas = {
       .required(),
     projectType: Joi.string().valid("onetime", "ongoing", "").required(),
     payType: Joi.string().valid("fixed", "hourly", "").required(),
-    page: Joi.number().min(0).required(),
+    page: Joi.number().min(1).required(),
     jobsPerPage: Joi.number().min(1).required(),
   }),
   jobDETAILS: Joi.object().keys({
@@ -127,7 +127,7 @@ const schemas = {
     jobId: Joi.string().length(24).hex().required(),
   }),
   getEmployerJOBS: Joi.object().keys({
-    page: Joi.number().min(0).required(),
+    page: Joi.number().min(1).required(),
     jobsPerPage: Joi.number().min(1).required(),
     employerId: Joi.string().length(24).hex().required(),
     jobStatus: Joi.string().valid("opened", "closed"),

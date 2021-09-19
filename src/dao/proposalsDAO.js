@@ -65,7 +65,7 @@ class ProposalsDAO {
       freelancerId: ObjectId(freelancerId),
     });
   }
-  static async getProposals({ filter, page = 0, proposalsPerPage = 20 } = {}) {
+  static async getProposals({ filter, page = 1, proposalsPerPage = 20 } = {}) {
     let queryParams = {};
     if (filter) {
       queryParams = filter;
@@ -97,28 +97,33 @@ class ProposalsDAO {
       { $sort: sort },
     ];
     let cursor;
+    let totalProposalsCount;
     try {
       cursor = await ProposalsDAO.#proposals.aggregate(pipeline);
+      const proposals = await cursor.toArray();
+      totalProposalsCount = proposals.length;
     } catch (e) {
       console.error(`Unable to issue find command, ${e}`);
       return {
         success: false,
         data: [],
-        totalNumProposals: 0,
+        totalProposalsCount: 0,
+        totalProposalsCountInPage: 0,
         statusCode: 404,
       };
     }
     const displayCursor = cursor
-      .skip(parseInt(page) * parseInt(proposalsPerPage))
+      .skip(parseInt(page - 1) * parseInt(proposalsPerPage))
       .limit(parseInt(proposalsPerPage));
 
     try {
       const documents = await displayCursor.toArray();
-      const totalNumProposals = documents.length;
+      const totalProposalsCountInPage = documents.length;
       return {
         success: true,
         data: documents,
-        totalNumProposals,
+        totalProposalsCount,
+        totalProposalsCountInPage,
         statusCode: documents.length > 0 ? 200 : 404,
       };
     } catch (e) {
