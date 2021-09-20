@@ -10,6 +10,8 @@ async function createJob(req, res, next) {
     const jobInfo = {
       ...req.body,
       employerId: ObjectId(employerId),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     const { success, data, statusCode } = await DAOs.jobsDAO.createJob(jobInfo);
     if (success) {

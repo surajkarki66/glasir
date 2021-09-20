@@ -14,8 +14,6 @@ const schemas = {
       .when("bidType", { is: "hourly", then: Joi.required() }),
     coverLetter: Joi.string().max(5000).required(),
     status: Joi.string().valid("initial", "active", "accepted").required(),
-    createdAt: Joi.date().default(new Date()),
-    updatedAt: Joi.date().default(new Date()),
   }),
   isProposalEXIST: Joi.object().keys({
     jobId: Joi.string().length(24).hex().required(),

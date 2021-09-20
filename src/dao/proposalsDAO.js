@@ -174,7 +174,6 @@ class ProposalsDAO {
 
         {
           $project: {
-            "job.proposals": 0,
             "job.employer.avatar": 0,
             "job.employer.company.website": 0,
             "job.employer.company.tagline": 0,
@@ -182,7 +181,6 @@ class ProposalsDAO {
             "job.employer.location.zip": 0,
             "job.employer.userId": 0,
             "job.employer.isVerified": 0,
-            "job.employer.createdAt": 0,
             "job.employer.updatedAt": 0,
             "job.employer.ratings": 0,
             "job.employerId": 0,

@@ -85,9 +85,9 @@ router
   .post(ProposalController.changeProposalDetails);
 
 router
-  .route("/withdrawProposal")
+  .route("/withdrawProposal/:proposalId/:freelancerId")
   .delete(checkAuth)
-  .delete(dataValidation(Schemas.proposalSchema.proposalDELETE, "body"))
+  .delete(dataValidation(Schemas.proposalSchema.proposalDELETE, "params"))
   .delete(
     freelancerPermissions.onlyFreelancerCanDoThisAction,
     freelancerPermissions.onlySameFreelancerCanDoThisAction,

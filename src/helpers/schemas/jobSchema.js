@@ -54,8 +54,6 @@ const schemas = {
       .required(),
     proposals: Joi.array().items(Joi.string().length(24).hex()).default([]),
     hired: Joi.array().items(Joi.string().length(24).hex()).default([]),
-    createdAt: Joi.date().default(new Date()),
-    updatedAt: Joi.date().default(new Date()),
   }),
   jobLIST: Joi.object().keys({
     page: Joi.number().min(1).required(),
@@ -121,7 +119,6 @@ const schemas = {
         })
         .required(),
     }),
-    updatedAt: Joi.date().default(new Date()),
   }),
   jobDELETE: Joi.object().keys({
     jobId: Joi.string().length(24).hex().required(),

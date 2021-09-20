@@ -18,6 +18,8 @@ async function saveJob(req, res, next) {
     const saveJobInfo = {
       jobId: ObjectId(jobId),
       freelancerId: ObjectId(freelancerId),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     const { success, data, statusCode } = await DAOs.saveJobsDAO.createSaveJob(
       saveJobInfo,

@@ -28,6 +28,8 @@ async function createProposal(req, res, next) {
       freelancerId: ObjectId(freelancerId),
       jobId: ObjectId(jobId),
       additionalFiles: newAdditionalFiles,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     let newProposalInfo = {};
     if (bidType === "fixed") {
@@ -126,7 +128,7 @@ async function getProposalDetails(req, res, next) {
 
 async function withdrawProposal(req, res, next) {
   try {
-    const { proposalId } = req.body;
+    const { proposalId } = req.params;
     const proposal = await DAOs.proposalsDAO.getProposalByProposalId(
       proposalId,
     );
