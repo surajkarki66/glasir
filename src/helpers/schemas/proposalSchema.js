@@ -42,8 +42,6 @@ const schemas = {
     proposalId: Joi.string().length(24).hex().required(),
   }),
   changeProposalDETAILS: Joi.object().keys({
-    freelancerId: Joi.string().length(24).hex().required(),
-    proposalId: Joi.string().length(24).hex().required(),
     bidType: Joi.string().valid("fixed", "hourly").required(),
     fixedBidAmount: Joi.number()
       .greater(0)

@@ -253,7 +253,8 @@ async function getJobProposalDetails(req, res, next) {
 }
 async function changeProposalDetails(req, res, next) {
   try {
-    const { bidType, proposalId } = req.body;
+    const { bidType } = req.body;
+    const { proposalId } = req.params;
 
     let proposalDetails = {
       ...req.body,

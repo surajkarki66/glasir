@@ -74,15 +74,15 @@ router
   .get(ProposalController.getProposalDetails);
 
 router
-  .route("/changeProposalDetails")
-  .post(checkAuth)
-  .post(dataValidation(Schemas.proposalSchema.changeProposalDETAILS, "body"))
-  .post(
+  .route("/changeProposalDetails/:proposalId/:freelancerId")
+  .patch(checkAuth)
+  .patch(dataValidation(Schemas.proposalSchema.changeProposalDETAILS, "body"))
+  .patch(
     freelancerPermissions.onlyFreelancerCanDoThisAction,
     freelancerPermissions.onlySameFreelancerCanDoThisAction,
     proposalPermissions.onlyProposalOwnerCanDoThisAction,
   )
-  .post(ProposalController.changeProposalDetails);
+  .patch(ProposalController.changeProposalDetails);
 
 router
   .route("/withdrawProposal/:proposalId/:freelancerId")
