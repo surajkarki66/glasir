@@ -41,12 +41,12 @@ const schemas = {
         zip: Joi.number().integer().required(),
         province: Joi.string()
           .valid(
-            "Province No.1",
-            "Province No.2",
-            "Bagmati",
-            "Gandaki",
-            "Lumbini",
-            "Karnali",
+            "Province No. 1",
+            "Province No. 2",
+            "Bagmati Province",
+            "Gandaki Province",
+            "Lumbini Province",
+            "Karnali Province",
             "Sudurpashchim",
           )
           .required(),
@@ -154,12 +154,12 @@ const schemas = {
       .required(),
     province: Joi.string()
       .valid(
-        "Province No.1",
-        "Province No.2",
-        "Bagmati",
-        "Gandaki",
-        "Lumbini",
-        "Karnali",
+        "Province No. 1",
+        "Province No. 2",
+        "Bagmati Province",
+        "Gandaki Province",
+        "Lumbini Province",
+        "Karnali Province",
         "Sudurpashchim",
         "",
       )
@@ -194,12 +194,12 @@ const schemas = {
       zip: Joi.number().integer().required(),
       province: Joi.string()
         .valid(
-          "Province No.1",
-          "Province No.2",
-          "Bagmati",
-          "Gandaki",
-          "Lumbini",
-          "Karnali",
+          "Province No. 1",
+          "Province No. 2",
+          "Bagmati Province",
+          "Gandaki Province",
+          "Lumbini Province",
+          "Karnali Province",
           "Sudurpashchim",
         )
         .required(),

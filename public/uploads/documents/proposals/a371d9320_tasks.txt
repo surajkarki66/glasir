@@ -1,0 +1,9 @@
+1) Add watch trailer, tvshows in moviedb
+2) Add pagination in shortIt
+3) Chat app in MERN stack
+4) Desktop app (electron and gtk)
+5) https://pushpin.org/ , https://fanout.io/, pusher for realtime
+6) PERN stack app
+7) Blockchain
+8) GraphQL
+
