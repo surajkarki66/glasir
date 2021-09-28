@@ -12,7 +12,7 @@ const schemas = {
         description: Joi.string().min(5).max(200).required(),
       })
       .required(),
-    avatar: Joi.string().required(),
+    avatar: Joi.string().default(null),
     phone: Joi.object()
       .keys({
         phoneNumber: Joi.string().required(),

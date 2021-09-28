@@ -247,7 +247,7 @@ class ProposalsDAO {
   }
   static async getProposalByJobId({
     filter,
-    page = 0,
+    page = 1,
     proposalsPerPage = 20,
   } = {}) {
     const query = filter;
@@ -256,6 +256,8 @@ class ProposalsDAO {
       bidType: 1,
       hourlyBidAmount: 1,
       fixedBidAmount: 1,
+      "freelancer._id": 1,
+      "freelancer.user":1,
       "freelancer.firstName": 1,
       "freelancer.lastName": 1,
       "freelancer.title": 1,
@@ -285,33 +287,52 @@ class ProposalsDAO {
         },
       },
       {
+        $lookup: {
+          from: "users",
+          localField: "freelancer.userId",
+          foreignField: "_id",
+          as: "freelancer.user",
+        },
+      },
+      {
+        $addFields: {
+          "freelancer.user": { $arrayElemAt: ["$freelancer.user", 0] },
+        },
+      },
+      {
         $project: project,
       },
       { $sort: sort },
     ];
     let cursor;
+    let totalProposalsCount;
+   
     try {
       cursor = await ProposalsDAO.#proposals.aggregate(pipeline);
+      const proposals = await cursor.toArray();
+      totalProposalsCount = proposals.length;
     } catch (e) {
       console.error(`Unable to issue find command, ${e}`);
       return {
         success: false,
         data: [],
-        totalNumProposals: 0,
+        totalProposalsCount: 0,
+        totalProposalsCountInPage: 0,
         statusCode: 404,
       };
     }
     const displayCursor = cursor
-      .skip(parseInt(page) * parseInt(proposalsPerPage))
+      .skip(parseInt(page - 1) * parseInt(proposalsPerPage))
       .limit(parseInt(proposalsPerPage));
 
     try {
       const documents = await displayCursor.toArray();
-      const totalNumProposals = documents.length;
+      const totalProposalsCountInPage = documents.length;
       return {
         success: true,
         data: documents,
-        totalNumProposals,
+        totalProposalsCount,
+        totalProposalsCountInPage,
         statusCode: documents.length > 0 ? 200 : 404,
       };
     } catch (e) {

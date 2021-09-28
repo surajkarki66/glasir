@@ -173,7 +173,7 @@ async function getFreelancerProposals(req, res, next) {
         status: "success",
         proposals: data,
         page: parseInt(page),
-        filters: {},
+        filters: filter,
         entriesPerPage: parseInt(proposalsPerPage),
         totalResultsInPage: totalProposalsCountInPage,
         totalResults: totalProposalsCount,
@@ -194,22 +194,28 @@ async function getFreelancerProposals(req, res, next) {
 }
 async function getJobProposals(req, res, next) {
   try {
-    const { page, proposalsPerPage, jobId } = req.query;
-    const filter = { jobId: ObjectId(jobId) };
-    const { success, data, totalNumProposals, statusCode } =
-      await DAOs.proposalsDAO.getProposalByJobId({
-        filter,
-        page,
-        proposalsPerPage,
-      });
+    const { page, proposalsPerPage, jobId, proposalStatus } = req.query;
+    const filter = { jobId: ObjectId(jobId), status: proposalStatus };
+    const {
+      success,
+      data,
+      totalProposalsCount,
+      totalProposalsCountInPage,
+      statusCode,
+    } = await DAOs.proposalsDAO.getProposalByJobId({
+      filter,
+      page,
+      proposalsPerPage,
+    });
     if (success) {
       const serverResponse = {
         status: "success",
         proposals: data,
         page: parseInt(page),
-        filters: {},
         entriesPerPage: parseInt(proposalsPerPage),
-        totalResults: totalNumProposals,
+        totalResultsInPage: totalProposalsCountInPage,
+        totalResults: totalProposalsCount,
+        filters: filter,
       };
       return writeServerResponse(
         res,

@@ -9,18 +9,20 @@ import { writeServerResponse } from "../helpers/response";
 
 async function getFreelancerContracts(req, res, next) {
   try {
-    const { freelancerId, page, contractsPerPage } = req.query;
-    const filter = { freelancerId: ObjectId(freelancerId), isActive: true };
-    const { success, data, totalNumContracts, statusCode } =
+    const { freelancerId, page, contractsPerPage, isActive } = req.query;
+    const filter = { freelancerId: ObjectId(freelancerId), isActive: isActive };
+    const { success, data, totalContractsCount,
+      totalContractsCountInPage, statusCode } =
       await DAOs.contractsDAO.getContracts({ filter, page, contractsPerPage });
     if (success) {
       const serverResponse = {
         status: "success",
         contracts: data,
         page: parseInt(page),
-        filters: {},
         entriesPerPage: parseInt(contractsPerPage),
-        totalResults: totalNumContracts,
+        totalResultsInPage: totalContractsCountInPage,
+        totalResults: totalContractsCount,
+        filters: filter,
       };
       return writeServerResponse(
         res,
@@ -39,18 +41,28 @@ async function getFreelancerContracts(req, res, next) {
 
 async function getEmployerContracts(req, res, next) {
   try {
-    const { employerId, page, contractsPerPage } = req.query;
-    const filter = { employerId: ObjectId(employerId) };
-    const { success, data, totalNumContracts, statusCode } =
-      await DAOs.contractsDAO.getContracts({ filter, page, contractsPerPage });
+    const { employerId, page, contractsPerPage,isActive } = req.query;
+    const filter = { employerId: ObjectId(employerId),isActive:isActive};
+    const {
+      success,
+      data,
+      totalContractsCount,
+      totalContractsCountInPage,
+      statusCode,
+    } = await DAOs.contractsDAO.getContracts({
+      filter,
+      page,
+      contractsPerPage,
+    });
     if (success) {
       const serverResponse = {
         status: "success",
         contracts: data,
         page: parseInt(page),
-        filters: {},
         entriesPerPage: parseInt(contractsPerPage),
-        totalResults: totalNumContracts,
+        totalResultsInPage: totalContractsCountInPage,
+        totalResults: totalContractsCount,
+        filters: filter,
       };
       return writeServerResponse(
         res,

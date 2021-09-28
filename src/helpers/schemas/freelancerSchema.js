@@ -5,7 +5,7 @@ const schemas = {
     firstName: Joi.string().min(2).max(32).required(),
     lastName: Joi.string().min(2).max(32).required(),
     title: Joi.string().min(10).max(70).required(),
-    avatar: Joi.string().required(),
+    avatar: Joi.string().default(null),
     overview: Joi.string().min(10).max(5000).required(),
     hourlyRate: Joi.object()
       .keys({
@@ -131,7 +131,7 @@ const schemas = {
   }),
 
   freelancerLIST: Joi.object().keys({
-    page: Joi.number().min(0).required(),
+    page: Joi.number().min(1).required(),
     freelancersPerPage: Joi.number().min(1).required(),
   }),
 
@@ -165,7 +165,7 @@ const schemas = {
       )
       .required(),
     englishProficiency: Joi.string().allow("").required(),
-    page: Joi.number().min(0).required(),
+    page: Joi.number().min(1).required(),
     freelancersPerPage: Joi.number().min(1).required(),
   }),
 

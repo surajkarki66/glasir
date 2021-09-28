@@ -141,19 +141,25 @@ async function uploadDocument(req, res, next) {
 async function getFreelancers(req, res, next) {
   try {
     const { page, freelancersPerPage } = req.query;
-    const { success, data, totalNumFreelancers, statusCode } =
-      await DAOs.freelancersDAO.getFreelancers({
-        page,
-        freelancersPerPage,
-      });
+    const {
+      success,
+      data,
+      totalFreelancersCount,
+      totalFreelancersCountInPage,
+      statusCode,
+    } = await DAOs.freelancersDAO.getFreelancers({
+      page,
+      freelancersPerPage,
+    });
     if (success) {
       const serverResponse = {
         status: "success",
         freelancers: data,
         page: parseInt(page),
-        filters: {},
         entriesPerPage: parseInt(freelancersPerPage),
-        totalResults: totalNumFreelancers,
+        totalResultsInPage: totalFreelancersCountInPage,
+        totalResults: totalFreelancersCount,
+        filters: filter,
       };
       return writeServerResponse(
         res,
@@ -185,21 +191,27 @@ async function searchFreelancer(req, res, next) {
       }
     });
 
-    const { success, data, totalNumFreelancers, statusCode } =
-      await DAOs.freelancersDAO.getFreelancers({
-        filters,
-        page,
-        freelancersPerPage,
-      });
+    const {
+      success,
+      data,
+      totalFreelancersCount,
+      totalFreelancersCountInPage,
+      statusCode,
+    } = await DAOs.freelancersDAO.getFreelancers({
+      filters,
+      page,
+      freelancersPerPage,
+    });
 
     if (success) {
       const serverResponse = {
         status: "success",
         freelancers: data,
         page: parseInt(page),
-        filters: {},
         entriesPerPage: parseInt(freelancersPerPage),
-        totalResults: totalNumFreelancers,
+        totalResultsInPage: totalFreelancersCountInPage,
+        totalResults: totalFreelancersCount,
+        filters: filters,
       };
       return writeServerResponse(
         res,

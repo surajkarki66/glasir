@@ -248,7 +248,7 @@ class JobsDAO {
       throw e;
     }
   }
-  static async getEmployerJobs({ filter, page = 0, jobsPerPage = 20 } = {}) {
+  static async getEmployerJobs({ filter, page = 1, jobsPerPage = 20 } = {}) {
     const sort = JobsDAO.#DEFAULT_SORT;
     const projection = {
       title: 1,
@@ -259,28 +259,41 @@ class JobsDAO {
       createdAt: 1,
       updatedAt: 1,
     };
+    const pipeline = [
+      { $match: filter },
+      {
+        $project: projection,
+      },
+      { $sort: sort },
+    ];
     let cursor;
+    let totalJobsCount;
     try {
-      cursor = await JobsDAO.#jobs.find(filter).project(projection).sort(sort);
+      cursor = await JobsDAO.#jobs.aggregate(pipeline);
+      const jobs = await cursor.toArray();
+      totalJobsCount = jobs.length;
     } catch (e) {
-      logger.error(`Unable to issue find command, ${e.message}`);
+      console.error(`Unable to issue find command, ${e}`);
       return {
         success: false,
         data: [],
-        totalNumJobs: 0,
+        totalJobsCount: 0,
+        totalJobsCountInPage: 0,
         statusCode: 404,
       };
     }
     const displayCursor = cursor
-      .skip(parseInt(page) * parseInt(jobsPerPage))
+      .skip(parseInt(page - 1) * parseInt(jobsPerPage))
       .limit(parseInt(jobsPerPage));
+
     try {
       const documents = await displayCursor.toArray();
-      const totalNumJobs = documents.length;
+      const totalJobsCountInPage = documents.length;
       return {
         success: true,
         data: documents,
-        totalNumJobs,
+        totalJobsCount,
+        totalJobsCountInPage,
         statusCode: documents.length > 0 ? 200 : 404,
       };
     } catch (e) {

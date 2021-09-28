@@ -58,7 +58,7 @@ const verifyToken = async (token, secretKey) => {
   return jwt.verify(token, secretKey, (error, response) => {
     if (error) {
       if (String(error).startsWith("TokenExpiredError")) {
-        return { error: "Expired link. Signup again." };
+        return { error: "Activation link is expired !" };
       }
       if (String(error).startsWith("JsonWebTokenError")) {
         return { error: "Invalid token." };

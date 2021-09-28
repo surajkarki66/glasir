@@ -78,7 +78,7 @@ async function getEmployerJobs(req, res, next) {
       filter = { ...filter, jobStatus: jobStatus };
     }
 
-    const { success, data, totalNumJobs, statusCode } =
+    const { success, data, totalJobsCount, totalJobsCountInPage, statusCode } =
       await DAOs.jobsDAO.getEmployerJobs({
         filter,
         page,
@@ -89,9 +89,10 @@ async function getEmployerJobs(req, res, next) {
         status: "success",
         jobs: data,
         page: parseInt(page),
-        filters: {},
         entriesPerPage: parseInt(jobsPerPage),
-        totalResults: totalNumJobs,
+        totalResultsInPage: totalJobsCountInPage,
+        totalResults: totalJobsCount,
+        filters: filter,
       };
       return writeServerResponse(
         res,
@@ -250,8 +251,8 @@ async function hireFreelancer(req, res, next) {
       fixedBidAmount,
       hourlyBidAmount,
     } = req.body;
-    const workDetailsFiles = req.file;
-    if (!workDetailsFiles) {
+    const workDetailsFile = req.file;
+    if (!workDetailsFile) {
       next(ApiError.badRequest("File not found"));
       return;
     }
@@ -261,7 +262,7 @@ async function hireFreelancer(req, res, next) {
       jobId: ObjectId(jobId),
       contractTitle,
       workDetails,
-      workDetailsFiles: workDetailsFiles.filename,
+      workDetailsFile: workDetailsFile.filename,
       bidType,
       isClosed: false,
       isActive: false,

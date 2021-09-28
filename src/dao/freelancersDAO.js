@@ -8,6 +8,7 @@ class FreelancersDAO {
   static DEFAULT_PROJECT = {
     firstName: 1,
     lastName: 1,
+    overview: 1,
     expertise: 1,
     hourlyRate: 1,
     totalMoneyEarned: 1,
@@ -116,7 +117,7 @@ class FreelancersDAO {
 
   static async getFreelancers({
     filters = null,
-    page = 0,
+    page = 1,
     freelancersPerPage = 20,
   } = {}) {
     let queryParams = {};
@@ -198,28 +199,34 @@ class FreelancersDAO {
     }
 
     let cursor;
+    let totalFreelancersCount;
     try {
       cursor = await FreelancersDAO.freelancers.aggregate(pipeline);
+      const freelancers = await cursor.toArray();
+      totalFreelancersCount = freelancers.length;
     } catch (e) {
       logger.error(`Unable to issue find command, ${e}`);
       return {
         success: false,
         data: [],
-        totalNumFreelancers: 0,
+        totalFreelancersCount: 0,
+        totalFreelancersCountInPage: 0,
         statusCode: 404,
       };
     }
 
     const displayCursor = cursor
-      .skip(parseInt(page) * parseInt(freelancersPerPage))
+      .skip(parseInt(page - 1) * parseInt(freelancersPerPage))
       .limit(parseInt(freelancersPerPage));
     try {
-      const freelancersList = await displayCursor.toArray();
+      const documents = await displayCursor.toArray();
+      const totalFreelancersCountInPage = documents.length;
       return {
         success: true,
-        data: freelancersList,
-        totalNumFreelancers: freelancersList.length,
-        statusCode: freelancersList.length > 0 ? 200 : 404,
+        data: documents,
+        totalFreelancersCount,
+        totalFreelancersCountInPage,
+        statusCode: documents.length > 0 ? 200 : 404,
       };
     } catch (e) {
       logger.error(

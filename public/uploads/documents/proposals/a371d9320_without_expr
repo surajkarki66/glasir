@@ -1,0 +1,6 @@
+#!/bin/zsh
+var1=100
+var2=200
+var3=500
+var4=$[$var1 * $var2 * $var3]
+echo the result is $var4

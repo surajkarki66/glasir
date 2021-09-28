@@ -117,7 +117,7 @@ async function getSavedJobs(req, res, next) {
         entriesPerPage: parseInt(jobsPerPage),
         totalResultsInPage: totalJobsCountInPage,
         totalResults: totalJobsCount,
-        filters: {},
+        filters: filter,
       };
       return writeServerResponse(
         res,

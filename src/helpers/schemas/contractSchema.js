@@ -2,14 +2,16 @@ import Joi from "joi";
 
 const schemas = {
   getFreelancerContractsLIST: Joi.object().keys({
-    page: Joi.number().min(0).required(),
+    page: Joi.number().min(1).required(),
     contractsPerPage: Joi.number().min(1).required(),
     freelancerId: Joi.string().length(24).hex().required(),
+    isActive: Joi.boolean().required(),
   }),
   getEmployerContractsLIST: Joi.object().keys({
-    page: Joi.number().min(0).required(),
+    page: Joi.number().min(1).required(),
     contractsPerPage: Joi.number().min(1).required(),
     employerId: Joi.string().length(24).hex().required(),
+    isActive: Joi.boolean().required(),
   }),
   getContractDETAILS: Joi.object().keys({
     contractId: Joi.string().length(24).hex().required(),

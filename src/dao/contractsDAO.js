@@ -6,6 +6,7 @@ import logger from "../configs/logger";
 class ContractsDAO {
   static #contracts;
   static #DEFAULT_PROJECTS = {
+    "job._id": 1,
     "job.title": 1,
     "job.description": 1,
     workDetails: 1,
@@ -74,7 +75,7 @@ class ContractsDAO {
       employerId: ObjectId(employerId),
     });
   }
-  static async getContracts({ filter, page = 0, contractsPerPage = 20 } = {}) {
+  static async getContracts({ filter, page = 1, contractsPerPage = 20 } = {}) {
     let queryParams = {};
     if (filter) {
       queryParams = filter;
@@ -106,28 +107,33 @@ class ContractsDAO {
       { $sort: sort },
     ];
     let cursor;
+    let totalContractsCount;
     try {
       cursor = await ContractsDAO.#contracts.aggregate(pipeline);
+      const contracts = await cursor.toArray();
+      totalContractsCount = contracts.length;
     } catch (e) {
       console.error(`Unable to issue find command, ${e}`);
       return {
         success: false,
         data: [],
-        totalNumContracts: 0,
+        totalContractsCount: 0,
+        totalContractsCountInPage: 0,
         statusCode: 404,
       };
     }
     const displayCursor = cursor
-      .skip(parseInt(page) * parseInt(contractsPerPage))
+      .skip(parseInt(page - 1) * parseInt(contractsPerPage))
       .limit(parseInt(contractsPerPage));
 
     try {
       const documents = await displayCursor.toArray();
-      const totalNumContracts = documents.length;
+      const totalContractsCountInPage = documents.length;
       return {
         success: true,
         data: documents,
-        totalNumContracts,
+        totalContractsCount,
+        totalContractsCountInPage,
         statusCode: documents.length > 0 ? 200 : 404,
       };
     } catch (e) {

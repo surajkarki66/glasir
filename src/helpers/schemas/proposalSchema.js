@@ -37,6 +37,9 @@ const schemas = {
     page: Joi.number().min(1).required(),
     proposalsPerPage: Joi.number().min(1).required(),
     jobId: Joi.string().length(24).hex().required(),
+    proposalStatus: Joi.string()
+      .valid("initial", "active", "accepted", "")
+      .required(),
   }),
   getJobProposalDETAILS: Joi.object().keys({
     proposalId: Joi.string().length(24).hex().required(),
