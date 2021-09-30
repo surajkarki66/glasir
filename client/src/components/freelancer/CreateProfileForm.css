@@ -1,0 +1,15 @@
+.intl-tel-input.allow-dropdown input,
+.intl-tel-input.allow-dropdown input[type="text"],
+.intl-tel-input.allow-dropdown input[type="tel"] {
+  height: 2.5rem;
+  width: 29.5rem;
+  border-radius: 5px;
+  border: 1px solid rgb(182, 181, 181);
+  margin-top: 1.6rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.intl-tel-input.allow-dropdown .selected-flag {
+  width: 46px;
+  margin-top: 3px;
+}
