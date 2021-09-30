@@ -1,6 +1,5 @@
 # Glasir
-This is our first academic project. Actually, `Glasir` is freelancing website targeted for Nepalese people.
-This repo contain all the endpoints of REST APIs required for `Glasir` website frontend.
+`Glasir` is a Nepali freelancing platform. Here you can find jobs and also applied for job as freelancer. As employer you can also hire freelancer for your jobs. It is built in MERN stack.
 
 ## To start the node development server.
 First create .env file with name `.env`. Then copy the following credentials
@@ -30,6 +29,21 @@ SERVICE_FEE_RATE=0.1
 
 ```
 
- - yarn install
- - yarn run dev
+```bash
+  $ yarn install
+  $ yarn run dev
+```
+
  
+ 
+## To start client side
+
+```bash
+  $ cd client
+  $ yarn install
+  $ yarn run dev
+```
+
+
+
+
