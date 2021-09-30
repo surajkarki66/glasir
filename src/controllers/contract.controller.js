@@ -11,9 +11,17 @@ async function getFreelancerContracts(req, res, next) {
   try {
     const { freelancerId, page, contractsPerPage, isActive } = req.query;
     const filter = { freelancerId: ObjectId(freelancerId), isActive: isActive };
-    const { success, data, totalContractsCount,
-      totalContractsCountInPage, statusCode } =
-      await DAOs.contractsDAO.getContracts({ filter, page, contractsPerPage });
+    const {
+      success,
+      data,
+      totalContractsCount,
+      totalContractsCountInPage,
+      statusCode,
+    } = await DAOs.contractsDAO.getContracts({
+      filter,
+      page,
+      contractsPerPage,
+    });
     if (success) {
       const serverResponse = {
         status: "success",
@@ -41,8 +49,8 @@ async function getFreelancerContracts(req, res, next) {
 
 async function getEmployerContracts(req, res, next) {
   try {
-    const { employerId, page, contractsPerPage,isActive } = req.query;
-    const filter = { employerId: ObjectId(employerId),isActive:isActive};
+    const { employerId, page, contractsPerPage, isActive } = req.query;
+    const filter = { employerId: ObjectId(employerId), isActive: isActive };
     const {
       success,
       data,
@@ -107,7 +115,7 @@ async function getContractDetails(req, res, next) {
 }
 
 async function activateContract(req, res, next) {
-  try {
+   try {
     const { contractId, freelancerId, employerId, token, fixedBidAmount } =
       req.body;
     const { isActive, isClosed } =

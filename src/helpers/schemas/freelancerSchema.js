@@ -35,20 +35,20 @@ const schemas = {
     ratings: Joi.array().default([]),
     location: Joi.object()
       .keys({
-        country: Joi.string().valid("Nepal").required(),
+        country: Joi.string().required(),
         street: Joi.string().min(5).max(70).required(),
         city: Joi.string().min(5).max(70).required(),
         zip: Joi.number().integer().required(),
         province: Joi.string()
-          .valid(
-            "Province No. 1",
-            "Province No. 2",
-            "Bagmati Province",
-            "Gandaki Province",
-            "Lumbini Province",
-            "Karnali Province",
-            "Sudurpashchim",
-          )
+         // .valid(
+         //  "Province No. 1",
+         //   "Province No. 2",
+         //   "Bagmati Province",
+         //   "Gandaki Province",
+         //   "Lumbini Province",
+         //   "Karnali Province",
+         //   "Sudurpashchim",
+         // )
           .required(),
       })
       .required(),
