@@ -100,7 +100,7 @@ const SavedJob = ({ job, setIsUnsave }) => {
                   position: "relative",
                 }}
               >
-                Posted <strong>{moment(createdAt).fromNow()}</strong>
+                Posted <strong>{moment(new Date(createdAt)).fromNow()}</strong>
               </Typography>
             </div>
           </div>

@@ -38,7 +38,7 @@ const FreelancerProposal = ({ proposal }) => {
       </div>
       <div>
         <Typography variant="body1">
-          <strong>{moment(createdAt).fromNow()}</strong>
+          <strong>{moment(new Date(createdAt)).fromNow()}</strong>
         </Typography>
       </div>
     </div>

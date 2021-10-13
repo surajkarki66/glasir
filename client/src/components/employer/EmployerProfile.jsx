@@ -187,7 +187,7 @@ const EmployerProfile = ({ employer, handleAvatarChange, btnLoading }) => {
             </div>
             <div>
               <Typography variant="body2">
-                Member since <b>{moment(createdAt).format("ll")}</b>
+                Member since <b>{moment(new Date(createdAt)).format("ll")}</b>
               </Typography>
             </div>
           </div>

@@ -239,8 +239,9 @@ const FreelancerDetailsPage = () => {
                       {datesAttended && (
                         <>
                           {" "}
-                          {moment(datesAttended.from).format("ll")} -{" "}
-                          {moment(datesAttended.to).format("ll")}{" "}
+                          {moment(new Date(datesAttended.from)).format(
+                            "ll"
+                          )} - {moment(new Date(datesAttended.to)).format("ll")}{" "}
                         </>
                       )}{" "}
                     </b>
@@ -273,7 +274,7 @@ const FreelancerDetailsPage = () => {
               </div>
               <div>
                 <Typography variant="body1">
-                  Member since <b>{moment(createdAt).format("ll")}</b>
+                  Member since <b>{moment(new Date(createdAt)).format("ll")}</b>
                 </Typography>
               </div>
             </div>
@@ -319,8 +320,8 @@ const FreelancerDetailsPage = () => {
                           <Typography variant="body1">{e.title}</Typography>
                           <Typography variant="subtitle2">
                             <b>
-                              ( {moment(e.period.from).format("ll")} -{" "}
-                              {moment(e.period.to).format("ll")} )
+                              ( {moment(new Date(e.period.from)).format("ll")} -{" "}
+                              {moment(new Date(e.period.to)).format("ll")} )
                             </b>
                           </Typography>
                         </>

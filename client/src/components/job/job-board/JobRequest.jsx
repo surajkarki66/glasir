@@ -119,7 +119,7 @@ const JobRequest = ({ job }) => {
           <div className={classes.lowerRight}>
             <div className={classes.spentContainer}>
               <Typography variant="body1">
-                Posted <strong>{moment(createdAt).fromNow()}</strong>
+                Posted <strong>{moment(new Date(createdAt)).fromNow()}</strong>
               </Typography>
             </div>
           </div>

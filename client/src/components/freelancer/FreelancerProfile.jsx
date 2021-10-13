@@ -231,8 +231,9 @@ const FreelancerProfile = ({
                       {datesAttended && (
                         <>
                           {" "}
-                          {moment(datesAttended.from).format("ll")} -{" "}
-                          {moment(datesAttended.to).format("ll")}{" "}
+                          {moment(new Date(datesAttended.from)).format(
+                            "ll"
+                          )} - {moment(new Date(datesAttended.to)).format("ll")}{" "}
                         </>
                       )}{" "}
                     </b>
@@ -312,8 +313,8 @@ const FreelancerProfile = ({
                           <Typography variant="body1">{e.title}</Typography>
                           <Typography variant="subtitle2">
                             <b>
-                              ( {moment(e.period.from).format("ll")} -{" "}
-                              {moment(e.period.to).format("ll")} )
+                              ( {moment(new Date(e.period.from)).format("ll")} -{" "}
+                              {moment(new Date(e.period.to)).format("ll")} )
                             </b>
                           </Typography>
                         </>

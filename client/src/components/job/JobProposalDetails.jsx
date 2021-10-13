@@ -239,7 +239,7 @@ const JobProposalDetails = ({ details, jobId }) => {
             </div>
             <div>
               <Typography variant="body1">
-                Member since <b>{moment(createdAt).format("ll")}</b>
+                Member since <b>{moment(new Date(createdAt)).format("ll")}</b>
               </Typography>
             </div>
           </div>

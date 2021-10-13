@@ -128,7 +128,7 @@ const JobRequest = () => {
                 variant="body1"
                 style={{ top: "12px", position: "relative" }}
               >
-                Posted <strong>{moment(createdAt).fromNow()}</strong>
+                Posted <strong>{moment(new Date(createdAt)).fromNow()}</strong>
               </Typography>
             </div>
             <div>

@@ -9,7 +9,8 @@
 	"private": false,
 	"scripts": {
 		"pre-run": "mkdir -p ./logs",
-		"dev": "yarn run pre-run && nodemon --exec babel-node src/index.js"
+		"dev": "yarn run pre-run && nodemon --exec babel-node src/index.js",
+		"start": "yarn run pre-run && babel-node src/index.js"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.12.3",

@@ -1,0 +1,8 @@
+<---------------- For electron.js ----------------->
+1)  
+
+<---------------- For Blockchain ----------------->
+1) Blockchain A-Z™: Learn How To Build Your First Blockchain
+2) Complete DApp - Solidity & React - Blockchain Development
+3) Ethereum and Solidity: The Complete Developer's Guide
+
