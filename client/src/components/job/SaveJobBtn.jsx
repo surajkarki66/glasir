@@ -5,11 +5,11 @@ import Cookie from "js-cookie";
 import React, { useEffect, useState, useCallback } from "react";
 import Axios from "../../axios-url";
 import { useSelector, useDispatch } from "react-redux";
-import { withRouter, Redirect } from "react-router";
+import { withRouter } from "react-router";
 
 import { checkProfile } from "../../actions/checkProfile";
 
-const SaveJobBtn = ({ jobId, btn = false }) => {
+const SaveJobBtn = ({ jobId, btn = false, getSavedJobs }) => {
   const profile = useSelector((state) => state.checkProfileState);
   const dispatch = useDispatch();
   const [isSave, setIsSave] = useState(false);
@@ -99,8 +99,8 @@ const SaveJobBtn = ({ jobId, btn = false }) => {
     }
   };
   if (success) {
-    window.location.reload();
-    return <Redirect to="/find-work/jobs/saved" />;
+    const { _id } = profile.data.data;
+    getSavedJobs(_id);
   }
   return (
     <React.Fragment>
