@@ -10,7 +10,6 @@ import AppPagination from "../../components/pagination/AppPagination";
 import SavedJob from "../../components/job/SavedJob";
 
 const SavedJobPage = () => {
-  /* TODO: When job is unsaved then the component should be re-render */
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
