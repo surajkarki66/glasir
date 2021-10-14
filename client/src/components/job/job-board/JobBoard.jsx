@@ -1,5 +1,3 @@
-// TODO: Add filtering of jobs
-
 import Cookie from "js-cookie";
 import Axios from "../../../axios-url";
 import React, { useEffect, useState, useCallback } from "react";
@@ -24,7 +22,9 @@ const JobBoard = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [error, setError] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState(
+    localStorage.getItem("service") ? localStorage.getItem("service") : ""
+  );
   const [expertiseLevel, setExpertiseLevel] = useState("");
   const [projectType, setProjectType] = useState("");
   const [payType, setPayType] = useState("");
@@ -95,50 +95,40 @@ const JobBoard = () => {
   const getJobs = useCallback(
     async (text, category, expertiseLevel, projectType, payType) => {
       setLoading(true);
-      if (category) {
-        try {
-          const res = await Axios.get(
-            `/api/v1/job/search?text=${text}&page=${page}&jobsPerPage=${jobsPerPage}&category=${category}&expertiseLevel=${expertiseLevel}&projectType=${projectType}&payType=${payType}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          const { jobs, totalResults, entriesPerPage } = res.data;
-          setJobs(jobs);
-          setError("");
-          setNoOfPages(Math.ceil(totalResults / jobsPerPage));
-          setJobsPerPage(entriesPerPage);
-          setLoading(false);
-        } catch (error) {
-          if (error.response.statusText === "Not Found") {
-            setError("No jobs found");
-            setJobs([]);
-            setNoOfPages(0);
-            setLoading(false);
-            return;
+
+      try {
+        const res = await Axios.get(
+          `/api/v1/job/search?text=${text}&page=${page}&jobsPerPage=${jobsPerPage}&category=${category}&expertiseLevel=${expertiseLevel}&projectType=${projectType}&payType=${payType}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
           }
-          setError(error.response.data.data.error);
+        );
+        const { jobs, totalResults, entriesPerPage } = res.data;
+        setJobs(jobs);
+        setError("");
+        setNoOfPages(Math.ceil(totalResults / jobsPerPage));
+        setJobsPerPage(entriesPerPage);
+        setLoading(false);
+      } catch (error) {
+        if (error.response.statusText === "Not Found") {
+          setError("No jobs found");
+          setJobs([]);
+          setNoOfPages(0);
           setLoading(false);
+          return;
         }
+        setError(error.response.data.data.error);
+        setLoading(false);
       }
     },
     [jobsPerPage, page, token]
   );
 
-  const updateSearchTerm = (
-    newSearchTerm,
-    category,
-    expertiseLevel,
-    projectType,
-    payType
-  ) => {
+  const updateSearchTerm = (newSearchTerm) => {
     setSearchTerm(newSearchTerm);
     getJobs(newSearchTerm, category, expertiseLevel, projectType, payType);
   };
   useEffect(() => {
-    if (localStorage.getItem("service")) {
-      setCategory(localStorage.getItem("service"));
-    }
     if (data) {
       if (data.data) {
         getJobs(searchTerm, category, expertiseLevel, projectType, payType);
