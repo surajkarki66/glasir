@@ -13,7 +13,6 @@ const SavedJobPage = () => {
   /* TODO: When job is unsaved then the component should be re-render */
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isUnsave, setIsUnsave] = useState(false);
   const [page, setPage] = useState(1);
   const [error, setError] = useState("");
   const [jobsPerPage, setJobsPerPage] = useState(10);
@@ -60,7 +59,7 @@ const SavedJobPage = () => {
       const { _id } = data.data;
       getSavedJobs(_id);
     }
-  }, [data, getSavedJobs, isUnsave]);
+  }, [data, getSavedJobs]);
 
   const handleChange = (e, p) => {
     setPage(p);
@@ -83,7 +82,7 @@ const SavedJobPage = () => {
               )}
 
               {_DATA.currentData().map((job) => (
-                <SavedJob job={job} key={job._id} setIsUnsave={setIsUnsave} />
+                <SavedJob job={job} key={job._id} getSavedJobs={getSavedJobs} />
               ))}
             </div>
             <div style={{ position: "relative", left: 0, right: 0, bottom: 0 }}>

@@ -7,7 +7,7 @@ import { jobRequestStyles } from "./styles";
 
 import SaveJobBtn from "./SaveJobBtn";
 
-const SavedJob = ({ job, setIsUnsave }) => {
+const SavedJob = ({ job, getSavedJobs }) => {
   const classes = jobRequestStyles();
   const { title, description, employer, pay, createdAt, _id, jobStatus } =
     job.job;
@@ -52,7 +52,7 @@ const SavedJob = ({ job, setIsUnsave }) => {
           </div>
 
           <div className={classes.iconsContainer}>
-            <SaveJobBtn jobId={_id} />
+            <SaveJobBtn jobId={_id} getSavedJobs={getSavedJobs} />
           </div>
         </div>
       </div>
