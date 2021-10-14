@@ -52,6 +52,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: "45%",
     marginTop: "13%",
   },
+  pagination: { position: "relative", left: 0, right: 0, bottom: 0 },
 }));
 
 const EmployerHome = () => {
@@ -162,12 +163,7 @@ const EmployerHome = () => {
     [freelancersPerPage, page, token]
   );
 
-  const updateSearchTerm = (
-    newSearchTerm,
-    service,
-    expertiseLevel,
-    englishProficiency
-  ) => {
+  const updateSearchTerm = (newSearchTerm) => {
     setSearchTerm(newSearchTerm);
     getFreelancers(newSearchTerm, service, expertiseLevel, englishProficiency);
   };
