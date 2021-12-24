@@ -12,9 +12,9 @@ MONGO_USERNAME=<mongodb database username>
 MONGO_PASSWORD=<mongodb database password>
 MONGO_HOST=<mongodb cluster host name>
 
-ACCESS_TOKEN_SECRET=laskdjflsdjf
-ACTIVATION_TOKEN_SECRET=jflsdkjufasdhfl
-FORGOT_TOKEN_SECRET=flkjorgetlk
+ACCESS_TOKEN_SECRET=<make your own token>
+ACTIVATION_TOKEN_SECRET=<make your own token>
+FORGOT_TOKEN_SECRET=<make your own token>
 
 EMAIL = <glasir-email>
 EMAIL_PASS = <glasir-password>
