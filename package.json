@@ -36,7 +36,7 @@
 		"joi": "^17.2.1",
 		"jsonwebtoken": "^8.5.1",
 		"libphonenumber-js": "^1.9.4",
-		"log4js": "^6.3.0",
+		"log4js": "^6.4.0",
 		"messagebird": "^3.5.0",
 		"moment": "^2.29.1",
 		"mongodb": "^3.6.2",
